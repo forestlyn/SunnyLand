@@ -3,12 +3,11 @@
 #include <SDL3_image/SDL_image.h>
 #include <spdlog/spdlog.h>
 #include "time.h"
+#include "../resource/resource_manager.h"
+
 namespace engine::core
 {
-    GameApp::GameApp() : is_running_(false)
-    {
-        time_ = std::make_unique<Time>();
-    }
+    GameApp::GameApp() = default;
 
     GameApp::~GameApp()
     {
@@ -22,6 +21,32 @@ namespace engine::core
     bool GameApp::Init()
     {
         spdlog::info("Initializing GameApp");
+
+        if (!initSDL())
+        {
+            spdlog::error("Failed to initialize SDL");
+            return false;
+        }
+        if (!initTime())
+        {
+            spdlog::error("Failed to initialize Time");
+            return false;
+        }
+        if (!initResourceManager())
+        {
+            spdlog::error("Failed to initialize ResourceManager");
+            return false;
+        }
+
+        testResourceManager();
+
+        is_running_ = true;
+        spdlog::trace("GameApp initialized successfully");
+        return true;
+    }
+
+    bool GameApp::initSDL()
+    {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
         {
             spdlog::error("SDL could not initialize! SDL_Error: {}", SDL_GetError());
@@ -42,11 +67,40 @@ namespace engine::core
             return false;
         }
 
-        is_running_ = true;
         return true;
     }
 
-    void GameApp::Run()
+    bool GameApp::initTime()
+    {
+        try
+        {
+            time_ = std::make_unique<engine::core::Time>();
+            spdlog::trace("Time initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create Time instance: {}", e.what());
+            return false;
+        }
+    }
+
+    bool GameApp::initResourceManager()
+    {
+        try
+        {
+            resource_manager_ = std::make_unique<engine::resource::ResourceManager>(renderer_);
+            spdlog::trace("ResourceManager initialized successfully");
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create ResourceManager instance: {}", e.what());
+            return false;
+        }
+        return true;
+    }
+
+    void GameApp::run()
     {
         if (!Init())
         {
@@ -112,5 +166,16 @@ namespace engine::core
 
         SDL_Quit();
         is_running_ = false;
+    }
+
+    void GameApp::testResourceManager()
+    {
+        resource_manager_->loadTexture("assets/textures/Actors/eagle-attack.png");
+        resource_manager_->loadFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
+        resource_manager_->loadSound("assets/audio/button_click.wav");
+
+        resource_manager_->unloadTexture("assets/textures/Actors/eagle-attack.png");
+        resource_manager_->unloadFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
+        resource_manager_->unloadSound("assets/audio/button_click.wav");
     }
 } // namespace engine::core

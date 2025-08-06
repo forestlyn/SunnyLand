@@ -3,6 +3,10 @@
 
 struct SDL_Window;
 struct SDL_Renderer;
+namespace engine::resource
+{
+    class ResourceManager;
+}
 
 namespace engine::core
 {
@@ -23,7 +27,7 @@ namespace engine::core
 
         [[nodiscard]] bool IsRunning() const { return is_running_; }
 
-        void Run();
+        void run();
 
     private:
         SDL_Window *window_ = nullptr;
@@ -31,11 +35,18 @@ namespace engine::core
         bool is_running_ = false;
 
         std::unique_ptr<engine::core::Time> time_;
+        std::unique_ptr<engine::resource::ResourceManager> resource_manager_;
 
         [[nodiscard]] bool Init();
         void handleEvents();
         void update(float deltaTime);
         void render();
         void close();
+
+        bool initSDL();
+        bool initTime();
+        bool initResourceManager();
+
+        void testResourceManager();
     };
 } // namespace engine::core
