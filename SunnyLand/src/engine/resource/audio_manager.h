@@ -48,12 +48,12 @@ namespace engine::resource
 
     private:
         Mix_Chunk *loadSound(const std::string &filePath);
-        Mix_Chunk *getSound(const std::string &filePath) const;
+        Mix_Chunk *getSound(const std::string &filePath);
         void unloadSound(const std::string &filePath);
         void clearSounds();
 
         Mix_Music *loadMusic(const std::string &filePath);
-        Mix_Music *getMusic(const std::string &filePath) const;
+        Mix_Music *getMusic(const std::string &filePath);
         void unloadMusic(const std::string &filePath);
         void clearMusics();
 

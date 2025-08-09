@@ -34,7 +34,7 @@ namespace engine::resource
         return textureManager_->loadTexture(filePath);
     }
 
-    SDL_Texture *ResourceManager::getTexture(const std::string &filePath) const
+    SDL_Texture *ResourceManager::getTexture(const std::string &filePath)
     {
         return textureManager_->getTexture(filePath);
     }
@@ -59,7 +59,7 @@ namespace engine::resource
         return audioManager_->loadSound(filePath);
     }
 
-    Mix_Chunk *ResourceManager::getSound(const std::string &filePath) const
+    Mix_Chunk *ResourceManager::getSound(const std::string &filePath)
     {
         return audioManager_->getSound(filePath);
     }
@@ -79,7 +79,7 @@ namespace engine::resource
         return audioManager_->loadMusic(filePath);
     }
 
-    Mix_Music *ResourceManager::getMusic(const std::string &filePath) const
+    Mix_Music *ResourceManager::getMusic(const std::string &filePath)
     {
         return audioManager_->getMusic(filePath);
     }
@@ -104,7 +104,7 @@ namespace engine::resource
         return fontManager_->loadFont(filePath, size);
     }
 
-    TTF_Font *ResourceManager::getFont(const std::string &filePath, int size) const
+    TTF_Font *ResourceManager::getFont(const std::string &filePath, int size)
     {
         return fontManager_->getFont(filePath, size);
     }

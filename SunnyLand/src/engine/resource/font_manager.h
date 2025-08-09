@@ -45,7 +45,7 @@ namespace engine::resource
 
     private:
         TTF_Font *loadFont(const std::string &filePath, int size);
-        TTF_Font *getFont(const std::string &filePath, int size) const;
+        TTF_Font *getFont(const std::string &filePath, int size);
         void unloadFont(const std::string &filePath, int size);
         void clearFonts();
     };

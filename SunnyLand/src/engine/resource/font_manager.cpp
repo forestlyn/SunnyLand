@@ -42,7 +42,7 @@ namespace engine::resource
         return font;
     }
 
-    TTF_Font *FontManager::getFont(const std::string &filePath, int size) const
+    TTF_Font *FontManager::getFont(const std::string &filePath, int size)
     {
         if (filePath.empty() || size <= 0)
         {
@@ -60,7 +60,7 @@ namespace engine::resource
         else
         {
             spdlog::warn("Font not found: {} at size {}", filePath, size);
-            return nullptr;
+            return loadFont(filePath, size);
         }
     }
 

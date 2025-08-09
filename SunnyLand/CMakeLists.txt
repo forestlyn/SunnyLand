@@ -33,6 +33,8 @@ add_executable(${TARGET}
                 src/main.cpp
                 src/engine/core/game_app.cpp
                 src/engine/core/time.cpp
+                src/engine/render/renderer.cpp
+                src/engine/render/camera.cpp
                 src/engine/resource/resource_manager.cpp
                 src/engine/resource/audio_manager.cpp
                 src/engine/resource/texture_manager.cpp

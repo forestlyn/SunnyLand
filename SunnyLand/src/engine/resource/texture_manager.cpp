@@ -42,18 +42,18 @@ namespace engine::resource
         return texture;
     }
 
-    SDL_Texture *TextureManager::getTexture(const std::string &filePath) const
+    SDL_Texture *TextureManager::getTexture(const std::string &filePath)
     {
         auto it = mTextureCache.find(filePath);
         if (it != mTextureCache.end())
         {
-            spdlog::debug("Retrieving texture: {}", filePath);
+            spdlog::trace("Retrieving texture: {}", filePath);
             return it->second.get();
         }
         else
         {
-            spdlog::warn("Texture not found: {}", filePath);
-            return nullptr;
+            spdlog::warn("Texture not found in cache: {}", filePath);
+            return loadTexture(filePath);
         }
     }
 

@@ -55,7 +55,7 @@ namespace engine::resource
         return chunk;
     }
 
-    Mix_Chunk *AudioManager::getSound(const std::string &filePath) const
+    Mix_Chunk *AudioManager::getSound(const std::string &filePath)
     {
         auto it = mAudioChunks.find(filePath);
         if (it != mAudioChunks.end())
@@ -66,7 +66,7 @@ namespace engine::resource
         else
         {
             spdlog::warn("Sound not found: {}", filePath);
-            return nullptr;
+            return loadSound(filePath);
         }
     }
 
@@ -114,7 +114,7 @@ namespace engine::resource
         return music;
     }
 
-    Mix_Music *AudioManager::getMusic(const std::string &filePath) const
+    Mix_Music *AudioManager::getMusic(const std::string &filePath)
     {
         auto it = mMusicTracks.find(filePath);
         if (it != mMusicTracks.end())
@@ -125,7 +125,7 @@ namespace engine::resource
         else
         {
             spdlog::warn("Music not found: {}", filePath);
-            return nullptr;
+            return loadMusic(filePath);
         }
     }
 

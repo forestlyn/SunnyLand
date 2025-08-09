@@ -38,7 +38,7 @@ namespace engine::resource
 
     private:
         SDL_Texture *loadTexture(const std::string &filePath);
-        SDL_Texture *getTexture(const std::string &filePath) const;
+        SDL_Texture *getTexture(const std::string &filePath);
         glm::vec2 getTextureSize(const std::string &filePath) const;
         void unloadTexture(const std::string &filePath);
         void clearTextures();

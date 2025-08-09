@@ -4,6 +4,8 @@
 #include <spdlog/spdlog.h>
 #include "time.h"
 #include "../resource/resource_manager.h"
+#include "../render/renderer.h"
+#include "../render/camera.h"
 
 namespace engine::core
 {
@@ -38,6 +40,18 @@ namespace engine::core
             return false;
         }
 
+        if (!initCamera())
+        {
+            spdlog::error("Failed to initialize Camera");
+            return false;
+        }
+
+        if (!initRenderer())
+        {
+            spdlog::error("Failed to initialize Renderer");
+            return false;
+        }
+
         testResourceManager();
 
         is_running_ = true;
@@ -60,8 +74,8 @@ namespace engine::core
             return false;
         }
 
-        renderer_ = SDL_CreateRenderer(window_, nullptr);
-        if (!renderer_)
+        sdl_renderer_ = SDL_CreateRenderer(window_, nullptr);
+        if (!sdl_renderer_)
         {
             spdlog::error("Renderer could not be created! SDL_Error: {}", SDL_GetError());
             return false;
@@ -89,7 +103,7 @@ namespace engine::core
     {
         try
         {
-            resource_manager_ = std::make_unique<engine::resource::ResourceManager>(renderer_);
+            resource_manager_ = std::make_unique<engine::resource::ResourceManager>(sdl_renderer_);
             spdlog::trace("ResourceManager initialized successfully");
         }
         catch (const std::exception &e)
@@ -98,6 +112,36 @@ namespace engine::core
             return false;
         }
         return true;
+    }
+
+    bool GameApp::initCamera()
+    {
+        try
+        {
+            camera_ = std::make_unique<engine::render::Camera>(glm::vec2(1280.0f, 720.0f));
+            spdlog::trace("Camera initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create Camera instance: {}", e.what());
+            return false;
+        }
+    }
+
+    bool GameApp::initRenderer()
+    {
+        try
+        {
+            renderer_ = std::make_unique<engine::render::Renderer>(resource_manager_.get(), sdl_renderer_);
+            spdlog::trace("Renderer initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create Renderer instance: {}", e.what());
+            return false;
+        }
     }
 
     void GameApp::run()
@@ -137,25 +181,25 @@ namespace engine::core
     void GameApp::update(float deltaTime)
     {
         // update game logic here
+        testCamera();
     }
 
     void GameApp::render()
     {
-        SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
-        SDL_RenderClear(renderer_);
+        renderer_->clearScreen();
 
         // Render game objects here
-
-        SDL_RenderPresent(renderer_);
+        testRenderer();
+        renderer_->present();
     }
 
     void GameApp::close()
     {
         spdlog::info("Closing GameApp");
-        if (renderer_)
+        if (sdl_renderer_)
         {
-            SDL_DestroyRenderer(renderer_);
-            renderer_ = nullptr;
+            SDL_DestroyRenderer(sdl_renderer_);
+            sdl_renderer_ = nullptr;
         }
 
         if (window_)
@@ -178,4 +222,33 @@ namespace engine::core
         resource_manager_->unloadFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
         resource_manager_->unloadSound("assets/audio/button_click.wav");
     }
+
+    void GameApp::testRenderer()
+    {
+        engine::render::Sprite sprite_world("assets/textures/Actors/frog.png");
+        engine::render::Sprite sprite_ui("assets/textures/UI/buttons/Start1.png");
+        engine::render::Sprite sprite_parallax("assets/textures/Layers/back.png");
+
+        static float rotation = 0.0f;
+        rotation += 0.1f;
+
+        // 注意渲染顺序
+        renderer_->drawParallax(*camera_, sprite_parallax, glm::vec2(100, 100), glm::vec2(0.5f, 0.5f), glm::bvec2(true, false));
+        renderer_->drawSprite(*camera_, sprite_world, glm::vec2(200, 200), glm::vec2(1.0f, 1.0f), rotation);
+        renderer_->drawUISprite(sprite_ui, glm::vec2(100, 100));
+    }
+
+    void GameApp::testCamera()
+    {
+        auto key_state = SDL_GetKeyboardState(nullptr);
+        if (key_state[SDL_SCANCODE_UP])
+            camera_->move(glm::vec2(0, -1));
+        if (key_state[SDL_SCANCODE_DOWN])
+            camera_->move(glm::vec2(0, 1));
+        if (key_state[SDL_SCANCODE_LEFT])
+            camera_->move(glm::vec2(-1, 0));
+        if (key_state[SDL_SCANCODE_RIGHT])
+            camera_->move(glm::vec2(1, 0));
+    }
+
 } // namespace engine::core

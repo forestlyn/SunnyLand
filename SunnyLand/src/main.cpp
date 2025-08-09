@@ -2,7 +2,7 @@
 #include <spdlog/spdlog.h>
 int main(int, char **)
 {
-    spdlog::set_level(spdlog::level::trace);
+    spdlog::set_level(spdlog::level::warn);
     engine::core::GameApp app;
     app.run();
     return 0;

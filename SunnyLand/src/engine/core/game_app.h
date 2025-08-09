@@ -8,6 +8,12 @@ namespace engine::resource
     class ResourceManager;
 }
 
+namespace engine::render
+{
+    class Camera;
+    class Renderer;
+}
+
 namespace engine::core
 {
     class Time;
@@ -31,11 +37,13 @@ namespace engine::core
 
     private:
         SDL_Window *window_ = nullptr;
-        SDL_Renderer *renderer_ = nullptr;
+        SDL_Renderer *sdl_renderer_ = nullptr;
         bool is_running_ = false;
 
         std::unique_ptr<engine::core::Time> time_;
         std::unique_ptr<engine::resource::ResourceManager> resource_manager_;
+        std::unique_ptr<engine::render::Camera> camera_;
+        std::unique_ptr<engine::render::Renderer> renderer_;
 
         [[nodiscard]] bool Init();
         void handleEvents();
@@ -43,10 +51,14 @@ namespace engine::core
         void render();
         void close();
 
-        bool initSDL();
-        bool initTime();
-        bool initResourceManager();
+        [[nodiscard]] bool initSDL();
+        [[nodiscard]] bool initTime();
+        [[nodiscard]] bool initResourceManager();
+        [[nodiscard]] bool initCamera();
+        [[nodiscard]] bool initRenderer();
 
         void testResourceManager();
+        void testRenderer();
+        void testCamera();
     };
 } // namespace engine::core
