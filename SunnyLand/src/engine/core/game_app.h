@@ -17,6 +17,7 @@ namespace engine::render
 namespace engine::core
 {
     class Time;
+    class Config;
 
     /// @brief The main application class for the game.
     /// Manages the game loop, window, and renderer.
@@ -44,6 +45,7 @@ namespace engine::core
         std::unique_ptr<engine::resource::ResourceManager> resource_manager_;
         std::unique_ptr<engine::render::Camera> camera_;
         std::unique_ptr<engine::render::Renderer> renderer_;
+        std::unique_ptr<engine::core::Config> config_;
 
         [[nodiscard]] bool Init();
         void handleEvents();
@@ -51,6 +53,7 @@ namespace engine::core
         void render();
         void close();
 
+        [[nodiscard]] bool initConfig();
         [[nodiscard]] bool initSDL();
         [[nodiscard]] bool initTime();
         [[nodiscard]] bool initResourceManager();

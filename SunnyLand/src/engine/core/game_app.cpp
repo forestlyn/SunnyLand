@@ -6,7 +6,7 @@
 #include "../resource/resource_manager.h"
 #include "../render/renderer.h"
 #include "../render/camera.h"
-
+#include "config.h"
 namespace engine::core
 {
     GameApp::GameApp() = default;
@@ -23,6 +23,12 @@ namespace engine::core
     bool GameApp::Init()
     {
         spdlog::info("Initializing GameApp");
+
+        if (!initConfig())
+        {
+            spdlog::error("Failed to initialize Config");
+            return false;
+        }
 
         if (!initSDL())
         {
@@ -58,6 +64,20 @@ namespace engine::core
         spdlog::trace("GameApp initialized successfully");
         return true;
     }
+    bool GameApp::initConfig()
+    {
+        try
+        {
+            config_ = std::make_unique<engine::core::Config>("assets/config.json");
+            spdlog::trace("Config initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create Config instance: {}", e.what());
+            return false;
+        }
+    }
 
     bool GameApp::initSDL()
     {
@@ -81,6 +101,13 @@ namespace engine::core
             return false;
         }
 
+        int vsync_mode = config_->vsync_enable_ ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
+        SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
+        spdlog::trace("VSync 设置为: {}", config_->vsync_enable_ ? "Enabled" : "Disabled");
+
+        SDL_SetRenderLogicalPresentation(sdl_renderer_, config_->window_size_w_ / 2, config_->window_size_h_ / 2, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+        spdlog::trace("SDL initialized successfully");
         return true;
     }
 
@@ -89,6 +116,7 @@ namespace engine::core
         try
         {
             time_ = std::make_unique<engine::core::Time>();
+            time_->setTargetFPS(config_->target_fps_); // Set target FPS to config value
             spdlog::trace("Time initialized successfully");
             return true;
         }
@@ -118,7 +146,7 @@ namespace engine::core
     {
         try
         {
-            camera_ = std::make_unique<engine::render::Camera>(glm::vec2(1280.0f, 720.0f));
+            camera_ = std::make_unique<engine::render::Camera>(glm::vec2(config_->window_size_w_ / 2, config_->window_size_h_ / 2));
             spdlog::trace("Camera initialized successfully");
             return true;
         }
@@ -151,8 +179,6 @@ namespace engine::core
             spdlog::error("Failed to initialize GameApp");
             return;
         }
-
-        time_->setTargetFPS(60); // Set target FPS to 60
 
         while (is_running_)
         {

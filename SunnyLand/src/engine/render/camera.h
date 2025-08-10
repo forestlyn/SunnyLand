@@ -17,10 +17,10 @@ namespace engine::render
     public:
         Camera(const glm::vec2 &viewport_size, const glm::vec2 &position = glm::vec2(0.0f, 0.0f), const std::optional<engine::utils::Rect> &limit_bounds = std::nullopt);
 
-        Camera(const Camera &) = default;
-        Camera &operator=(const Camera &) = default;
-        Camera(Camera &&) noexcept = default;
-        Camera &operator=(Camera &&) noexcept = default;
+        Camera(const Camera &) = delete;
+        Camera &operator=(const Camera &) = delete;
+        Camera(Camera &&) = delete;
+        Camera &operator=(Camera &&) = delete;
 
         glm::vec2 worldToScreen(const glm::vec2 &world_pos) const;
         glm::vec2 screenToWorld(const glm::vec2 &screen_pos) const;
