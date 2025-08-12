@@ -47,7 +47,7 @@ namespace engine::resource
         auto it = mTextureCache.find(filePath);
         if (it != mTextureCache.end())
         {
-            spdlog::trace("Retrieving texture: {}", filePath);
+            // spdlog::trace("Retrieving texture: {}", filePath);
             return it->second.get();
         }
         else

@@ -8,6 +8,8 @@
 #include "../render/camera.h"
 #include "../input/input_manager.h"
 #include "config.h"
+#include "../object/game_object.h"
+
 namespace engine::core
 {
     GameApp::GameApp() = default;
@@ -66,6 +68,7 @@ namespace engine::core
         }
 
         testResourceManager();
+        testGameObject();
 
         is_running_ = true;
         spdlog::trace("GameApp initialized successfully");
@@ -225,7 +228,7 @@ namespace engine::core
             return;
         }
 
-        testInputManager();
+        // testInputManager();
     }
 
     void GameApp::update(float deltaTime)
@@ -329,6 +332,12 @@ namespace engine::core
                 spdlog::info(" {} 按下中 ", action);
             }
         }
+    }
+
+    void GameApp::testGameObject()
+    {
+        engine::object::GameObject game_object("test_game_object");
+        game_object.addComponent<engine::component::Component>();
     }
 
 } // namespace engine::core

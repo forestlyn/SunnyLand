@@ -41,6 +41,7 @@ add_executable(${TARGET}
                 src/engine/resource/audio_manager.cpp
                 src/engine/resource/texture_manager.cpp
                 src/engine/resource/font_manager.cpp
+                src/engine/object/game_object.cpp
                 )
 
 # 链接库
