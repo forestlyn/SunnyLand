@@ -6,6 +6,7 @@
 #include "../resource/resource_manager.h"
 #include "../render/renderer.h"
 #include "../render/camera.h"
+#include "../input/input_manager.h"
 #include "config.h"
 namespace engine::core
 {
@@ -55,6 +56,12 @@ namespace engine::core
         if (!initRenderer())
         {
             spdlog::error("Failed to initialize Renderer");
+            return false;
+        }
+
+        if (!initInputManager())
+        {
+            spdlog::error("Failed to initialize InputManager");
             return false;
         }
 
@@ -172,6 +179,21 @@ namespace engine::core
         }
     }
 
+    bool GameApp::initInputManager()
+    {
+        try
+        {
+            input_manager_ = std::make_unique<engine::input::InputManager>(sdl_renderer_, config_.get());
+            spdlog::trace("InputManager initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create InputManager instance: {}", e.what());
+            return false;
+        }
+    }
+
     void GameApp::run()
     {
         if (!Init())
@@ -183,8 +205,10 @@ namespace engine::core
         while (is_running_)
         {
             time_->update();
+            input_manager_->update();
             // spdlog::info("Running GameApp frame with delta time: {}", time_->getDeltaTime());
             handleEvents();
+
             update(time_->getDeltaTime());
             render();
         }
@@ -194,14 +218,14 @@ namespace engine::core
 
     void GameApp::handleEvents()
     {
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
+        if (input_manager_->shouldExit())
         {
-            if (event.type == SDL_EVENT_QUIT)
-            {
-                is_running_ = false;
-            }
+            spdlog::info("Exit requested by InputManager");
+            is_running_ = false;
+            return;
         }
+
+        testInputManager();
     }
 
     void GameApp::update(float deltaTime)
@@ -275,6 +299,36 @@ namespace engine::core
             camera_->move(glm::vec2(-1, 0));
         if (key_state[SDL_SCANCODE_RIGHT])
             camera_->move(glm::vec2(1, 0));
+    }
+
+    void GameApp::testInputManager()
+    {
+        std::vector<std::string> actions = {
+            "move_up",
+            "move_down",
+            "move_left",
+            "move_right",
+            "jump",
+            "attack",
+            "pause",
+            "MouseLeftClick",
+            "MouseRightClick"};
+
+        for (const auto &action : actions)
+        {
+            if (input_manager_->isActionPressed(action))
+            {
+                spdlog::info(" {} 按下 ", action);
+            }
+            if (input_manager_->isActionReleased(action))
+            {
+                spdlog::info(" {} 抬起 ", action);
+            }
+            if (input_manager_->isActionDown(action))
+            {
+                spdlog::info(" {} 按下中 ", action);
+            }
+        }
     }
 
 } // namespace engine::core
