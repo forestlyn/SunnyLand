@@ -32,6 +32,7 @@ find_package(spdlog REQUIRED)
 add_executable(${TARGET} 
                 src/main.cpp
                 src/engine/core/game_app.cpp
+                src/engine/core/context.cpp
                 src/engine/core/time.cpp
                 src/engine/input/input_manager.cpp
                 src/engine/core/config.cpp

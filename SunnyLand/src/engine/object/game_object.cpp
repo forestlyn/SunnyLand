@@ -15,27 +15,27 @@ namespace engine::object
         clean();
     }
 
-    void GameObject::update(float delta_time)
+    void GameObject::update(float delta_time, const engine::core::Context &context)
     {
         for (auto &[type, component] : m_components)
         {
-            component->update(delta_time);
+            component->update(delta_time, context);
         }
     }
 
-    void GameObject::handleInput()
+    void GameObject::handleInput(const engine::core::Context &context)
     {
         for (auto &[type, component] : m_components)
         {
-            component->handleInput();
+            component->handleInput(context);
         }
     }
 
-    void GameObject::render()
+    void GameObject::render(const engine::core::Context &context)
     {
         for (auto &[type, component] : m_components)
         {
-            component->render();
+            component->render(context);
         }
     }
 

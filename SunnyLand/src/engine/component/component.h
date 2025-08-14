@@ -4,6 +4,11 @@ namespace engine::object
 {
     class GameObject;
 }
+
+namespace engine::core
+{
+    class Context;
+}
 namespace engine::component
 {
     class Component
@@ -12,6 +17,7 @@ namespace engine::component
 
     private:
         engine::object::GameObject *m_gameObject;
+        bool is_active_ = true;
 
     public:
         Component() {}
@@ -31,11 +37,21 @@ namespace engine::component
             return m_gameObject;
         }
 
+        bool isActive() const
+        {
+            return is_active_;
+        }
+
+        void setActive(bool active)
+        {
+            is_active_ = active;
+        }
+
     protected:
         virtual void init() {}
-        virtual void handleInput() {}
-        virtual void update(float) {}
-        virtual void render() {}
+        virtual void handleInput(const engine::core::Context &context) {}
+        virtual void update(float deltaTime, const engine::core::Context &context) {}
+        virtual void render(const engine::core::Context &context) {}
         virtual void clean() {}
     };
 }

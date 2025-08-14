@@ -9,6 +9,7 @@
 #include "../input/input_manager.h"
 #include "config.h"
 #include "../object/game_object.h"
+#include "context.h"
 
 namespace engine::core
 {
@@ -64,6 +65,12 @@ namespace engine::core
         if (!initInputManager())
         {
             spdlog::error("Failed to initialize InputManager");
+            return false;
+        }
+
+        if (!initContext())
+        {
+            spdlog::error("Failed to initialize Context");
             return false;
         }
 
@@ -193,6 +200,21 @@ namespace engine::core
         catch (const std::exception &e)
         {
             spdlog::error("Failed to create InputManager instance: {}", e.what());
+            return false;
+        }
+    }
+
+    bool GameApp::initContext()
+    {
+        try
+        {
+            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *resource_manager_.get());
+            spdlog::trace("Context initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create Context instance: {}", e.what());
             return false;
         }
     }

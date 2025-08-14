@@ -6,6 +6,11 @@
 #include <typeindex>
 #include <spdlog/spdlog.h>
 
+namespace engine::core
+{
+    class Context;
+}
+
 namespace engine::object
 {
     class GameObject
@@ -86,9 +91,9 @@ namespace engine::object
             }
         }
 
-        void update(float delta_time);
-        void handleInput();
-        void render();
+        void update(float delta_time, const engine::core::Context &context);
+        void handleInput(const engine::core::Context &context);
+        void render(const engine::core::Context &context);
         void clean();
     };
 }
