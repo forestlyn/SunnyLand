@@ -39,7 +39,7 @@ namespace engine::resource
         return textureManager_->getTexture(filePath);
     }
 
-    glm::vec2 ResourceManager::getTextureSize(const std::string &filePath) const
+    glm::vec2 ResourceManager::getTextureSize(const std::string &filePath)
     {
         return textureManager_->getTextureSize(filePath);
     }

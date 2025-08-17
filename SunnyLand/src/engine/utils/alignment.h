@@ -1,4 +1,4 @@
-
+#pragma once
 namespace engine::utils
 {
     enum class Alignment

@@ -10,9 +10,14 @@
 #include "config.h"
 #include "../object/game_object.h"
 #include "context.h"
+#include "../component/transform_component.h"
+#include "../component/sprite_component.h"
+#include "../utils/alignment.h"
 
 namespace engine::core
 {
+    engine::object::GameObject game_object("test_game_object");
+
     GameApp::GameApp() = default;
 
     GameApp::~GameApp()
@@ -265,6 +270,7 @@ namespace engine::core
 
         // Render game objects here
         testRenderer();
+        game_object.render(*context_);
         renderer_->present();
     }
 
@@ -355,11 +361,12 @@ namespace engine::core
             }
         }
     }
-
     void GameApp::testGameObject()
     {
-        engine::object::GameObject game_object("test_game_object");
-        game_object.addComponent<engine::component::Component>();
+        game_object.addComponent<engine::component::TransformComponent>(glm::vec2(100, 100));
+        game_object.addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", resource_manager_.get(), engine::utils::Alignment::CENTER);
+        game_object.getComponent<engine::component::TransformComponent>()->setScale(glm::vec2(1.0f, 1.0f));
+        game_object.getComponent<engine::component::TransformComponent>()->setRotation(0.0f);
     }
 
 } // namespace engine::core

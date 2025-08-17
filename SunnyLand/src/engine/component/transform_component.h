@@ -13,7 +13,7 @@ namespace engine::component
         friend class engine::object::GameObject;
 
     public:
-        TransformComponent(glm::vec2 position, float rotation, glm::vec2 scale);
+        TransformComponent(glm::vec2 position = {0.0f, 0.0f}, float rotation = 0.0f, glm::vec2 scale = {1.0f, 1.0f});
 
         void setPosition(const glm::vec2 &position);
         glm::vec2 getPosition() const;
@@ -27,6 +27,6 @@ namespace engine::component
         float rotation_;
         glm::vec2 scale_;
 
-        void update(float delta_time, const engine::core::Context &context) override;
+        void update(float delta_time, engine::core::Context &context) override;
     };
 }

@@ -57,13 +57,13 @@ namespace engine::resource
         }
     }
 
-    glm::vec2 TextureManager::getTextureSize(const std::string &filePath) const
+    glm::vec2 TextureManager::getTextureSize(const std::string &filePath)
     {
-        auto it = mTextureCache.find(filePath);
-        if (it != mTextureCache.end())
+        SDL_Texture *it = getTexture(filePath);
+        if (it)
         {
             float width, height;
-            SDL_GetTextureSize(it->second.get(), &width, &height);
+            SDL_GetTextureSize(it, &width, &height);
             return glm::vec2(width, height);
         }
         else

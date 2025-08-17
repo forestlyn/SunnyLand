@@ -1,15 +1,16 @@
 #include "transform_component.h"
 #include "../core/context.h"
 #include "../object/game_object.h"
+#include "sprite_component.h"
 namespace engine::component
 {
 
-    TransformComponent::TransformComponent(glm::vec2 position = glm::vec2(0.0f, 0.0f), float rotation = 0.0f, glm::vec2 scale = glm::vec2(1.0f, 1.0f))
+    TransformComponent::TransformComponent(glm::vec2 position, float rotation, glm::vec2 scale)
         : position_(position), rotation_(rotation), scale_(scale)
     {
     }
 
-    void TransformComponent::update(float delta_time, const engine::core::Context &context)
+    void TransformComponent::update(float delta_time, engine::core::Context &context)
     {
         // Update the transform component based on the context
     }
@@ -37,6 +38,14 @@ namespace engine::component
     void TransformComponent::setScale(const glm::vec2 &scale)
     {
         scale_ = scale;
+        if (m_gameObject)
+        {
+            SpriteComponent *spriteComponent = m_gameObject->getComponent<SpriteComponent>();
+            if (spriteComponent)
+            {
+                spriteComponent->updateOffset();
+            }
+        }
     }
 
     glm::vec2 TransformComponent::getScale() const

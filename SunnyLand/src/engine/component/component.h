@@ -15,7 +15,7 @@ namespace engine::component
     {
         friend class engine::object::GameObject;
 
-    private:
+    protected:
         engine::object::GameObject *m_gameObject;
         bool is_active_ = true;
 
@@ -49,9 +49,9 @@ namespace engine::component
 
     protected:
         virtual void init() {}
-        virtual void handleInput(const engine::core::Context &context) {}
-        virtual void update(float deltaTime, const engine::core::Context &context) {}
-        virtual void render(const engine::core::Context &context) {}
+        virtual void handleInput(engine::core::Context &context) {}
+        virtual void update(float deltaTime, engine::core::Context &context) {}
+        virtual void render(engine::core::Context &context) {}
         virtual void clean() {}
     };
 }

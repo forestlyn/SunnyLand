@@ -15,7 +15,7 @@ namespace engine::object
         clean();
     }
 
-    void GameObject::update(float delta_time, const engine::core::Context &context)
+    void GameObject::update(float delta_time, engine::core::Context &context)
     {
         for (auto &[type, component] : m_components)
         {
@@ -23,7 +23,7 @@ namespace engine::object
         }
     }
 
-    void GameObject::handleInput(const engine::core::Context &context)
+    void GameObject::handleInput(engine::core::Context &context)
     {
         for (auto &[type, component] : m_components)
         {
@@ -31,7 +31,7 @@ namespace engine::object
         }
     }
 
-    void GameObject::render(const engine::core::Context &context)
+    void GameObject::render(engine::core::Context &context)
     {
         for (auto &[type, component] : m_components)
         {

@@ -2,7 +2,9 @@
 #include "component.h"
 #include <glm/glm.hpp>
 #include <string>
-
+#include <optional>
+#include <SDL3/SDL_rect.h>
+#include "../utils/alignment.h"
 namespace engine::core
 {
     class Context;
@@ -14,11 +16,6 @@ namespace engine::resource
 namespace engine::render
 {
     class Sprite;
-}
-
-namespace engine::utils
-{
-    class Alignment;
 }
 
 namespace engine::component
@@ -35,7 +32,7 @@ namespace engine::component
                         std::optional<SDL_FRect> source_rect_opt = std::nullopt,
                         bool is_flipped = false);
 
-        ~SpriteComponent();
+        ~SpriteComponent() = default;
         SpriteComponent(const SpriteComponent &) = delete;
         SpriteComponent &operator=(const SpriteComponent &) = delete;
         SpriteComponent(SpriteComponent &&) = delete;
@@ -50,7 +47,7 @@ namespace engine::component
         glm::vec2 getOffset() const;
         engine::utils::Alignment getAlignment() const;
 
-        void setSpriteById(const std::string &texture_path, const std::optional<SDL_FRect> &source_rect_opt = std::nullopt, const bool is_flipped = false);
+        void setSpriteById(const std::string &texture_path, const std::optional<SDL_FRect> source_rect_opt = std::nullopt, const bool is_flipped = false);
         void setSpriteRect(const std::optional<SDL_FRect> &source_rect_opt);
         void setOffset(const glm::vec2 &offset);
         void setAlignment(engine::utils::Alignment alignment);
@@ -64,8 +61,9 @@ namespace engine::component
         glm::vec2 offset_ = {0.0f, 0.0f};                                     ///< @brief 精灵偏移量
         engine::utils::Alignment alignment_ = engine::utils::Alignment::NONE; ///< @brief 精灵对齐方式
 
+        void init() override;
         void updateSpriteSize();
-        void update(float delta_time, const engine::core::Context &context) override;
-        void render(const engine::core::Context &context) override;
+        void update(float delta_time, engine::core::Context &context) override;
+        void render(engine::core::Context &context) override;
     };
 }

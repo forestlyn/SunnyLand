@@ -91,9 +91,9 @@ namespace engine::object
             }
         }
 
-        void update(float delta_time, const engine::core::Context &context);
-        void handleInput(const engine::core::Context &context);
-        void render(const engine::core::Context &context);
+        void update(float delta_time, engine::core::Context &context);
+        void handleInput(engine::core::Context &context);
+        void render(engine::core::Context &context);
         void clean();
     };
 }

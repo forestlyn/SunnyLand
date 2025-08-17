@@ -43,6 +43,8 @@ add_executable(${TARGET}
                 src/engine/resource/texture_manager.cpp
                 src/engine/resource/font_manager.cpp
                 src/engine/object/game_object.cpp
+                src/engine/component/sprite_component.cpp
+                src/engine/component/transform_component.cpp
                 )
 
 # 链接库
