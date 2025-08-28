@@ -19,6 +19,12 @@ namespace engine::input
     class InputManager;
 }
 
+namespace engine::scene
+{
+    class SceneManager;
+    class Scene;
+}
+
 namespace engine::core
 {
     class Time;
@@ -54,6 +60,7 @@ namespace engine::core
         std::unique_ptr<engine::core::Config> config_;
         std::unique_ptr<engine::input::InputManager> input_manager_;
         std::unique_ptr<engine::core::Context> context_;
+        std::unique_ptr<engine::scene::SceneManager> scene_manager_;
 
         [[nodiscard]] bool Init();
         void handleEvents();
@@ -69,11 +76,12 @@ namespace engine::core
         [[nodiscard]] bool initRenderer();
         [[nodiscard]] bool initInputManager();
         [[nodiscard]] bool initContext();
+        [[nodiscard]] bool initSceneManager();
 
-        void testResourceManager();
-        void testRenderer();
-        void testCamera();
-        void testInputManager();
-        void testGameObject();
+        // void testResourceManager();
+        // void testRenderer();
+        // void testCamera();
+        // void testInputManager();
+        // void testGameObject();
     };
 } // namespace engine::core
