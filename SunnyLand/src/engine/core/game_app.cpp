@@ -219,7 +219,7 @@ namespace engine::core
     {
         try
         {
-            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *resource_manager_.get());
+            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *resource_manager_.get(), *input_manager_.get());
             spdlog::trace("Context initialized successfully");
             return true;
         }
