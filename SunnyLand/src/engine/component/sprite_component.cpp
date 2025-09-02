@@ -15,12 +15,23 @@ namespace engine::component
                                      bool is_flipped)
         : resource_manager_(resource_manager),
           transform_component_(nullptr),
-          sprite_(nullptr),
           sprite_size_(0.0f, 0.0f),
           offset_(0.0f, 0.0f),
           alignment_(alignment)
     {
         setSpriteById(texture_path, source_rect_opt, is_flipped);
+    }
+
+    SpriteComponent::SpriteComponent(engine::render::Sprite &&sprite,
+                                     engine::resource::ResourceManager *resource_manager,
+                                     engine::utils::Alignment alignment)
+        : resource_manager_(resource_manager),
+          transform_component_(nullptr),
+          sprite_(sprite),
+          sprite_size_(0.0f, 0.0f),
+          offset_(0.0f, 0.0f),
+          alignment_(alignment)
+    {
     }
 
     void SpriteComponent::init()
@@ -91,32 +102,17 @@ namespace engine::component
 
     std::string SpriteComponent::getTextureId() const
     {
-        if (sprite_)
-        {
-            return sprite_->getTextureId();
-        }
-        spdlog::warn("Sprite is not initialized, returning empty texture ID");
-        return "";
+        return sprite_.getTextureId();
     }
 
-    engine::render::Sprite *SpriteComponent::getSprite() const
+    engine::render::Sprite *SpriteComponent::getSprite()
     {
-        if (sprite_)
-        {
-            return sprite_;
-        }
-        spdlog::warn("Sprite is not initialized, returning nullptr");
-        return nullptr;
+        return &sprite_;
     }
 
     bool SpriteComponent::getIsFlipped() const
     {
-        if (sprite_)
-        {
-            return sprite_->getIsFlip();
-        }
-        spdlog::warn("Sprite is not initialized, returning false for isFlipped");
-        return false;
+        return sprite_.getIsFlip();
     }
 
     glm::vec2 SpriteComponent::getSpriteSize() const
@@ -142,30 +138,16 @@ namespace engine::component
             return;
         }
 
-        sprite_ = new engine::render::Sprite(texture_path, source_rect_opt, is_flipped);
-        if (sprite_)
-        {
-            updateSpriteSize();
-            updateOffset();
-        }
-        else
-        {
-            spdlog::warn("Failed to load sprite from path: {}", texture_path);
-        }
+        sprite_ = engine::render::Sprite(texture_path, source_rect_opt, is_flipped);
+        updateSpriteSize();
+        updateOffset();
     }
 
     void SpriteComponent::setSpriteRect(const std::optional<SDL_FRect> &source_rect_opt)
     {
-        if (sprite_)
-        {
-            sprite_->setRect(source_rect_opt);
-            updateSpriteSize();
-            updateOffset();
-        }
-        else
-        {
-            spdlog::warn("Sprite is not initialized, cannot set sprite rect");
-        }
+        sprite_.setRect(source_rect_opt);
+        updateSpriteSize();
+        updateOffset();
     }
 
     void SpriteComponent::setOffset(const glm::vec2 &offset)
@@ -181,21 +163,14 @@ namespace engine::component
 
     void SpriteComponent::updateSpriteSize()
     {
-        if (sprite_)
+
+        if (sprite_.getRect().has_value())
         {
-            if (sprite_->getRect().has_value())
-            {
-                auto rect = sprite_->getRect().value();
-                sprite_size_ = {rect.w, rect.h};
-            }
-            else
-                sprite_size_ = resource_manager_->getTextureSize(sprite_->getTextureId());
+            auto rect = sprite_.getRect().value();
+            sprite_size_ = {rect.w, rect.h};
         }
         else
-        {
-            spdlog::warn("Sprite is not initialized, cannot update sprite size");
-            sprite_size_ = {0.0f, 0.0f};
-        }
+            sprite_size_ = resource_manager_->getTextureSize(sprite_.getTextureId());
     }
 
     void SpriteComponent::render(engine::core::Context &context)
@@ -207,9 +182,18 @@ namespace engine::component
         auto pos = transform_component_->getPosition() + offset_;
         auto scale = transform_component_->getScale();
         auto rotation = transform_component_->getRotation();
-        context.getRenderer().drawSprite(context.getCamera(), *sprite_, pos, scale, rotation);
+        context.getRenderer().drawSprite(context.getCamera(), sprite_, pos, scale, rotation);
     }
     void SpriteComponent::update(float delta_time, engine::core::Context &context)
     {
+    }
+
+    bool SpriteComponent::getHidden() const
+    {
+        return isHidden_;
+    }
+    void SpriteComponent::setHidden(bool hidden)
+    {
+        isHidden_ = hidden;
     }
 }

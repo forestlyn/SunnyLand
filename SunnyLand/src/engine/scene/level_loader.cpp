@@ -2,6 +2,7 @@
 #include "../component/parallax_component.h"
 #include "../component/transform_component.h"
 #include "../component/tilelayer_component.h"
+#include "../component/sprite_component.h"
 #include "../object/game_object.h"
 #include "../scene/scene.h"
 #include "../core/context.h"
@@ -149,6 +150,53 @@ namespace engine::scene
     void LevelLoader::loadObjectLayer(const nlohmann::json &layer_json, Scene &scene)
     {
         // 加载对象图层
+        if (layer_json.contains("objects") && layer_json["objects"].is_array())
+        {
+            for (const auto &obj : layer_json["objects"])
+            {
+                int gid = obj.value("gid", 0);
+                if (gid == 0)
+                {
+                    // TODO
+                }
+                else
+                {
+                    auto tile_info = getTileInfoByGid(gid);
+                    if (tile_info.sprite.getTextureId().empty())
+                    {
+                        spdlog::warn("Object gid {} has no valid sprite", gid);
+                        continue;
+                    }
+
+                    auto name = obj.value("name", "unnamed");
+                    auto x = obj.value("x", 0.0f);
+                    auto y = obj.value("y", 0.0f);
+                    auto width = obj.value("width", 0.0f);
+                    auto height = obj.value("height", 0.0f);
+                    auto rotation = obj.value("rotation", 0.0f);
+                    auto visible = obj.value("visible", true);
+
+                    auto src_rect = tile_info.sprite.getRect();
+                    if (!src_rect.has_value() || src_rect->w == 0 || src_rect->h == 0)
+                    {
+                        spdlog::warn("Object gid {} has invalid sprite rect", gid);
+                        continue;
+                    }
+                    auto scale = glm::vec2(width / src_rect->w, height / src_rect->h);
+
+                    auto gameObj = std::make_unique<engine::object::GameObject>(name);
+                    engine::component::TransformComponent *transform = gameObj->addComponent<engine::component::TransformComponent>(glm::vec2(x, y - height), rotation, scale);
+                    engine::component::SpriteComponent *spriteComp = gameObj->addComponent<engine::component::SpriteComponent>(std::move(tile_info.sprite), &(scene.getContext().getResourceManager()));
+                    spriteComp->setHidden(!visible);
+                    scene.addGameObject(std::move(gameObj));
+                    spdlog::trace("Object loaded: {} at ({}, {})", name, x, y);
+                }
+            }
+        }
+        else
+        {
+            spdlog::warn("Object layer is missing objects array");
+        }
     }
     void LevelLoader::loadTileset(const std::string &tileset_path, int first_gid)
     {
