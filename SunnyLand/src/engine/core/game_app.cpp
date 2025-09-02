@@ -132,7 +132,6 @@ namespace engine::core
         int vsync_mode = config_->vsync_enable_ ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
         SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
         spdlog::trace("VSync 设置为: {}", config_->vsync_enable_ ? "Enabled" : "Disabled");
-
         SDL_SetRenderLogicalPresentation(sdl_renderer_, config_->window_size_w_ / 2, config_->window_size_h_ / 2, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
         spdlog::trace("SDL initialized successfully");

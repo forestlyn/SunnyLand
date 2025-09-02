@@ -36,6 +36,7 @@ namespace engine::resource
             spdlog::error("Failed to load texture: {}. SDL_image Error: {}", filePath, SDL_GetError());
             return nullptr;
         }
+        SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 
         mTextureCache[filePath] = std::unique_ptr<SDL_Texture, SDLTextureDeleter>(texture);
         spdlog::debug("Texture loaded: {}", filePath);

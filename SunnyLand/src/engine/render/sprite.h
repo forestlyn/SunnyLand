@@ -13,6 +13,7 @@ namespace engine::render
         bool is_flip;
 
     public:
+        Sprite() = default;
         Sprite(const std::string &texture_id, const std::optional<SDL_FRect> &rect = std::nullopt, const bool &is_flip = false)
             : texture_id(texture_id), rect(rect), is_flip(is_flip) {}
 

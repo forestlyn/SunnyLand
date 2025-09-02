@@ -1,8 +1,13 @@
 #pragma once
 
 #include <string>
-#include <nlohmann/json_fwd.hpp>
-
+#include <nlohmann/json.hpp>
+#include <glm/vec2.hpp>
+#include <map>
+namespace engine::component
+{
+    struct TileInfo;
+}
 namespace engine::scene
 {
     class Scene;
@@ -10,6 +15,10 @@ namespace engine::scene
     {
     private:
         std::string m_map_path;
+        glm::ivec2 m_map_size;
+        glm::vec2 m_offset;
+        glm::vec2 m_tile_size;
+        std::map<int, nlohmann::json> m_tileset_data;
 
     public:
         LevelLoader() = default;
@@ -20,6 +29,9 @@ namespace engine::scene
         void loadTileLayer(const nlohmann::json &layer_json, Scene &scene);   ///< @brief 加载瓦片图层
         void loadObjectLayer(const nlohmann::json &layer_json, Scene &scene); ///< @brief 加载对象图层
 
-        std::string resolvePath(std::string image_path);
+        engine::component::TileInfo getTileInfoByGid(int gid);
+        void loadTileset(const std::string &tileset_path, int first_gid);
+
+        std::string resolvePath(const std::string &relative_path, const std::string &file_path);
     };
 } // namespace engine::scene

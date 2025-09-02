@@ -21,7 +21,7 @@ namespace game::scene
         Scene::initialize();
         spdlog::info("Initializing GameScene");
         engine::scene::LevelLoader level_loader;
-        level_loader.loadLevel("assets/maps/level1.tmj", *this);
+        level_loader.loadLevel("./assets/maps/level1.tmj", *this);
         createTestObject();
     }
 

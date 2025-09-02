@@ -1,26 +1,28 @@
 #include "level_loader.h"
-#include <spdlog/spdlog.h>
+#include "../component/parallax_component.h"
+#include "../component/transform_component.h"
+#include "../component/tilelayer_component.h"
+#include "../object/game_object.h"
+#include "../scene/scene.h"
+#include "../core/context.h"
+#include "../render/sprite.h"
+#include "../utils/math.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
-#include <filesystem>
-#include "../object/game_object.h"
-#include "../component/transform_component.h"
-#include "../component/parallax_component.h"
+#include <spdlog/spdlog.h>
 #include <glm/vec2.hpp>
-#include <memory>
-#include "scene.h"
+#include <filesystem>
 
 namespace engine::scene
 {
     void LevelLoader::loadLevel(const std::string &map_path, Scene &scene)
     {
-        m_map_path = map_path;
 
         // 读取关卡文件
-        std::ifstream file(m_map_path);
+        std::ifstream file(map_path);
         if (!file.is_open())
         {
-            spdlog::error("Failed to open level file: {}", m_map_path);
+            spdlog::error("Failed to open level file: {}", map_path);
             return;
         }
 
@@ -41,6 +43,28 @@ namespace engine::scene
             return;
         }
 
+        m_map_path = map_path;
+        m_map_size.x = level_data.value("width", 0);
+        m_map_size.y = level_data.value("height", 0);
+        m_tile_size.x = level_data.value("tilewidth", 0);
+        m_tile_size.y = level_data.value("tileheight", 0);
+
+        if (level_data.contains("tilesets") && level_data["tilesets"].is_array())
+        {
+            for (const auto &tileset : level_data["tilesets"])
+            {
+                if (tileset.contains("firstgid") && tileset["firstgid"].is_number_integer() && tileset.contains("source") && tileset["source"].is_string())
+                {
+                    int first_gid = tileset["firstgid"];
+                    std::string source = tileset["source"];
+                    loadTileset(resolvePath(source, m_map_path), first_gid);
+                }
+                else
+                {
+                    spdlog::warn("Tileset entry is missing required properties");
+                }
+            }
+        }
         // 加载图层
         for (const auto &layer : level_data["layers"])
         {
@@ -76,7 +100,7 @@ namespace engine::scene
             return;
         }
 
-        image_path = resolvePath(image_path);
+        image_path = resolvePath(image_path, m_map_path);
         auto name = layer_json.value("name", "unnamed");
         auto parallaxx = layer_json.value("parallaxx", 0.0f);
         auto parallaxy = layer_json.value("parallaxy", 0.0f);
@@ -99,27 +123,131 @@ namespace engine::scene
     void LevelLoader::loadTileLayer(const nlohmann::json &layer_json, Scene &scene)
     {
         // 加载瓦片图层
+        if (!layer_json.contains("data") || !layer_json["data"].is_array())
+        {
+            spdlog::warn("Tile layer is missing data array");
+            return;
+        }
+        std::vector<engine::component::TileInfo> tiles_info;
+        for (auto const &val : layer_json["data"])
+        {
+            if (!val.is_number_integer())
+            {
+                spdlog::warn("Tile layer data contains non-integer value");
+                return;
+            }
+            int gid = val;
+            auto tile_info = getTileInfoByGid(gid);
+            tiles_info.push_back(tile_info);
+        }
+        auto name = layer_json.value("name", "Unnamed");
+        auto gameObj = std::make_unique<engine::object::GameObject>(name);
+        gameObj->addComponent<engine::component::TileLayerComponent>(m_tile_size, m_map_size, std::move(tiles_info));
+        scene.addGameObject(std::move(gameObj));
     }
 
     void LevelLoader::loadObjectLayer(const nlohmann::json &layer_json, Scene &scene)
     {
         // 加载对象图层
     }
+    void LevelLoader::loadTileset(const std::string &tileset_path, int first_gid)
+    {
+        // 加载瓦片集
+        try
+        {
+            nlohmann::json tileset_data;
+            std::ifstream(tileset_path) >> tileset_data;
+            tileset_data["path"] = tileset_path;
+            m_tileset_data[first_gid] = std::move(tileset_data);
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to load tileset: {}", e.what());
+        }
+    }
 
-    std::string LevelLoader::resolvePath(std::string image_path)
+    engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid)
+    {
+        if (gid == 0)
+        {
+            return engine::component::TileInfo();
+        }
+        auto tile_set = m_tileset_data.upper_bound(gid);
+        if (tile_set == m_tileset_data.begin())
+        {
+            spdlog::warn("Unknown tileset for gid: {}", gid);
+            return engine::component::TileInfo();
+        }
+        --tile_set;
+        auto first_gid = tile_set->first;
+        auto tilesetJson = tile_set->second;
+        auto local_gid = gid - first_gid;
+        if (!tilesetJson.contains("path"))
+        {
+            spdlog::warn("Tileset is missing path property for gid: {}", gid);
+            return engine::component::TileInfo();
+        }
+        auto tileset_path = tilesetJson.value("path", "");
+        if (tilesetJson.contains("image"))
+        {
+            auto image_path = resolvePath(tilesetJson["image"], tileset_path);
+            auto columns = tilesetJson.value("columns", 0);
+            if (columns <= 0)
+            {
+                spdlog::warn("Tileset is missing columns property for gid: {}", gid);
+                return engine::component::TileInfo();
+            }
+            auto x = local_gid % columns;
+            auto y = local_gid / columns;
+            auto tile_width = m_tile_size.x;
+            auto tile_height = m_tile_size.y;
+            SDL_FRect src_rect = {x * tile_width, y * tile_height, tile_width, tile_height};
+            engine::render::Sprite sprite = engine::render::Sprite(image_path, src_rect);
+            return engine::component::TileInfo(sprite, engine::component::TileType::Normal);
+        }
+        else
+        {
+            if (!tilesetJson.contains("tiles"))
+            {
+                spdlog::warn("Tileset is missing tiles property for gid: {}", gid);
+                return engine::component::TileInfo();
+            }
+            for (auto const &tile : tilesetJson["tiles"])
+            {
+                if (!tile.contains("id") || !tile.contains("image"))
+                {
+                    spdlog::warn("Tile is missing id or image property for gid: {}", gid);
+                    continue;
+                }
+                int tile_id = tile["id"];
+                if (tile_id != local_gid)
+                    continue;
+                std::string tile_image = resolvePath(tile["image"], tileset_path);
+                auto image_width = tile.value("imagewidth", 0);
+                auto image_height = tile.value("imageheight", 0);
+                SDL_FRect src_rect = {tile.value("x", 0), tile.value("y", 0), tile.value("width", image_width), tile.value("height", image_height)};
+                auto sprite = engine::render::Sprite(tile_image, src_rect);
+                return engine::component::TileInfo(sprite, engine::component::TileType::Normal);
+            }
+        }
+        spdlog::warn("Unknown tileset for gid: {}", gid);
+        return engine::component::TileInfo();
+    }
+
+    std::string LevelLoader::resolvePath(const std::string &relative_path, const std::string &file_path)
     {
         // 解析资源路径
         try
         {
-            std::filesystem::path path(m_map_path);
+            std::filesystem::path path(file_path);
             auto parent_path = path.parent_path();
-            auto full_path = std::filesystem::canonical(parent_path / image_path);
+            auto full_path = std::filesystem::canonical(parent_path / relative_path);
             return full_path.string();
         }
         catch (const std::exception &e)
         {
             spdlog::error("Failed to resolve path: {}", e.what());
-            return image_path;
+            return file_path;
         }
     }
 }
