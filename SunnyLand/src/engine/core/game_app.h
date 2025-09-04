@@ -25,6 +25,11 @@ namespace engine::scene
     class Scene;
 }
 
+namespace engine::physics
+{
+    class PhysicsEngine;
+}
+
 namespace engine::core
 {
     class Time;
@@ -61,6 +66,7 @@ namespace engine::core
         std::unique_ptr<engine::input::InputManager> input_manager_;
         std::unique_ptr<engine::core::Context> context_;
         std::unique_ptr<engine::scene::SceneManager> scene_manager_;
+        std::unique_ptr<engine::physics::PhysicsEngine> physics_engine_;
 
         [[nodiscard]] bool Init();
         void handleEvents();
@@ -77,6 +83,7 @@ namespace engine::core
         [[nodiscard]] bool initInputManager();
         [[nodiscard]] bool initContext();
         [[nodiscard]] bool initSceneManager();
+        [[nodiscard]] bool initPhysicsEngine();
 
         // void testResourceManager();
         // void testRenderer();

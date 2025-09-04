@@ -1,17 +1,24 @@
 #pragma once
 #include <memory>
 #include "../../engine/scene/scene.h"
-
+#include <memory>
 namespace engine::scene
 {
     class SceneManager;
     class Scene;
 }
 
+namespace engine::object
+{
+    class GameObject;
+}
+
 namespace game::scene
 {
     class GameScene final : public engine::scene::Scene
     {
+        engine::object::GameObject *test_object_;
+
     public:
         GameScene(std::string scene_name, engine::core::Context &context, engine::scene::SceneManager &scene_manager);
         void initialize() override;
@@ -23,5 +30,6 @@ namespace game::scene
     private:
         void createTestObject();
         void testCamera();
+        void testObject();
     };
 }

@@ -16,6 +16,11 @@ namespace engine::input
     class InputManager;
 }
 
+namespace engine::physics
+{
+    class PhysicsEngine;
+}
+
 namespace engine::core
 {
     class Context
@@ -25,9 +30,10 @@ namespace engine::core
         engine::render::Renderer &m_renderer;
         engine::resource::ResourceManager &m_resourceManager;
         engine::input::InputManager &m_inputManager;
+        engine::physics::PhysicsEngine &m_physicsEngine;
 
     public:
-        Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager);
+        Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager, engine::physics::PhysicsEngine &physicsEngine);
 
         ~Context();
 
@@ -35,5 +41,6 @@ namespace engine::core
         engine::render::Renderer &getRenderer();
         engine::resource::ResourceManager &getResourceManager();
         engine::input::InputManager &getInputManager();
+        engine::physics::PhysicsEngine &getPhysicsEngine();
     };
 }

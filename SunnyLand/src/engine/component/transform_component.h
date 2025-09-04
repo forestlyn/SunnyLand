@@ -22,6 +22,8 @@ namespace engine::component
         void setScale(const glm::vec2 &scale);
         glm::vec2 getScale() const;
 
+        void translate(const glm::vec2 &offset);
+
     private:
         glm::vec2 position_;
         float rotation_;

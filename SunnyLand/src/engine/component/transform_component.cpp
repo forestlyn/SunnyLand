@@ -53,4 +53,9 @@ namespace engine::component
         return scale_;
     }
 
+    void TransformComponent::translate(const glm::vec2 &offset)
+    {
+        position_ += offset;
+    }
+
 }

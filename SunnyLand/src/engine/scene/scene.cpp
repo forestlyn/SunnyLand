@@ -1,6 +1,8 @@
 #include "scene.h"
 #include "../object/game_object.h"
 #include <spdlog/spdlog.h>
+#include "../core/context.h"
+#include "../physics/physics_engine.h"
 
 namespace engine::scene
 {
@@ -99,6 +101,9 @@ namespace engine::scene
         {
             return;
         }
+
+        context.getPhysicsEngine().update(delta_time);
+
         for (auto it = game_objects.begin(); it != game_objects.end();)
         {
             if ((*it) && (*it)->isActive() && ((*it)->isNeedRemove() == false))

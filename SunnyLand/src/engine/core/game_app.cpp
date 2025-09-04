@@ -15,6 +15,7 @@
 #include "../utils/alignment.h"
 #include "../scene/scene_manager.h"
 #include "../../game/scene/game_scene.h"
+#include "../physics/physics_engine.h"
 namespace engine::core
 {
 
@@ -70,6 +71,12 @@ namespace engine::core
         if (!initInputManager())
         {
             spdlog::error("Failed to initialize InputManager");
+            return false;
+        }
+
+        if (!initPhysicsEngine())
+        {
+            spdlog::error("Failed to initialize PhysicsEngine");
             return false;
         }
 
@@ -218,7 +225,7 @@ namespace engine::core
     {
         try
         {
-            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *resource_manager_.get(), *input_manager_.get());
+            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *resource_manager_.get(), *input_manager_.get(), *physics_engine_.get());
             spdlog::trace("Context initialized successfully");
             return true;
         }
@@ -240,6 +247,21 @@ namespace engine::core
         catch (const std::exception &e)
         {
             spdlog::error("Failed to create SceneManager instance: {}", e.what());
+            return false;
+        }
+    }
+
+    bool GameApp::initPhysicsEngine()
+    {
+        try
+        {
+            physics_engine_ = std::make_unique<engine::physics::PhysicsEngine>();
+            spdlog::trace("PhysicsEngine initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create PhysicsEngine instance: {}", e.what());
             return false;
         }
     }
@@ -297,6 +319,8 @@ namespace engine::core
 
     void GameApp::close()
     {
+        scene_manager_->close();
+        resource_manager_.reset();
         spdlog::info("Closing GameApp");
         if (sdl_renderer_)
         {

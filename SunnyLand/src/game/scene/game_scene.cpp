@@ -3,9 +3,11 @@
 #include "../../engine/object/game_object.h"
 #include "../../engine/component/transform_component.h"
 #include "../../engine/component/sprite_component.h"
+#include "../../engine/component/physics_component.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
+#include "../../engine/physics/physics_engine.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
 
@@ -41,7 +43,8 @@ namespace game::scene
     {
         Scene::handleInput();
         // spdlog::info("Handling input in GameScene");
-        testCamera();
+        testObject();
+        // testCamera();
     }
 
     void GameScene::close()
@@ -54,10 +57,12 @@ namespace game::scene
     {
         spdlog::trace("在 GameScene 中创建 test_object...");
         auto test_object = std::make_unique<engine::object::GameObject>("test_object");
+        test_object_ = test_object.get();
 
         // 添加组件
         test_object->addComponent<engine::component::TransformComponent>(glm::vec2(100.0f, 100.0f));
         test_object->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", &(context.getResourceManager()));
+        test_object->addComponent<engine::component::PhysicsComponent>(&context.getPhysicsEngine());
 
         // 将创建好的 GameObject 添加到场景中 （一定要用std::move，否则传递的是左值）
         addGameObject(std::move(test_object));
@@ -76,5 +81,31 @@ namespace game::scene
             camera.move(glm::vec2(-1, 0));
         if (input_manager.isActionDown("move_right"))
             camera.move(glm::vec2(1, 0));
+    }
+
+    void GameScene::testObject()
+    {
+        if (!test_object_)
+        {
+            spdlog::warn("test_object_ is null");
+            return;
+        }
+        auto &input_manager = context.getInputManager();
+
+        if (input_manager.isActionDown("move_left"))
+        {
+            spdlog::info("Moving test_object left");
+            test_object_->getComponent<engine::component::TransformComponent>()->translate(glm::vec2(-1, 0));
+        }
+        if (input_manager.isActionDown("move_right"))
+        {
+            spdlog::info("Moving test_object right");
+            test_object_->getComponent<engine::component::TransformComponent>()->translate(glm::vec2(1, 0));
+        }
+        if (input_manager.isActionPressed("jump"))
+        {
+            spdlog::info("Jumping test_object");
+            test_object_->getComponent<engine::component::PhysicsComponent>()->setVelocity(glm::vec2(0, -400));
+        }
     }
 }
