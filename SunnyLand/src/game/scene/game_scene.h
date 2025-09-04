@@ -31,5 +31,6 @@ namespace game::scene
         void createTestObject();
         void testCamera();
         void testObject();
+        void testCollision();
     };
 }

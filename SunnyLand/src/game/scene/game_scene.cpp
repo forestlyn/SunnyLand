@@ -4,10 +4,12 @@
 #include "../../engine/component/transform_component.h"
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/physics_component.h"
+#include "../../engine/component/collider_component.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
 #include "../../engine/physics/physics_engine.h"
+#include "../../engine/physics/collider.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
 
@@ -37,6 +39,7 @@ namespace game::scene
     {
         Scene::render();
         // spdlog::info("Rendering GameScene");
+        testCollision();
     }
 
     void GameScene::handleInput()
@@ -63,9 +66,20 @@ namespace game::scene
         test_object->addComponent<engine::component::TransformComponent>(glm::vec2(100.0f, 100.0f));
         test_object->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", &(context.getResourceManager()));
         test_object->addComponent<engine::component::PhysicsComponent>(&context.getPhysicsEngine());
+        test_object->addComponent<engine::component::ColliderComponent>(std::make_unique<engine::physics::AABBCollider>(glm::vec2(32.0f, 32.0f)),
+                                                                        engine::utils::Alignment::CENTER);
+
+        auto test_object1 = std::make_unique<engine::object::GameObject>("test_object");
+
+        test_object1->addComponent<engine::component::TransformComponent>(glm::vec2(50.0f, 50.0f));
+        test_object1->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", &(context.getResourceManager()));
+        test_object1->addComponent<engine::component::PhysicsComponent>(&context.getPhysicsEngine(), false);
+        test_object1->addComponent<engine::component::ColliderComponent>(std::make_unique<engine::physics::CircleCollider>(16.0f),
+                                                                         engine::utils::Alignment::CENTER);
 
         // 将创建好的 GameObject 添加到场景中 （一定要用std::move，否则传递的是左值）
         addGameObject(std::move(test_object));
+        addGameObject(std::move(test_object1));
         spdlog::trace("test_object 创建并添加到 GameScene 中。");
     }
 
@@ -106,6 +120,16 @@ namespace game::scene
         {
             spdlog::info("Jumping test_object");
             test_object_->getComponent<engine::component::PhysicsComponent>()->setVelocity(glm::vec2(0, -400));
+        }
+    }
+
+    void GameScene::testCollision()
+    {
+        auto &physics_engine = context.getPhysicsEngine();
+        const auto &collision_pairs = physics_engine.getCollisionPairs();
+        for (const auto &[objA, objB] : collision_pairs)
+        {
+            spdlog::info("Collision detected between {} and {}", objA->getName(), objB->getName());
         }
     }
 }

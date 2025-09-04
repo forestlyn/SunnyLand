@@ -2,6 +2,7 @@
 #include "../core/context.h"
 #include "../object/game_object.h"
 #include "sprite_component.h"
+#include "collider_component.h"
 namespace engine::component
 {
 
@@ -45,6 +46,15 @@ namespace engine::component
             {
                 spriteComponent->updateOffset();
             }
+            ColliderComponent *colliderComponent = m_gameObject->getComponent<ColliderComponent>();
+            if (colliderComponent)
+            {
+                colliderComponent->updateOffset();
+            }
+        }
+        else
+        {
+            spdlog::error("TransformComponent has no owner GameObject when setting scale");
         }
     }
 
