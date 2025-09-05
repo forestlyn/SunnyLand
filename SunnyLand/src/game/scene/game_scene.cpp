@@ -66,7 +66,8 @@ namespace game::scene
         test_object->addComponent<engine::component::TransformComponent>(glm::vec2(100.0f, 100.0f));
         test_object->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", &(context.getResourceManager()));
         test_object->addComponent<engine::component::PhysicsComponent>(&context.getPhysicsEngine());
-        test_object->addComponent<engine::component::ColliderComponent>(std::make_unique<engine::physics::AABBCollider>(glm::vec2(32.0f, 32.0f)),
+        test_object->addComponent<engine::component::ColliderComponent>(&context.getPhysicsEngine(),
+                                                                        std::make_unique<engine::physics::AABBCollider>(glm::vec2(32.0f, 32.0f)),
                                                                         engine::utils::Alignment::CENTER);
 
         auto test_object1 = std::make_unique<engine::object::GameObject>("test_object");
@@ -74,7 +75,8 @@ namespace game::scene
         test_object1->addComponent<engine::component::TransformComponent>(glm::vec2(50.0f, 50.0f));
         test_object1->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", &(context.getResourceManager()));
         test_object1->addComponent<engine::component::PhysicsComponent>(&context.getPhysicsEngine(), false);
-        test_object1->addComponent<engine::component::ColliderComponent>(std::make_unique<engine::physics::CircleCollider>(16.0f),
+        test_object1->addComponent<engine::component::ColliderComponent>(&context.getPhysicsEngine(),
+                                                                         std::make_unique<engine::physics::CircleCollider>(16.0f),
                                                                          engine::utils::Alignment::CENTER);
 
         // 将创建好的 GameObject 添加到场景中 （一定要用std::move，否则传递的是左值）

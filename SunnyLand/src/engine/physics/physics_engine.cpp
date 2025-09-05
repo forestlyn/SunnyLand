@@ -13,12 +13,12 @@ namespace engine::physics
     {
     }
 
-    void PhysicsEngine::registerComponent(engine::component::PhysicsComponent *component)
+    void PhysicsEngine::registerPhysicsComponent(engine::component::PhysicsComponent *component)
     {
         physics_components_.push_back(component);
     }
 
-    void PhysicsEngine::unregisterComponent(engine::component::PhysicsComponent *component)
+    void PhysicsEngine::unregisterPhysicsComponent(engine::component::PhysicsComponent *component)
     {
         if (!component)
             return;
@@ -26,6 +26,22 @@ namespace engine::physics
         if (it != physics_components_.end())
         {
             physics_components_.erase(it);
+        }
+    }
+
+    void PhysicsEngine::registerColliderComponent(engine::component::ColliderComponent *component)
+    {
+        collider_components_.push_back(component);
+    }
+
+    void PhysicsEngine::unregisterColliderComponent(engine::component::ColliderComponent *component)
+    {
+        if (!component)
+            return;
+        auto it = std::remove(collider_components_.begin(), collider_components_.end(), component);
+        if (it != collider_components_.end())
+        {
+            collider_components_.erase(it);
         }
     }
 
@@ -63,27 +79,21 @@ namespace engine::physics
     void PhysicsEngine::updateCollisionPairs()
     {
         collision_pairs_.clear();
-        for (size_t i = 0; i < physics_components_.size(); ++i)
+        for (size_t i = 0; i < collider_components_.size(); ++i)
         {
-            auto *compA = physics_components_[i];
-            if (!compA || !compA->isEnabled())
-                continue;
-            auto *objA = compA->getOwner();
-            if (!objA)
-                continue;
-            auto colliderA = objA->getComponent<engine::component::ColliderComponent>();
+            auto *colliderA = collider_components_[i];
             if (!colliderA || !colliderA->isActive())
                 continue;
-            for (size_t j = i + 1; j < physics_components_.size(); ++j)
+            auto *objA = colliderA->getOwner();
+            if (!objA)
+                continue;
+            for (size_t j = i + 1; j < collider_components_.size(); ++j)
             {
-                auto *compB = physics_components_[j];
-                if (!compB || !compB->isEnabled())
-                    continue;
-                auto *objB = compB->getOwner();
-                if (!objB || objA == objB)
-                    continue;
-                auto colliderB = objB->getComponent<engine::component::ColliderComponent>();
+                auto *colliderB = collider_components_[j];
                 if (!colliderB || !colliderB->isActive())
+                    continue;
+                auto *objB = colliderB->getOwner();
+                if (!objB || objA == objB)
                     continue;
                 // 检测碰撞
                 if (collision::checkCollision(colliderA, colliderB))

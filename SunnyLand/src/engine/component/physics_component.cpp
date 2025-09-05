@@ -24,12 +24,12 @@ namespace engine::component
             return;
         }
         transform_component_ = m_gameObject->getComponent<TransformComponent>();
-        physicsEngine_->registerComponent(this);
+        physicsEngine_->registerPhysicsComponent(this);
     }
 
     void PhysicsComponent::clean()
     {
-        physicsEngine_->unregisterComponent(this);
+        physicsEngine_->unregisterPhysicsComponent(this);
         transform_component_ = nullptr;
     }
 

@@ -9,6 +9,11 @@ namespace engine::core
 {
     class Context;
 }
+
+namespace engine::physics
+{
+    class PhysicsEngine;
+}
 namespace engine::component
 {
     class TransformComponent;
@@ -19,6 +24,7 @@ namespace engine::component
     private:
         std::unique_ptr<engine::physics::Collider> collider_; /// 碰撞体
         TransformComponent *transform_ = nullptr;
+        engine::physics::PhysicsEngine *physics_engine_ = nullptr;
 
         glm::vec2 offset_{0.0f, 0.0f};                                        /// 包围盒左上角相对于 TransformComponent 的position偏移
         engine::utils::Alignment alignment_ = engine::utils::Alignment::NONE; /// 对齐方式
@@ -27,7 +33,8 @@ namespace engine::component
         bool is_active_ = true;   /// 是否启用碰撞检测
 
     public:
-        ColliderComponent(std::unique_ptr<engine::physics::Collider> collider,
+        ColliderComponent(engine::physics::PhysicsEngine *physicsEngine,
+                          std::unique_ptr<engine::physics::Collider> collider,
                           engine::utils::Alignment alignment = engine::utils::Alignment::NONE,
                           bool is_trigger = false, bool is_active = true);
 
@@ -63,6 +70,7 @@ namespace engine::component
     protected:
         void init() override;
         void update(float deltaTime, engine::core::Context &context) override {}
+        void clean() override;
     };
 
 } // namespace engine::component
