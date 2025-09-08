@@ -27,7 +27,7 @@ namespace engine::core
         {
             delta_time_ = current_delta_time;
         }
-        last_time_ = frame_start_time_;
+        last_time_ = SDL_GetTicksNS();
         // spdlog::info("Time updated: frame_start_time_ = {}, delta_time_ = {}", frame_start_time_, delta_time_);
     }
 
@@ -92,6 +92,13 @@ namespace engine::core
                 SDL_DelayNS(wait_time);
                 delta_time_ = SDL_GetTicksNS() - frame_start_time_;
                 delta_time_ /= 1000000000.0; // Convert to seconds
+                // spdlog::info("Frame rate limited:{}ns waited {} ns, new delta_time_ = {}", delta_time, wait_time, delta_time_);
+            }
+            else
+            {
+                // delta_time_ = delta_time;
+                // 这里暂时不能设置时间，否则导致时间过长物体直接穿墙而过
+                spdlog::info("Frame rate limit exceeded: {} > {}", delta_time, target_frame_time_);
             }
         }
     }

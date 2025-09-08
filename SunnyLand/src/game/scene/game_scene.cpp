@@ -5,6 +5,7 @@
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/physics_component.h"
 #include "../../engine/component/collider_component.h"
+#include "../../engine/component/tilelayer_component.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
@@ -22,11 +23,25 @@ namespace game::scene
 
     void GameScene::initialize()
     {
-        Scene::initialize();
         spdlog::info("Initializing GameScene");
         engine::scene::LevelLoader level_loader;
         level_loader.loadLevel("./assets/maps/level1.tmj", *this);
-        createTestObject();
+
+        auto main_obj = findGameObjectByName("main");
+        if (main_obj)
+        {
+            auto *layer = main_obj->getComponent<engine::component::TileLayerComponent>();
+            if (layer)
+            {
+                context.getPhysicsEngine().registerCollisionTileLayer(layer);
+            }
+        }
+        player_ = findGameObjectByName("player");
+        if (!player_)
+        {
+            spdlog::error("Player object not found in the scene");
+        }
+        Scene::initialize();
     }
 
     void GameScene::update(float deltaTime)
@@ -39,14 +54,14 @@ namespace game::scene
     {
         Scene::render();
         // spdlog::info("Rendering GameScene");
-        testCollision();
+        // testCollision();
     }
 
     void GameScene::handleInput()
     {
         Scene::handleInput();
         // spdlog::info("Handling input in GameScene");
-        testObject();
+        testPlayer();
         // testCamera();
     }
 
@@ -54,35 +69,6 @@ namespace game::scene
     {
         Scene::close();
         spdlog::info("Closing GameScene");
-    }
-
-    void GameScene::createTestObject()
-    {
-        spdlog::trace("在 GameScene 中创建 test_object...");
-        auto test_object = std::make_unique<engine::object::GameObject>("test_object");
-        test_object_ = test_object.get();
-
-        // 添加组件
-        test_object->addComponent<engine::component::TransformComponent>(glm::vec2(100.0f, 100.0f));
-        test_object->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", &(context.getResourceManager()));
-        test_object->addComponent<engine::component::PhysicsComponent>(&context.getPhysicsEngine());
-        test_object->addComponent<engine::component::ColliderComponent>(&context.getPhysicsEngine(),
-                                                                        std::make_unique<engine::physics::AABBCollider>(glm::vec2(32.0f, 32.0f)),
-                                                                        engine::utils::Alignment::CENTER);
-
-        auto test_object1 = std::make_unique<engine::object::GameObject>("test_object");
-
-        test_object1->addComponent<engine::component::TransformComponent>(glm::vec2(50.0f, 50.0f));
-        test_object1->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", &(context.getResourceManager()));
-        test_object1->addComponent<engine::component::PhysicsComponent>(&context.getPhysicsEngine(), false);
-        test_object1->addComponent<engine::component::ColliderComponent>(&context.getPhysicsEngine(),
-                                                                         std::make_unique<engine::physics::CircleCollider>(16.0f),
-                                                                         engine::utils::Alignment::CENTER);
-
-        // 将创建好的 GameObject 添加到场景中 （一定要用std::move，否则传递的是左值）
-        addGameObject(std::move(test_object));
-        addGameObject(std::move(test_object1));
-        spdlog::trace("test_object 创建并添加到 GameScene 中。");
     }
 
     void GameScene::testCamera()
@@ -99,30 +85,43 @@ namespace game::scene
             camera.move(glm::vec2(1, 0));
     }
 
-    void GameScene::testObject()
+    void GameScene::testPlayer()
     {
-        if (!test_object_)
+        if (!player_)
         {
-            spdlog::warn("test_object_ is null");
+            spdlog::warn("player_ is null");
             return;
         }
         auto &input_manager = context.getInputManager();
-
+        auto physics_comp = player_->getComponent<engine::component::PhysicsComponent>();
+        if (!physics_comp)
+        {
+            return;
+        }
         if (input_manager.isActionDown("move_left"))
         {
-            spdlog::info("Moving test_object left");
-            test_object_->getComponent<engine::component::TransformComponent>()->translate(glm::vec2(-1, 0));
+            physics_comp->velocity_.x = -100.0f;
+        }
+        else
+        {
+            physics_comp->velocity_.x *= 0.9f;
         }
         if (input_manager.isActionDown("move_right"))
         {
-            spdlog::info("Moving test_object right");
-            test_object_->getComponent<engine::component::TransformComponent>()->translate(glm::vec2(1, 0));
+            physics_comp->velocity_.x = 100.0f;
+        }
+        else
+        {
+            physics_comp->velocity_.x *= 0.9f;
         }
         if (input_manager.isActionPressed("jump"))
         {
-            spdlog::info("Jumping test_object");
-            test_object_->getComponent<engine::component::PhysicsComponent>()->setVelocity(glm::vec2(0, -400));
+            physics_comp->velocity_.y = -400.0f;
         }
+        // if (physics_comp->velocity_.y != 0.0f || physics_comp->velocity_.x != 0.0f)
+        // {
+        //     spdlog::info("Player velocity: ({}, {})", physics_comp->velocity_.x, physics_comp->velocity_.y);
+        // }
     }
 
     void GameScene::testCollision()

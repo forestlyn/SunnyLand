@@ -69,7 +69,6 @@ namespace engine::component
         if (transform_ == nullptr || collider_ == nullptr)
             return;
 
-        auto position = transform_->getPosition();
         auto size = collider_->getAABBSize() * transform_->getScale();
 
         switch (alignment_)

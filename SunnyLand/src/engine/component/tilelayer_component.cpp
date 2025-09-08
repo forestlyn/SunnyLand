@@ -5,7 +5,6 @@
 #include "../render/camera.h"
 #include <spdlog/spdlog.h>
 
-#
 namespace engine::component
 {
     TileLayerComponent::TileLayerComponent(glm::ivec2 tile_size, glm::ivec2 map_size, std::vector<TileInfo> &&tiles)
@@ -56,6 +55,10 @@ namespace engine::component
                     context.getRenderer().drawSprite(context.getCamera(), tile->sprite, spritePos);
                     // spdlog::info("TileLayerComponent::render: drawing tile at ({}, {}) {} {}", i, j, spritePos.x, spritePos.y);
                 }
+                else if (!tile)
+                {
+                    spdlog::error("render:please check map_size_");
+                }
             }
         }
     }
@@ -98,6 +101,15 @@ namespace engine::component
     glm::vec2 TileLayerComponent::getWorldPos(glm::ivec2 &mapPos) const
     {
         return glm::vec2(offset_.x + mapPos.x * tile_size_.x, offset_.y + mapPos.y * tile_size_.y);
+    }
+
+    void TileLayerComponent::clean()
+    {
+        if (physics_engine_)
+        {
+            physics_engine_->unregisterCollisionTileLayer(this);
+            physics_engine_ = nullptr;
+        }
     }
 
 } // namespace engine::component

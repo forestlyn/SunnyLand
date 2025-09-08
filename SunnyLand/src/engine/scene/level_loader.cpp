@@ -2,7 +2,11 @@
 #include "../component/parallax_component.h"
 #include "../component/transform_component.h"
 #include "../component/tilelayer_component.h"
+#include "../component/collider_component.h"
+#include "../component/physics_component.h"
 #include "../component/sprite_component.h"
+#include "../physics/collider.h"
+#include "../physics/physics_engine.h"
 #include "../object/game_object.h"
 #include "../scene/scene.h"
 #include "../core/context.h"
@@ -188,6 +192,43 @@ namespace engine::scene
                     engine::component::TransformComponent *transform = gameObj->addComponent<engine::component::TransformComponent>(glm::vec2(x, y - height), rotation, scale);
                     engine::component::SpriteComponent *spriteComp = gameObj->addComponent<engine::component::SpriteComponent>(std::move(tile_info.sprite), &(scene.getContext().getResourceManager()));
                     spriteComp->setHidden(!visible);
+
+                    auto tileJson = getTileJsonByGid(gid);
+                    auto useGravity = getPropertyFromJson<bool>(tileJson, "gravity");
+                    auto tagname = getPropertyFromJson<std::string>(tileJson, "tag");
+
+                    if (tile_info.type == engine::component::TileType::Solid)
+                    {
+                        auto collider = std::make_unique<engine::physics::AABBCollider>(glm::vec2(src_rect->w, src_rect->h));
+                        engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
+                        engine::component::PhysicsComponent *physicsComp = gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+                        gameObj->setTag("Solid");
+                    }
+                    else if (auto rect = getColliderRect(tileJson); rect)
+                    {
+                        auto collider = std::make_unique<engine::physics::AABBCollider>(rect->size);
+                        engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
+                        colliderComp->setOffset(rect->position);
+                        engine::component::PhysicsComponent *physicsComp = gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+                    }
+
+                    if (tagname)
+                    {
+                        gameObj->setTag(tagname.value());
+                    }
+                    if (useGravity)
+                    {
+                        auto physicsComp = gameObj->getComponent<engine::component::PhysicsComponent>();
+                        if (physicsComp)
+                        {
+                            physicsComp->setUseGravity(useGravity.value());
+                        }
+                        else
+                        {
+                            spdlog::warn("对象 '{}' 在设置重力信息时没有物理组件，请检查地图设置。", gameObj->getName());
+                            gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), useGravity.value());
+                        }
+                    }
                     scene.addGameObject(std::move(gameObj));
                     spdlog::trace("Object loaded: {} at ({}, {})", name, x, y);
                 }
@@ -223,7 +264,7 @@ namespace engine::scene
         auto tile_set = m_tileset_data.upper_bound(gid);
         if (tile_set == m_tileset_data.begin())
         {
-            spdlog::warn("Unknown tileset for gid: {}", gid);
+            spdlog::warn("getTileInfoByGid:Unknown tileset for gid: {}", gid);
             return engine::component::TileInfo();
         }
         --tile_set;
@@ -236,6 +277,7 @@ namespace engine::scene
             return engine::component::TileInfo();
         }
         auto tileset_path = tilesetJson.value("path", "");
+        // 处理瓦片集
         if (tilesetJson.contains("image"))
         {
             auto image_path = resolvePath(tilesetJson["image"], tileset_path);
@@ -251,8 +293,10 @@ namespace engine::scene
             auto tile_height = m_tile_size.y;
             SDL_FRect src_rect = {x * tile_width, y * tile_height, tile_width, tile_height};
             engine::render::Sprite sprite = engine::render::Sprite(image_path, src_rect);
-            return engine::component::TileInfo(sprite, engine::component::TileType::Normal);
+            auto type = getTileTypeById(tilesetJson, local_gid);
+            return engine::component::TileInfo(sprite, type);
         }
+        // 处理单独瓦片
         else
         {
             if (!tilesetJson.contains("tiles"))
@@ -271,15 +315,109 @@ namespace engine::scene
                 if (tile_id != local_gid)
                     continue;
                 std::string tile_image = resolvePath(tile["image"], tileset_path);
-                auto image_width = tile.value("imagewidth", 0);
-                auto image_height = tile.value("imageheight", 0);
-                SDL_FRect src_rect = {tile.value("x", 0), tile.value("y", 0), tile.value("width", image_width), tile.value("height", image_height)};
+                auto image_width = tile.value("imagewidth", 0.0f);
+                auto image_height = tile.value("imageheight", 0.0f);
+                SDL_FRect src_rect = {tile.value("x", 0.0f), tile.value("y", 0.0f), tile.value("width", image_width), tile.value("height", image_height)};
                 auto sprite = engine::render::Sprite(tile_image, src_rect);
-                return engine::component::TileInfo(sprite, engine::component::TileType::Normal);
+                auto type = getTileType(tile);
+                return engine::component::TileInfo(sprite, type);
             }
         }
-        spdlog::warn("Unknown tileset for gid: {}", gid);
+        spdlog::warn("getTileInfoByGid:Unknown tileset for gid: {}", gid);
         return engine::component::TileInfo();
+    }
+
+    engine::component::TileType LevelLoader::getTileType(const nlohmann::json &tilejson)
+    {
+        if (!tilejson.contains("properties"))
+        {
+            return engine::component::TileType::Normal;
+        }
+        auto properties_json = tilejson["properties"];
+        for (const auto &prop : properties_json)
+        {
+            if (prop.contains("name") && prop["name"] == "solid")
+            {
+                bool solid = prop.value("value", false);
+                return solid ? engine::component::TileType::Solid : engine::component::TileType::Normal;
+            }
+        }
+        return engine::component::TileType::Normal;
+    }
+
+    engine::component::TileType LevelLoader::getTileTypeById(const nlohmann::json &tileset_json, int id)
+    {
+        if (!tileset_json.contains("tiles"))
+        {
+            spdlog::warn("Tileset is missing tiles property for id: {}", id);
+            return engine::component::TileType::Normal;
+        }
+        for (const auto &tile : tileset_json["tiles"])
+        {
+            if (tile.contains("id") && tile["id"].is_number_integer() && tile["id"] == id)
+            {
+                return getTileType(tile);
+            }
+        }
+        return engine::component::TileType::Normal;
+    }
+
+    std::optional<engine::utils::Rect> LevelLoader::getColliderRect(const nlohmann::json &tileJson)
+    {
+        if (tileJson.contains("objectgroup") && tileJson["objectgroup"].contains("objects"))
+        {
+            auto objs = tileJson["objectgroup"]["objects"];
+            if (objs.is_array())
+            {
+                for (auto obj : objs)
+                {
+                    if (obj.contains("x") && obj.contains("y") && obj.contains("width") && obj.contains("height"))
+                    {
+                        engine::utils::Rect rect = {glm::vec2(obj["x"], obj["y"]),
+                                                    glm::vec2(obj["width"], obj["height"])};
+                        return rect;
+                    }
+                }
+            }
+        }
+        return std::nullopt;
+    }
+
+    std::optional<nlohmann::json> LevelLoader::getTileJsonByGid(int gid)
+    {
+        if (gid == 0)
+        {
+            return std::nullopt;
+        }
+        auto tile_set = m_tileset_data.upper_bound(gid);
+        if (tile_set == m_tileset_data.begin())
+        {
+            spdlog::warn("getTileJsonByGid:Unknown tileset for gid: {}", gid);
+            return std::nullopt;
+        }
+        --tile_set;
+        auto first_gid = tile_set->first;
+        auto tilesetJson = tile_set->second;
+        auto local_gid = gid - first_gid;
+        if (!tilesetJson.contains("tiles") || !tilesetJson["tiles"].is_array())
+        {
+            spdlog::warn("Tileset is missing tiles property for gid: {}", gid);
+            return std::nullopt;
+        }
+        for (const auto &tile : tilesetJson["tiles"])
+        {
+            if (!tile.contains("id"))
+            {
+                spdlog::warn("Tile is missing id property for gid: {}", gid);
+                continue;
+            }
+            int tile_id = tile["id"];
+            if (tile_id != local_gid)
+                continue;
+            return tile;
+        }
+        spdlog::warn("getTileJsonByGid:Unknown tileset for gid: {}", gid);
+        return std::nullopt;
     }
 
     std::string LevelLoader::resolvePath(const std::string &relative_path, const std::string &file_path)

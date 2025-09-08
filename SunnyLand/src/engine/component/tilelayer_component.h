@@ -3,6 +3,7 @@
 #include "../render/sprite.h"
 #include <glm/vec2.hpp>
 #include <vector>
+#include "../physics/physics_engine.h"
 namespace engine::render
 {
     class Sprite;
@@ -12,13 +13,14 @@ namespace engine::core
 {
     class Context;
 }
+
 namespace engine::component
 {
     enum class TileType
     {
         None,
         Normal,
-        SOLID
+        Solid
     };
 
     struct TileInfo
@@ -40,6 +42,8 @@ namespace engine::component
         glm::vec2 offset_ = {0.0f, 0.0f};
         std::vector<TileInfo> tiles_;
         bool is_hidden;
+
+        engine::physics::PhysicsEngine *physics_engine_ = nullptr;
 
     public:
         TileLayerComponent(glm::ivec2 tile_size, glm::ivec2 map_size, std::vector<TileInfo> &&tiles);
@@ -68,10 +72,13 @@ namespace engine::component
         bool isHidden() const { return is_hidden; }
         void setHidden(bool hidden) { is_hidden = hidden; }
 
+        void setPhysicsEngine(engine::physics::PhysicsEngine *engine) { physics_engine_ = engine; }
+
     private:
         void init() override;
         void update(float deltaTime, engine::core::Context &context) override {}
         void render(engine::core::Context &context) override;
+        void clean() override;
     };
 
 } // namespace engine::component

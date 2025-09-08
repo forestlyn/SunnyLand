@@ -39,7 +39,7 @@ namespace engine::scene
         void safeAddGameObject(std::unique_ptr<engine::object::GameObject> &&game_object);
         void removeGameObject(engine::object::GameObject *game_object);
         void safeRemoveGameObject(engine::object::GameObject *game_object);
-        engine::object::GameObject *getGameObjectByName(const std::string &name);
+        engine::object::GameObject *findGameObjectByName(const std::string &name);
 
         virtual void initialize();
         virtual void handleInput();

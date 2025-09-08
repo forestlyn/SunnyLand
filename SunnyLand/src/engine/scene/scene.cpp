@@ -55,7 +55,7 @@ namespace engine::scene
         game_object->setNeedRemove(true);
     }
 
-    engine::object::GameObject *Scene::getGameObjectByName(const std::string &name)
+    engine::object::GameObject *Scene::findGameObjectByName(const std::string &name)
     {
         for (const auto &obj : game_objects)
         {
@@ -69,8 +69,6 @@ namespace engine::scene
 
     void Scene::initialize()
     {
-        game_objects = std::vector<std::unique_ptr<engine::object::GameObject>>();
-        pending_game_objects = std::vector<std::unique_ptr<engine::object::GameObject>>();
         is_initialize = true;
     }
 

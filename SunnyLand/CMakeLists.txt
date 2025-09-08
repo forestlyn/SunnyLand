@@ -19,6 +19,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR})
 
 set(TARGET ${PROJECT_NAME}-${CMAKE_SYSTEM_NAME})
 
+
 # 查找并载入Cmake预设
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
@@ -67,3 +68,5 @@ target_link_libraries(${TARGET}
                         nlohmann_json::nlohmann_json
                         spdlog::spdlog
                         )
+
+SET_TARGET_PROPERTIES(${TARGET} PROPERTIES LINK_FLAGS "/PROFILE")

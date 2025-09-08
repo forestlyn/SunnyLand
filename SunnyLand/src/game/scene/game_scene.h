@@ -17,7 +17,7 @@ namespace game::scene
 {
     class GameScene final : public engine::scene::Scene
     {
-        engine::object::GameObject *test_object_;
+        engine::object::GameObject *player_;
 
     public:
         GameScene(std::string scene_name, engine::core::Context &context, engine::scene::SceneManager &scene_manager);
@@ -28,9 +28,8 @@ namespace game::scene
         void close() override;
 
     private:
-        void createTestObject();
         void testCamera();
-        void testObject();
+        void testPlayer();
         void testCollision();
     };
 }
