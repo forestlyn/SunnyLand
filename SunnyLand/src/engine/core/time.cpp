@@ -15,7 +15,7 @@ namespace engine::core
     {
         Uint64 current_time = SDL_GetTicksNS();
         frame_start_time_ = current_time;
-
+        frame_count_++;
         double current_delta_time = static_cast<double>(frame_start_time_ - last_time_) / 1000000000.0;
 
         // Limit time
@@ -92,6 +92,8 @@ namespace engine::core
                 SDL_DelayNS(wait_time);
                 delta_time_ = SDL_GetTicksNS() - frame_start_time_;
                 delta_time_ /= 1000000000.0; // Convert to seconds
+                total_run_time_ += delta_time;
+                total_wait_time_ += static_cast<double>(wait_time) / 1000000000.0;
                 // spdlog::info("Frame rate limited:{}ns waited {} ns, new delta_time_ = {}", delta_time, wait_time, delta_time_);
             }
             else
@@ -101,5 +103,24 @@ namespace engine::core
                 spdlog::info("Frame rate limit exceeded: {} > {}", delta_time, target_frame_time_);
             }
         }
+    }
+    void Time::logTimeStats() const
+    {
+        if (frame_count_ == 0)
+            return; // Avoid division by zero
+
+        double average_run_time = total_run_time_ / frame_count_;
+        double average_wait_time = total_wait_time_ / frame_count_;
+        spdlog::info("Time Stats - Total Run Time: {:.6f}s, Total Wait Time: {:.6f}s, Frame Count: {}, Average Run Time: {:.6f}s, Average Wait Time: {:.6f}s",
+                     total_run_time_, total_wait_time_, frame_count_, average_run_time, average_wait_time);
+    }
+
+    void Time::clean()
+    {
+        logTimeStats();
+        total_run_time_ = 0.0;
+        total_wait_time_ = 0.0;
+        frame_count_ = 0;
+        spdlog::info("Time cleaned: total_run_time_, total_wait_time_, and frame_count_ reset to 0.");
     }
 } // namespace engine::core

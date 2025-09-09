@@ -170,7 +170,7 @@ namespace engine::component
             sprite_size_ = {rect.w, rect.h};
         }
         else
-            sprite_size_ = resource_manager_->getTextureSize(sprite_.getTextureId());
+            sprite_size_ = resource_manager_->getTextureSize(sprite_.getConstTextureId());
     }
 
     void SpriteComponent::render(engine::core::Context &context)

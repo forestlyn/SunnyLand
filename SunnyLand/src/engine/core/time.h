@@ -17,6 +17,10 @@ namespace engine::core
         int target_fps_ = 0;           // Target frames per second
         double target_frame_time_ = 0; // Target frame time in milliseconds
 
+        double total_run_time_ = 0.0;
+        double total_wait_time_ = 0.0;
+        int frame_count_ = 0;
+
     public:
         Time();
 
@@ -41,7 +45,10 @@ namespace engine::core
         /// @brief Gets the target frames per second.
         int getTargetFPS() const;
 
+        void clean();
+
     private:
         void limitFrameRate(double delta_time);
+        void logTimeStats() const;
     };
 } // namespace engine::core

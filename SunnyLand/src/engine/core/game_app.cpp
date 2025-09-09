@@ -321,6 +321,7 @@ namespace engine::core
     {
         scene_manager_->close();
         resource_manager_.reset();
+        time_->clean();
         spdlog::info("Closing GameApp");
         if (sdl_renderer_)
         {

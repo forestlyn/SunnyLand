@@ -166,7 +166,7 @@ namespace engine::scene
                 else
                 {
                     auto tile_info = getTileInfoByGid(gid);
-                    if (tile_info.sprite.getTextureId().empty())
+                    if (tile_info.sprite.getConstTextureId().empty())
                     {
                         spdlog::warn("Object gid {} has no valid sprite", gid);
                         continue;
@@ -269,7 +269,7 @@ namespace engine::scene
         }
         --tile_set;
         auto first_gid = tile_set->first;
-        auto tilesetJson = tile_set->second;
+        const auto &tilesetJson = tile_set->second;
         auto local_gid = gid - first_gid;
         if (!tilesetJson.contains("path"))
         {

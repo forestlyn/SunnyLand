@@ -25,7 +25,7 @@ namespace engine::render
     void Renderer::drawSprite(const Camera &camera, const engine::render::Sprite &sprite, const glm::vec2 &position,
                               const glm::vec2 &scale, float rotation)
     {
-        auto texture = resourceManager_->getTexture(sprite.getTextureId());
+        auto texture = resourceManager_->getTexture(sprite.getConstTextureId());
         if (!texture)
         {
             spdlog::error("Failed to get texture for sprite");
@@ -63,7 +63,7 @@ namespace engine::render
     void Renderer::drawParallax(const Camera &camera, const engine::render::Sprite &sprite, const glm::vec2 &position,
                                 const glm::vec2 &scroll_factor, const glm::bvec2 &repeat, const glm::vec2 &scale)
     {
-        auto texture = resourceManager_->getTexture(sprite.getTextureId());
+        auto texture = resourceManager_->getTexture(sprite.getConstTextureId());
         if (!texture)
         {
             spdlog::error("Failed to get texture for sprite");
@@ -131,7 +131,7 @@ namespace engine::render
 
     void Renderer::drawUISprite(const Sprite &sprite, const glm::vec2 &position, const std::optional<glm::vec2> &size)
     {
-        auto texture = resourceManager_->getTexture(sprite.getTextureId());
+        auto texture = resourceManager_->getTexture(sprite.getConstTextureId());
         if (!texture)
         {
             spdlog::error("Failed to get texture for sprite");
@@ -210,7 +210,7 @@ namespace engine::render
         else
         {
             // If no rect is provided, use the full texture size
-            auto texture = resourceManager_->getTexture(sprite.getTextureId());
+            auto texture = resourceManager_->getTexture(sprite.getConstTextureId());
             if (texture)
             {
                 SDL_FRect fullRect = {0, 0, static_cast<float>(texture->w), static_cast<float>(texture->h)};
@@ -218,7 +218,7 @@ namespace engine::render
             }
             else
             {
-                spdlog::error("Texture not found for sprite: {}", sprite.getTextureId());
+                spdlog::error("Texture not found for sprite: {}", sprite.getConstTextureId());
                 return std::nullopt;
             }
         }
