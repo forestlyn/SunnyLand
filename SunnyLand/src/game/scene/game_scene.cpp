@@ -41,6 +41,16 @@ namespace game::scene
         {
             spdlog::error("Player object not found in the scene");
         }
+        else
+        {
+            auto transform = player_->getComponent<engine::component::TransformComponent>();
+            if (transform)
+                context.getCamera().setFollowTarget(transform);
+        }
+
+        auto world_size = main_obj->getComponent<engine::component::TileLayerComponent>()->getWorldSize();
+        context.getCamera().setLimitBounds(engine::utils::Rect(glm::vec2(0), world_size));
+        context.getPhysicsEngine().setWorldBound(engine::utils::Rect(glm::vec2(0), world_size));
         Scene::initialize();
     }
 

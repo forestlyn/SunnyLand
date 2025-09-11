@@ -86,6 +86,8 @@ namespace engine::physics
             component->clearForce();
 
             resolveTileLayerCollision(component, deltaTime);
+
+            applyWorldBound(component);
         }
         // 更新碰撞对
         updateCollisionPairs();
@@ -143,6 +145,20 @@ namespace engine::physics
                     newWorldPos.x = (tilex + 1) * tileSize.x;
                     component->velocity_.x = 0.0f;
                 }
+                else
+                {
+                    // 检测左下角的斜坡
+                    float slopeHeight = getTileHeightAtWidth(newWorldPos.x - tilex * tileSize.x, y_bottom_left_type, tileSize);
+                    if (slopeHeight > 0.0f)
+                    {
+                        // 地面位置=底部tile*size +（tile高度-斜坡高度）
+                        float groundY = tiley_bottom_left * tileSize.y + (tileSize.y - slopeHeight);
+                        if (newWorldPos.y + worldSize.y > groundY)
+                        {
+                            newWorldPos.y = groundY - worldSize.y;
+                        }
+                    }
+                }
             }
             else if (deltaMove.x > 0.0f) // 向右移动
             {
@@ -159,6 +175,19 @@ namespace engine::physics
                     // 碰撞，调整位置和速度
                     newWorldPos.x = tilex * tileSize.x - worldSize.x;
                     component->velocity_.x = 0.0f;
+                }
+                else
+                {
+                    // 检测右下角的斜坡
+                    float slopeHeight = getTileHeightAtWidth(newWorldPos.x + worldSize.x - tilex * tileSize.x, y_bottom_right_type, tileSize);
+                    if (slopeHeight > 0.0f)
+                    {
+                        float groundY = tiley_bottom_right * tileSize.y + (tileSize.y - slopeHeight);
+                        if (newWorldPos.y + worldSize.y > groundY)
+                        {
+                            newWorldPos.y = groundY - worldSize.y;
+                        }
+                    }
                 }
             }
             // 再计算Y轴方向的碰撞,X方向按照原本位置计算
@@ -178,6 +207,7 @@ namespace engine::physics
                     newWorldPos.y = (tiley + 1) * tileSize.y;
                     component->velocity_.y = 0.0f;
                 }
+                // 不处理斜坡，斜坡只能在脚下
             }
             else if (deltaMove.y > 0.0f) // 向下移动
             {
@@ -189,11 +219,29 @@ namespace engine::physics
                 glm::ivec2 tilePosBottomRight = glm::ivec2(tilex_bottom_right, tiley);
                 auto x_bottom_right_type = tileLayer->getTileType(tilePosBottomRight);
 
-                if (x_bottom_left_type == engine::component::TileType::Solid || x_bottom_right_type == engine::component::TileType::Solid)
+                if (x_bottom_left_type == engine::component::TileType::Solid || x_bottom_right_type == engine::component::TileType::Solid ||
+                    x_bottom_left_type == engine::component::TileType::UniSolid || x_bottom_right_type == engine::component::TileType::UniSolid)
                 {
                     // 碰撞，调整位置和速度
                     newWorldPos.y = tiley * tileSize.y - worldSize.y;
                     component->velocity_.y = 0.0f;
+                }
+                else
+                {
+                    // 检测脚下的斜坡
+                    float slopeHeightLeft = getTileHeightAtWidth(newWorldPos.x - tilex_bottom_left * tileSize.x, x_bottom_left_type, tileSize);
+                    float slopeHeightRight = getTileHeightAtWidth(newWorldPos.x + worldSize.x - tilex_bottom_right * tileSize.x, x_bottom_right_type, tileSize);
+                    float slopeHeight = std::max(slopeHeightLeft, slopeHeightRight);
+                    if (slopeHeight > 0.0f)
+                    {
+                        float groundY = tiley * tileSize.y + (tileSize.y - slopeHeight);
+                        if (newWorldPos.y + worldSize.y > groundY)
+                        {
+                            newWorldPos.y = groundY - worldSize.y;
+                            // 落地，速度归0
+                            component->velocity_.y = 0.0f;
+                        }
+                    }
                 }
             }
         }
@@ -306,6 +354,60 @@ namespace engine::physics
                     }
                 }
             }
+        }
+    }
+
+    void PhysicsEngine::applyWorldBound(engine::component::PhysicsComponent *component)
+    {
+        if (!component || !world_bound_)
+            return;
+        auto *obj = component->getOwner();
+        if (!obj)
+            return;
+        auto *transform = obj->getComponent<engine::component::TransformComponent>();
+        auto *colliderComp = obj->getComponent<engine::component::ColliderComponent>();
+        auto worldAABB = colliderComp->getWorldAABB();
+        auto worldPos = worldAABB.position; // 左上角位置
+        auto worldSize = worldAABB.size;
+
+        // 只检查上边界和左边界右边界，下边界允许超出
+        if (worldPos.x < world_bound_->position.x)
+        {
+            worldPos.x = world_bound_->position.x;
+            component->velocity_.x = 0.0f;
+        }
+        else if (worldPos.x + worldSize.x > world_bound_->position.x + world_bound_->size.x)
+        {
+            worldPos.x = world_bound_->position.x + world_bound_->size.x - worldSize.x;
+            component->velocity_.x = 0.0f;
+        }
+        if (worldPos.y < world_bound_->position.y)
+        {
+            worldPos.y = world_bound_->position.y;
+            component->velocity_.y = 0.0f;
+        }
+        transform->translate(worldPos - worldAABB.position);
+    }
+
+    float PhysicsEngine::getTileHeightAtWidth(float width, engine::component::TileType type, const glm::ivec2 &tileSize)
+    {
+        float x = glm::clamp(width / static_cast<float>(tileSize.x), 0.0f, 1.0f);
+        switch (type)
+        {
+        case engine::component::TileType::Slope_0_1:
+            return tileSize.y * x;
+        case engine::component::TileType::Slope_1_0:
+            return tileSize.y * (1.0f - x);
+        case engine::component::TileType::Slope_0_2:
+            return tileSize.y * x * 0.5f;
+        case engine::component::TileType::Slope_2_0:
+            return tileSize.y * 0.5f * (1.0f - x);
+        case engine::component::TileType::Slope_1_2:
+            return tileSize.y * (1.0f - x * 0.5f);
+        case engine::component::TileType::Slope_2_1:
+            return tileSize.y * (0.5f + x * 0.5f);
+        default:
+            return 0.0f;
         }
     }
 } // namespace engine::physics

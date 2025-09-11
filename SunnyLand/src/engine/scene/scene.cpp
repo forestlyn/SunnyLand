@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 #include "../core/context.h"
 #include "../physics/physics_engine.h"
+#include "../render/camera.h"
 
 namespace engine::scene
 {
@@ -101,7 +102,7 @@ namespace engine::scene
         }
 
         context.getPhysicsEngine().update(delta_time);
-
+        context.getCamera().update(delta_time);
         for (auto it = game_objects.begin(); it != game_objects.end();)
         {
             if ((*it) && (*it)->isActive() && ((*it)->isNeedRemove() == false))

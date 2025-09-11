@@ -341,6 +341,30 @@ namespace engine::scene
                 bool solid = prop.value("value", false);
                 return solid ? engine::component::TileType::Solid : engine::component::TileType::Normal;
             }
+            if (prop.contains("name") && prop["name"] == "unisolid")
+            {
+                bool unisolid = prop.value("value", false);
+                return unisolid ? engine::component::TileType::UniSolid : engine::component::TileType::Normal;
+            }
+
+            if (prop.contains("name") && prop["name"] == "slope")
+            {
+                std::string slope = prop.value("value", "");
+                if (slope == "0_1")
+                    return engine::component::TileType::Slope_0_1;
+                else if (slope == "1_0")
+                    return engine::component::TileType::Slope_1_0;
+                else if (slope == "0_2")
+                    return engine::component::TileType::Slope_0_2;
+                else if (slope == "2_0")
+                    return engine::component::TileType::Slope_2_0;
+                else if (slope == "1_2")
+                    return engine::component::TileType::Slope_1_2;
+                else if (slope == "2_1")
+                    return engine::component::TileType::Slope_2_1;
+                else
+                    return engine::component::TileType::Normal;
+            }
         }
         return engine::component::TileType::Normal;
     }

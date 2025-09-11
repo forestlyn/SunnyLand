@@ -1,7 +1,10 @@
 #pragma once
 #include "../utils/math.h"
 #include <optional>
-
+namespace engine::component
+{
+    class TransformComponent;
+}
 namespace engine::render
 {
 
@@ -11,7 +14,8 @@ namespace engine::render
         glm::vec2 viewport_size_;
         glm::vec2 position_;
         std::optional<engine::utils::Rect> limit_bounds_;
-
+        engine::component::TransformComponent *follow_target_ = nullptr;
+        float smooth_factor_ = 5.0f;
         void clampPosition();
 
     public:
@@ -37,5 +41,8 @@ namespace engine::render
 
         std::optional<engine::utils::Rect> getLimitBounds() const;
         void setLimitBounds(const std::optional<engine::utils::Rect> &bounds);
+
+        void setFollowTarget(engine::component::TransformComponent *target) { follow_target_ = target; }
+        engine::component::TransformComponent *getFollowTarget() const { return follow_target_; }
     };
 }

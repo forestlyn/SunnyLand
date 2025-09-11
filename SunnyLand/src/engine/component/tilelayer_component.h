@@ -20,7 +20,14 @@ namespace engine::component
     {
         None,
         Normal,
-        Solid
+        Solid,     // 实心碰撞
+        UniSolid,  // 单向碰撞
+        Slope_0_1, // 斜坡,0 to 1
+        Slope_1_0, // 斜坡,1 to 0
+        Slope_0_2, // 斜坡,0 to 1/2
+        Slope_2_0, // 斜坡,1/2 to 0
+        Slope_1_2, // 斜坡,1 to 1/2
+        Slope_2_1  // 斜坡,1/2 to 1
     };
 
     struct TileInfo
