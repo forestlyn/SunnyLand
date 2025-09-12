@@ -13,6 +13,7 @@
 #include "../../engine/physics/collider.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
+#include "../component/player_component.h"
 
 namespace game::scene
 {
@@ -24,9 +25,30 @@ namespace game::scene
     void GameScene::initialize()
     {
         spdlog::info("Initializing GameScene");
-        engine::scene::LevelLoader level_loader;
-        level_loader.loadLevel("./assets/maps/level1.tmj", *this);
+        if (!initLevel())
+        {
+            spdlog::error("Failed to initialize level");
+            context.getInputManager().setShouldExit(true);
+        }
+        if (!initPlayer())
+        {
+            spdlog::error("Failed to initialize player");
+            context.getInputManager().setShouldExit(true);
+        }
+        Scene::initialize();
+        spdlog::info("GameScene initialized successfully");
+    }
 
+    bool GameScene::initLevel()
+    {
+        // 这里可以添加额外的关卡初始化逻辑
+        engine::scene::LevelLoader level_loader;
+        bool success = level_loader.loadLevel("./assets/maps/level1.tmj", *this);
+        if (!success)
+        {
+            spdlog::error("Failed to load level");
+            return false;
+        }
         auto main_obj = findGameObjectByName("main");
         if (main_obj)
         {
@@ -35,23 +57,51 @@ namespace game::scene
             {
                 context.getPhysicsEngine().registerCollisionTileLayer(layer);
             }
+            else
+            {
+                spdlog::warn("Main object does not have a TileLayerComponent");
+                return false;
+            }
         }
+        else
+        {
+            spdlog::warn("Main tile layer object not found");
+            return false;
+        }
+        auto world_size = main_obj->getComponent<engine::component::TileLayerComponent>()->getWorldSize();
+        context.getCamera().setLimitBounds(engine::utils::Rect(glm::vec2(0), world_size));
+        context.getPhysicsEngine().setWorldBound(engine::utils::Rect(glm::vec2(0), world_size));
+
+        return true;
+    }
+
+    bool GameScene::initPlayer()
+    {
+
         player_ = findGameObjectByName("player");
         if (!player_)
         {
             spdlog::error("Player object not found in the scene");
+            return false;
         }
         else
         {
+            auto player_component = player_->addComponent<game::component::PlayerComponent>();
+            if (!player_component)
+            {
+                spdlog::error("Failed to add PlayerComponent to player object");
+                return false;
+            }
             auto transform = player_->getComponent<engine::component::TransformComponent>();
             if (transform)
                 context.getCamera().setFollowTarget(transform);
+            else
+            {
+                spdlog::error("Player object does not have a TransformComponent");
+                return false;
+            }
         }
-
-        auto world_size = main_obj->getComponent<engine::component::TileLayerComponent>()->getWorldSize();
-        context.getCamera().setLimitBounds(engine::utils::Rect(glm::vec2(0), world_size));
-        context.getPhysicsEngine().setWorldBound(engine::utils::Rect(glm::vec2(0), world_size));
-        Scene::initialize();
+        return true;
     }
 
     void GameScene::update(float deltaTime)
@@ -71,8 +121,6 @@ namespace game::scene
     {
         Scene::handleInput();
         // spdlog::info("Handling input in GameScene");
-        testPlayer();
-        // testCamera();
     }
 
     void GameScene::close()
@@ -81,66 +129,4 @@ namespace game::scene
         spdlog::info("Closing GameScene");
     }
 
-    void GameScene::testCamera()
-    {
-        auto &camera = context.getCamera();
-        auto &input_manager = context.getInputManager();
-        if (input_manager.isActionDown("move_up"))
-            camera.move(glm::vec2(0, -1));
-        if (input_manager.isActionDown("move_down"))
-            camera.move(glm::vec2(0, 1));
-        if (input_manager.isActionDown("move_left"))
-            camera.move(glm::vec2(-1, 0));
-        if (input_manager.isActionDown("move_right"))
-            camera.move(glm::vec2(1, 0));
-    }
-
-    void GameScene::testPlayer()
-    {
-        if (!player_)
-        {
-            spdlog::warn("player_ is null");
-            return;
-        }
-        auto &input_manager = context.getInputManager();
-        auto physics_comp = player_->getComponent<engine::component::PhysicsComponent>();
-        if (!physics_comp)
-        {
-            return;
-        }
-        if (input_manager.isActionDown("move_left"))
-        {
-            physics_comp->velocity_.x = -100.0f;
-        }
-        else
-        {
-            physics_comp->velocity_.x *= 0.9f;
-        }
-        if (input_manager.isActionDown("move_right"))
-        {
-            physics_comp->velocity_.x = 100.0f;
-        }
-        else
-        {
-            physics_comp->velocity_.x *= 0.9f;
-        }
-        if (input_manager.isActionPressed("jump"))
-        {
-            physics_comp->velocity_.y = -400.0f;
-        }
-        // if (physics_comp->velocity_.y != 0.0f || physics_comp->velocity_.x != 0.0f)
-        // {
-        //     spdlog::info("Player velocity: ({}, {})", physics_comp->velocity_.x, physics_comp->velocity_.y);
-        // }
-    }
-
-    void GameScene::testCollision()
-    {
-        auto &physics_engine = context.getPhysicsEngine();
-        const auto &collision_pairs = physics_engine.getCollisionPairs();
-        for (const auto &[objA, objB] : collision_pairs)
-        {
-            spdlog::info("Collision detected between {} and {}", objA->getName(), objB->getName());
-        }
-    }
 }

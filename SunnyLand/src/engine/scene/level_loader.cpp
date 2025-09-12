@@ -20,7 +20,7 @@
 
 namespace engine::scene
 {
-    void LevelLoader::loadLevel(const std::string &map_path, Scene &scene)
+    bool LevelLoader::loadLevel(const std::string &map_path, Scene &scene)
     {
 
         // 读取关卡文件
@@ -28,7 +28,7 @@ namespace engine::scene
         if (!file.is_open())
         {
             spdlog::error("Failed to open level file: {}", map_path);
-            return;
+            return false;
         }
 
         nlohmann::json level_data;
@@ -39,13 +39,13 @@ namespace engine::scene
         catch (const std::exception &e)
         {
             spdlog::error("Failed to parse level file: {}", e.what());
-            return;
+            return false;
         }
 
         if (!level_data.contains("layers") || !level_data["layers"].is_array())
         {
             spdlog::error("Level file does not contain valid layers array");
-            return;
+            return false;
         }
 
         m_map_path = map_path;
@@ -93,6 +93,7 @@ namespace engine::scene
         }
 
         spdlog::info("Level loaded successfully: {}", m_map_path);
+        return true;
     }
 
     void LevelLoader::loadImageLayer(const nlohmann::json &layer_json, Scene &scene)

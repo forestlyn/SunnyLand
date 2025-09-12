@@ -49,9 +49,9 @@ namespace engine::component
 
     protected:
         virtual void init() {}
-        virtual void handleInput(engine::core::Context &context) {}
-        virtual void update(float deltaTime, engine::core::Context &context) {}
-        virtual void render(engine::core::Context &context) {}
+        virtual void handleInput(engine::core::Context &) {}
+        virtual void update(float, engine::core::Context &) {}
+        virtual void render(engine::core::Context &) {}
         virtual void clean() {}
     };
 }

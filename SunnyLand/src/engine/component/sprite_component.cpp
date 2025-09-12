@@ -115,6 +115,11 @@ namespace engine::component
         return sprite_.getIsFlip();
     }
 
+    void SpriteComponent::setIsFlipped(bool flipped)
+    {
+        sprite_.setIsFlip(flipped);
+    }
+
     glm::vec2 SpriteComponent::getSpriteSize() const
     {
         return sprite_size_;

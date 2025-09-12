@@ -70,6 +70,7 @@ namespace engine::physics
             if (!component || !component->isEnabled() || !component->getTransformComponent())
                 continue;
 
+            component->resetCollisionFlags();
             // 应用重力
             if (component->isUseGravity())
             {
@@ -144,6 +145,7 @@ namespace engine::physics
                     // 碰撞，调整位置和速度
                     newWorldPos.x = (tilex + 1) * tileSize.x;
                     component->velocity_.x = 0.0f;
+                    component->setColliderLeft(true);
                 }
                 else
                 {
@@ -156,6 +158,7 @@ namespace engine::physics
                         if (newWorldPos.y + worldSize.y > groundY)
                         {
                             newWorldPos.y = groundY - worldSize.y;
+                            component->setColliderBelow(true);
                         }
                     }
                 }
@@ -175,6 +178,7 @@ namespace engine::physics
                     // 碰撞，调整位置和速度
                     newWorldPos.x = tilex * tileSize.x - worldSize.x;
                     component->velocity_.x = 0.0f;
+                    component->setColliderRight(true);
                 }
                 else
                 {
@@ -186,6 +190,7 @@ namespace engine::physics
                         if (newWorldPos.y + worldSize.y > groundY)
                         {
                             newWorldPos.y = groundY - worldSize.y;
+                            component->setColliderBelow(true);
                         }
                     }
                 }
@@ -206,6 +211,7 @@ namespace engine::physics
                     // 碰撞，调整位置和速度
                     newWorldPos.y = (tiley + 1) * tileSize.y;
                     component->velocity_.y = 0.0f;
+                    component->setColliderAbove(true);
                 }
                 // 不处理斜坡，斜坡只能在脚下
             }
@@ -225,6 +231,7 @@ namespace engine::physics
                     // 碰撞，调整位置和速度
                     newWorldPos.y = tiley * tileSize.y - worldSize.y;
                     component->velocity_.y = 0.0f;
+                    component->setColliderBelow(true);
                 }
                 else
                 {
@@ -240,6 +247,7 @@ namespace engine::physics
                             newWorldPos.y = groundY - worldSize.y;
                             // 落地，速度归0
                             component->velocity_.y = 0.0f;
+                            component->setColliderBelow(true);
                         }
                     }
                 }

@@ -44,6 +44,7 @@ namespace engine::component
         std::string getTextureId() const;
         engine::render::Sprite *getSprite();
         bool getIsFlipped() const;
+        void setIsFlipped(bool flipped);
         glm::vec2 getSpriteSize() const;
         glm::vec2 getOffset() const;
         engine::utils::Alignment getAlignment() const;

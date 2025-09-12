@@ -31,6 +31,12 @@ namespace engine::component
         engine::physics::PhysicsEngine *physicsEngine_ = nullptr;
         engine::component::TransformComponent *transform_component_ = nullptr;
 
+        // 碰撞标志
+        bool collider_below = false;
+        bool collider_above = false;
+        bool collider_left = false;
+        bool collider_right = false;
+
     public:
         PhysicsComponent(engine::physics::PhysicsEngine *physicsEngine, bool useGravity = true, float mass = 1.0f);
         ~PhysicsComponent() = default;
@@ -58,6 +64,23 @@ namespace engine::component
         engine::component::TransformComponent *getTransformComponent() const { return transform_component_; }
         bool isEnabled() const { return enabled_; }
         glm::vec2 getVelocity() const { return velocity_; }
+
+        void resetCollisionFlags()
+        {
+            collider_below = false;
+            collider_above = false;
+            collider_left = false;
+            collider_right = false;
+        }
+        void setColliderBelow(bool value) { collider_below = value; }
+        void setColliderAbove(bool value) { collider_above = value; }
+        void setColliderLeft(bool value) { collider_left = value; }
+        void setColliderRight(bool value) { collider_right = value; }
+
+        bool isColliderBelow() const { return collider_below; }
+        bool isColliderAbove() const { return collider_above; }
+        bool isColliderLeft() const { return collider_left; }
+        bool isColliderRight() const { return collider_right; }
 
     protected:
         void init() override;

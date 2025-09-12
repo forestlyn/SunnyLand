@@ -28,7 +28,7 @@ namespace engine::scene
 
     public:
         LevelLoader() = default;
-        void loadLevel(const std::string &map_path, Scene &scene); ///< @brief 从文件加载关卡数据
+        [[nodiscard]] bool loadLevel(const std::string &map_path, Scene &scene); ///< @brief 从文件加载关卡数据
 
     private:
         void loadImageLayer(const nlohmann::json &layer_json, Scene &scene);  ///< @brief 加载图片图层
