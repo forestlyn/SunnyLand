@@ -69,6 +69,10 @@ namespace engine::component
                 isOneShotRemoved_ = false;
             }
         }
+        else
+        {
+            spdlog::warn("Animation '{}' not found in AnimationComponent.", name);
+        }
     }
 
     void AnimationComponent::stopAnimation()

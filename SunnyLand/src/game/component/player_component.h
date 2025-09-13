@@ -14,6 +14,7 @@ namespace engine::component
     class PhysicsComponent;
     class SpriteComponent;
     class AnimationComponent;
+    class HealthComponent;
 }
 namespace game::component::state
 {
@@ -38,6 +39,7 @@ namespace game::component
         engine::component::PhysicsComponent *physics_ = nullptr;
         engine::component::SpriteComponent *sprite_ = nullptr;
         engine::component::AnimationComponent *animation_ = nullptr;
+        engine::component::HealthComponent *health_ = nullptr;
 
         std::unique_ptr<state::PlayerState> current_state_ = nullptr;
         bool is_dead_ = false;
@@ -46,6 +48,8 @@ namespace game::component
         float max_speed_ = 120.0f;      ///< @brief 最大移动速度 (像素/秒)
         float friction_factor_ = 0.85f; ///< @brief 摩擦系数 (Idle时缓冲效果，每帧乘以此系数)
         float jump_force_ = 350.0f;     ///< @brief 跳跃力 (按下"jump"键给的瞬间向上的力)
+
+        float stunned_duration_ = 1.0f; // 眩晕持续时间
 
     public:
         PlayerComponent() = default;
@@ -65,6 +69,8 @@ namespace game::component
         void setFrictionFactor(float factor) { friction_factor_ = factor; }
         float getJumpForce() const { return jump_force_; }
         void setJumpForce(float force) { jump_force_ = force; }
+        float getStunnedDuration() const { return stunned_duration_; }
+        void setStunnedDuration(float duration) { stunned_duration_ = duration; }
 
         void setState(std::unique_ptr<state::PlayerState> new_state);
 
@@ -79,6 +85,8 @@ namespace game::component
         void move(MoveDirection direction);
         void clampVelocity();
         void playAnimation(const std::string &anim_name);
+        void takeDamage(int amount);
+        void heal(int amount);
 
     private:
         void init() override;

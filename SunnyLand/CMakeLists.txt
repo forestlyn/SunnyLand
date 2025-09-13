@@ -54,6 +54,7 @@ add_executable(${TARGET}
                 src/engine/component/physics_component.cpp
                 src/engine/component/collider_component.cpp
                 src/engine/component/animation_component.cpp
+                src/engine/component/health_component.cpp
                 src/engine/scene/scene.cpp
                 src/engine/scene/scene_manager.cpp
                 src/engine/scene/level_loader.cpp
@@ -63,6 +64,8 @@ add_executable(${TARGET}
                 src/game/component/state/walk_state.cpp
                 src/game/component/state/jump_state.cpp
                 src/game/component/state/fall_state.cpp
+                src/game/component/state/hurt_state.cpp
+                src/game/component/state/dead_state.cpp
                 )
 
 # 链接库

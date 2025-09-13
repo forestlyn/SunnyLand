@@ -6,6 +6,7 @@
 #include "../component/physics_component.h"
 #include "../component/sprite_component.h"
 #include "../component/animation_component.h"
+#include "../component/health_component.h"
 #include "../render/animation.h"
 #include "../physics/collider.h"
 #include "../physics/physics_engine.h"
@@ -121,7 +122,7 @@ namespace engine::scene
         auto offsety = layer_json.value("offsety", 0);
 
         auto image = std::make_unique<engine::object::GameObject>(name);
-        engine::component::TransformComponent *transform = image->addComponent<engine::component::TransformComponent>(glm::vec2(x + offsetx, y + offsety), 0, glm::vec2(1.0));
+        image->addComponent<engine::component::TransformComponent>(glm::vec2(x + offsetx, y + offsety), 0, glm::vec2(1.0));
         engine::component::ParallaxComponent *parallax = image->addComponent<engine::component::ParallaxComponent>(image_path, glm::vec2(parallaxx, parallaxy), glm::bvec2(repeatx, repeaty));
         parallax->SetHidden(!visible);
         scene.addGameObject(std::move(image));
@@ -192,7 +193,7 @@ namespace engine::scene
                     auto scale = glm::vec2(width / src_rect->w, height / src_rect->h);
 
                     auto gameObj = std::make_unique<engine::object::GameObject>(name);
-                    engine::component::TransformComponent *transform = gameObj->addComponent<engine::component::TransformComponent>(glm::vec2(x, y - height), rotation, scale);
+                    gameObj->addComponent<engine::component::TransformComponent>(glm::vec2(x, y - height), rotation, scale);
                     engine::component::SpriteComponent *spriteComp = gameObj->addComponent<engine::component::SpriteComponent>(std::move(tile_info.sprite), &(scene.getContext().getResourceManager()));
                     spriteComp->setHidden(!visible);
 
@@ -200,12 +201,13 @@ namespace engine::scene
                     auto useGravity = getPropertyFromJson<bool>(tileJson, "gravity");
                     auto animationJson = getPropertyFromJson<std::string>(tileJson, "animation");
                     auto tagname = getPropertyFromJson<std::string>(tileJson, "tag");
+                    auto health = getPropertyFromJson<int>(tileJson, "health");
 
                     if (tile_info.type == engine::component::TileType::Solid)
                     {
                         auto collider = std::make_unique<engine::physics::AABBCollider>(glm::vec2(src_rect->w, src_rect->h));
-                        engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
-                        engine::component::PhysicsComponent *physicsComp = gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+                        gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
+                        gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
                         gameObj->setTag("Solid");
                     }
                     else if (auto rect = getColliderRect(tileJson); rect)
@@ -213,7 +215,7 @@ namespace engine::scene
                         auto collider = std::make_unique<engine::physics::AABBCollider>(rect->size);
                         engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
                         colliderComp->setOffset(rect->position);
-                        engine::component::PhysicsComponent *physicsComp = gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+                        gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
                     }
                     if (animationJson)
                     {
@@ -239,6 +241,15 @@ namespace engine::scene
                     if (tagname)
                     {
                         gameObj->setTag(tagname.value());
+                    }
+
+                    if (health)
+                    {
+                        auto healthComp = gameObj->addComponent<engine::component::HealthComponent>(health.value());
+                        if (!healthComp)
+                        {
+                            spdlog::warn("Failed to add HealthComponent to object '{}'", name);
+                        }
                     }
                     if (useGravity)
                     {
@@ -315,7 +326,7 @@ namespace engine::scene
             auto y = local_gid / columns;
             auto tile_width = m_tile_size.x;
             auto tile_height = m_tile_size.y;
-            SDL_FRect src_rect = {x * tile_width, y * tile_height, tile_width, tile_height};
+            SDL_FRect src_rect = {static_cast<float>(x) * tile_width, static_cast<float>(y) * tile_height, static_cast<float>(tile_width), static_cast<float>(tile_height)};
             engine::render::Sprite sprite = engine::render::Sprite(image_path, src_rect);
             auto type = getTileTypeById(tilesetJson, local_gid);
             return engine::component::TileInfo(sprite, type);

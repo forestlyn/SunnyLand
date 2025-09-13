@@ -102,7 +102,7 @@ namespace engine::physics
         auto *transform = obj->getComponent<engine::component::TransformComponent>();
         auto *colliderComp = obj->getComponent<engine::component::ColliderComponent>();
         // spdlog::info("haha");
-        if (!colliderComp || !colliderComp->isActive() || colliderComp->isTrigger() || !transform)
+        if (!colliderComp || colliderComp->isTrigger() || !transform)
             return;
         // spdlog::info("hehe");
 
@@ -116,6 +116,11 @@ namespace engine::physics
         auto deltaMove = component->velocity_ * deltaTime;
         auto newWorldPos = worldPos + deltaMove; // 计算新的左上角位置
 
+        if (!colliderComp->isActive())
+        {
+            transform->translate(deltaMove);
+            return;
+        }
         // spdlog::info("Current Position: ({}, {}), Velocity: ({}, {}), DeltaMove: ({}, {}), New Position: ({}, {})",
         //              worldPos.x, worldPos.y,
         //              component->velocity_.x, component->velocity_.y,
@@ -143,7 +148,7 @@ namespace engine::physics
                 if (y_top_left_type == engine::component::TileType::Solid || y_bottom_left_type == engine::component::TileType::Solid)
                 {
                     // 碰撞，调整位置和速度
-                    newWorldPos.x = (tilex + 1) * tileSize.x;
+                    newWorldPos.x = static_cast<float>(tilex + 1) * tileSize.x;
                     component->velocity_.x = 0.0f;
                     component->setColliderLeft(true);
                 }
@@ -209,7 +214,7 @@ namespace engine::physics
                 if (x_top_left_type == engine::component::TileType::Solid || x_top_right_type == engine::component::TileType::Solid)
                 {
                     // 碰撞，调整位置和速度
-                    newWorldPos.y = (tiley + 1) * tileSize.y;
+                    newWorldPos.y = static_cast<float>(tiley + 1) * tileSize.y;
                     component->velocity_.y = 0.0f;
                     component->setColliderAbove(true);
                 }

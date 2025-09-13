@@ -83,7 +83,7 @@ namespace engine::component
 
     private:
         void init() override;
-        void update(float deltaTime, engine::core::Context &context) override {}
+        void update(float, engine::core::Context &) override {}
         void render(engine::core::Context &context) override;
         void clean() override;
     };

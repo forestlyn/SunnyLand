@@ -11,7 +11,7 @@ namespace engine::component
     {
     }
 
-    void TransformComponent::update(float delta_time, engine::core::Context &context)
+    void TransformComponent::update(float, engine::core::Context &)
     {
         // Update the transform component based on the context
     }

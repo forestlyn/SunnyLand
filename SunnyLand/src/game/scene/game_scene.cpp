@@ -7,6 +7,7 @@
 #include "../../engine/component/collider_component.h"
 #include "../../engine/component/tilelayer_component.h"
 #include "../../engine/component/animation_component.h"
+#include "../../engine/component/health_component.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
@@ -183,6 +184,7 @@ namespace game::scene
     void GameScene::handleInput()
     {
         Scene::handleInput();
+        testHealth();
         // spdlog::info("Handling input in GameScene");
     }
 
@@ -190,6 +192,22 @@ namespace game::scene
     {
         Scene::close();
         spdlog::info("Closing GameScene");
+    }
+
+    void GameScene::testHealth()
+    {
+        if (player_ && context.getInputManager().isActionPressed("attack"))
+        {
+            auto playerComp = player_->getComponent<game::component::PlayerComponent>();
+            if (playerComp)
+            {
+                playerComp->takeDamage(1);
+            }
+            else
+            {
+                spdlog::warn("Player does not have a PlayerComponent");
+            }
+        }
     }
 
 }
