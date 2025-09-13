@@ -5,6 +5,7 @@
 #include "../component/collider_component.h"
 #include "../component/physics_component.h"
 #include "../component/sprite_component.h"
+#include "../component/animation_component.h"
 #include "../physics/collider.h"
 #include "../physics/physics_engine.h"
 #include "../object/game_object.h"
@@ -196,6 +197,7 @@ namespace engine::scene
 
                     auto tileJson = getTileJsonByGid(gid);
                     auto useGravity = getPropertyFromJson<bool>(tileJson, "gravity");
+                    auto animationJson = getPropertyFromJson<std::string>(tileJson, "animation");
                     auto tagname = getPropertyFromJson<std::string>(tileJson, "tag");
 
                     if (tile_info.type == engine::component::TileType::Solid)
@@ -211,6 +213,11 @@ namespace engine::scene
                         engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
                         colliderComp->setOffset(rect->position);
                         engine::component::PhysicsComponent *physicsComp = gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+                    }
+                    if (animationJson)
+                    {
+                        engine::component::AnimationComponent *animComp = gameObj->addComponent<engine::component::AnimationComponent>();
+                        loadAnimation(*animationJson, *animComp, glm::vec2(width, height));
                     }
 
                     if (tagname)

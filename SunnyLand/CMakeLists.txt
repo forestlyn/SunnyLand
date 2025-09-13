@@ -39,6 +39,7 @@ add_executable(${TARGET}
                 src/engine/core/config.cpp
                 src/engine/render/renderer.cpp
                 src/engine/render/camera.cpp
+                src/engine/render/animation.cpp
                 src/engine/resource/resource_manager.cpp
                 src/engine/resource/audio_manager.cpp
                 src/engine/resource/texture_manager.cpp
@@ -52,6 +53,7 @@ add_executable(${TARGET}
                 src/engine/component/tilelayer_component.cpp
                 src/engine/component/physics_component.cpp
                 src/engine/component/collider_component.cpp
+                src/engine/component/animation_component.cpp
                 src/engine/scene/scene.cpp
                 src/engine/scene/scene_manager.cpp
                 src/engine/scene/level_loader.cpp
