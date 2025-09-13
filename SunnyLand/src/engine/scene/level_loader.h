@@ -8,6 +8,7 @@ namespace engine::component
 {
     enum class TileType;
     struct TileInfo;
+    class AnimationComponent;
 }
 
 namespace engine::utils
@@ -44,7 +45,7 @@ namespace engine::scene
 
         void loadTileset(const std::string &tileset_path, int first_gid);
 
-        void loadAnimation(const nlohmann::json &animation_json, engine::component::AnimationComponent &animation_component, const glm::vec2 &sprite_size);
+        void loadAnimation(const nlohmann::json &animation_json, engine::component::AnimationComponent *animation_component, const glm::vec2 &sprite_size);
 
         std::string resolvePath(const std::string &relative_path, const std::string &file_path);
 

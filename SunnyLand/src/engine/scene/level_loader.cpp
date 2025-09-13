@@ -6,6 +6,7 @@
 #include "../component/physics_component.h"
 #include "../component/sprite_component.h"
 #include "../component/animation_component.h"
+#include "../render/animation.h"
 #include "../physics/collider.h"
 #include "../physics/physics_engine.h"
 #include "../object/game_object.h"
@@ -217,8 +218,23 @@ namespace engine::scene
                     if (animationJson)
                     {
                         engine::component::AnimationComponent *animComp = gameObj->addComponent<engine::component::AnimationComponent>();
-                        loadAnimation(*animationJson, *animComp, glm::vec2(width, height));
+                        nlohmann::json animationJsonParsed;
+                        try
+                        {
+                            animationJsonParsed = nlohmann::json::parse(*animationJson);
+                        }
+                        catch (const std::exception &e)
+                        {
+                            spdlog::warn("Failed to parse animation JSON for object '{}': {}", name, e.what());
+                            continue;
+                        }
+                        loadAnimation(animationJsonParsed, animComp, glm::vec2(width, height));
+                        spdlog::info("Loaded animation for object '{}'", name);
                     }
+                    // else
+                    // {
+                    //     spdlog::info("No animation property for object '{}'", name);
+                    // }
 
                     if (tagname)
                     {
@@ -451,7 +467,41 @@ namespace engine::scene
         spdlog::warn("getTileJsonByGid:Unknown tileset for gid: {}", gid);
         return std::nullopt;
     }
-
+    void LevelLoader::loadAnimation(const nlohmann::json &animation_json, engine::component::AnimationComponent *animation_component, const glm::vec2 &sprite_size)
+    {
+        if (animation_json.is_null() || !animation_json.is_object())
+        {
+            spdlog::warn("Animation JSON is invalid.");
+            return;
+        }
+        for (auto const &anim : animation_json.items())
+        {
+            std::string anim_name = anim.key();
+            const auto &frames_json = anim.value();
+            if (!frames_json.contains("frames") || !frames_json["frames"].is_array())
+            {
+                spdlog::warn("Animation '{}' is missing frames array.", anim_name);
+                continue;
+            }
+            auto animation = std::make_unique<engine::render::Animation>(anim_name);
+            auto duration_ms = frames_json.value("duration", 100); // 默认100毫秒
+            auto row = frames_json.value("row", 0);
+            for (const auto &frame : frames_json["frames"])
+            {
+                if (!frame.is_number_integer())
+                {
+                    spdlog::warn("Animation '{}' frames array contains non-integer value.", anim_name);
+                    continue;
+                }
+                int column = frame.get<int>();
+                SDL_FRect src_rect = {column * sprite_size.x, row * sprite_size.y, sprite_size.x, sprite_size.y};
+                auto duration = static_cast<float>(duration_ms) / 1000.0f;
+                animation->addAnimationFrame(src_rect, duration);
+            }
+            animation_component->addAnimation(std::move(animation));
+            spdlog::trace("Animation '{}' loaded.", anim_name);
+        }
+    }
     std::string LevelLoader::resolvePath(const std::string &relative_path, const std::string &file_path)
     {
         // 解析资源路径

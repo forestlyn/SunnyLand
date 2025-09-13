@@ -2,15 +2,18 @@
 #include "../../engine/component/component.h"
 #include "state/player_state.h"
 #include <memory>
+#include <string>
 namespace engine::input
 {
     class InputManager;
 }
+
 namespace engine::component
 {
     class TransformComponent;
     class PhysicsComponent;
     class SpriteComponent;
+    class AnimationComponent;
 }
 namespace game::component::state
 {
@@ -34,6 +37,7 @@ namespace game::component
         engine::component::TransformComponent *transform_ = nullptr;
         engine::component::PhysicsComponent *physics_ = nullptr;
         engine::component::SpriteComponent *sprite_ = nullptr;
+        engine::component::AnimationComponent *animation_ = nullptr;
 
         std::unique_ptr<state::PlayerState> current_state_ = nullptr;
         bool is_dead_ = false;
@@ -68,11 +72,13 @@ namespace game::component
         engine::component::TransformComponent *getTransform() const { return transform_; }
         engine::component::PhysicsComponent *getPhysics() const { return physics_; }
         engine::component::SpriteComponent *getSprite() const { return sprite_; }
+        engine::component::AnimationComponent *getAnimation() const { return animation_; }
 
         void idle();
         void jump();
         void move(MoveDirection direction);
         void clampVelocity();
+        void playAnimation(const std::string &anim_name);
 
     private:
         void init() override;

@@ -3,6 +3,7 @@
 #include "../../engine/component/transform_component.h"
 #include "../../engine/component/physics_component.h"
 #include "../../engine/component/sprite_component.h"
+#include "../../engine/component/animation_component.h"
 #include "../../engine/object/game_object.h"
 #include "../../engine/input/input_manager.h"
 #include <utility>
@@ -16,10 +17,11 @@ namespace game::component
         transform_ = m_gameObject->getComponent<engine::component::TransformComponent>();
         physics_ = m_gameObject->getComponent<engine::component::PhysicsComponent>();
         sprite_ = m_gameObject->getComponent<engine::component::SpriteComponent>();
+        animation_ = m_gameObject->getComponent<engine::component::AnimationComponent>();
 
-        if (!transform_ || !physics_ || !sprite_)
+        if (!transform_ || !physics_ || !sprite_ || !animation_)
         {
-            spdlog::error("PlayerComponent requires TransformComponent, PhysicsComponent, and SpriteComponent.");
+            spdlog::error("PlayerComponent requires TransformComponent, PhysicsComponent, SpriteComponent, and AnimationComponent.");
         }
 
         // 初始状态为Idle
@@ -120,4 +122,17 @@ namespace game::component
     {
         physics_->velocity_.x *= friction_factor_;
     }
+
+    void PlayerComponent::playAnimation(const std::string &anim_name)
+    {
+        if (animation_)
+        {
+            animation_->playAnimation(anim_name);
+        }
+        else
+        {
+            spdlog::warn("PlayerComponent has no AnimationComponent to play animation: {}", anim_name);
+        }
+    }
+
 }

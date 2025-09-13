@@ -15,6 +15,7 @@ namespace game::component::state
     void JumpState::enter()
     {
         player_component_->jump();
+        player_component_->playAnimation("jump");
     }
 
     void JumpState::exit()

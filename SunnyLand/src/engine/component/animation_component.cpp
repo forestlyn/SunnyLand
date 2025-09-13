@@ -23,7 +23,11 @@ namespace engine::component
     void AnimationComponent::update(float deltaTime, engine::core::Context &)
     {
         if (!is_active_ || !spriteComponent_ || !currentAnimation_ || !isPlaying_ || currentAnimation_->isEmpty())
+        {
+            spdlog::trace("{} :AnimationComponent update skipped: is_active_={}, spriteComponent_={}, currentAnimation_={}, isPlaying_={}, isEmpty_={}",
+                          m_gameObject->getName(), is_active_, spriteComponent_ != nullptr, currentAnimation_ != nullptr, isPlaying_, currentAnimation_ ? currentAnimation_->isEmpty() : true);
             return;
+        }
 
         animationTimer_ += deltaTime;
         const auto *frame = currentAnimation_->getFrame(animationTimer_);
@@ -46,6 +50,7 @@ namespace engine::component
     {
         if (animation)
         {
+            spdlog::trace("Animation '{}' added to AnimationComponent.", animation->getName());
             animations_[animation->getName()] = std::move(animation);
         }
     }

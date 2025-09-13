@@ -6,6 +6,7 @@
 #include "../../engine/component/physics_component.h"
 #include "../../engine/component/collider_component.h"
 #include "../../engine/component/tilelayer_component.h"
+#include "../../engine/component/animation_component.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
@@ -33,6 +34,11 @@ namespace game::scene
         if (!initPlayer())
         {
             spdlog::error("Failed to initialize player");
+            context.getInputManager().setShouldExit(true);
+        }
+        if (!initEnemyAndItem())
+        {
+            spdlog::error("Failed to initialize enemy and item");
             context.getInputManager().setShouldExit(true);
         }
         Scene::initialize();
@@ -102,6 +108,63 @@ namespace game::scene
             }
         }
         return true;
+    }
+
+    bool GameScene::initEnemyAndItem()
+    {
+        bool success = true;
+        for (auto &game_object : game_objects)
+        {
+            if (game_object->getName() == "eagle")
+            {
+                if (auto *ac = game_object->getComponent<engine::component::AnimationComponent>(); ac)
+                {
+                    ac->playAnimation("fly");
+                }
+                else
+                {
+                    spdlog::error("Eagle对象缺少 AnimationComponent，无法播放动画。");
+                    success = false;
+                }
+            }
+            if (game_object->getName() == "frog")
+            {
+                if (auto *ac = game_object->getComponent<engine::component::AnimationComponent>(); ac)
+                {
+                    ac->playAnimation("idle");
+                }
+                else
+                {
+                    spdlog::error("Frog对象缺少 AnimationComponent，无法播放动画。");
+                    success = false;
+                }
+            }
+            if (game_object->getName() == "opossum")
+            {
+                if (auto *ac = game_object->getComponent<engine::component::AnimationComponent>(); ac)
+                {
+                    ac->playAnimation("walk");
+                }
+                else
+                {
+                    spdlog::error("Opossum对象缺少 AnimationComponent，无法播放动画。");
+                    success = false;
+                }
+            }
+            if (game_object->getTag() == "item")
+            {
+                if (auto *ac = game_object->getComponent<engine::component::AnimationComponent>(); ac)
+                {
+                    ac->playAnimation("idle");
+                }
+                else
+                {
+                    spdlog::error("Item对象缺少 AnimationComponent，无法播放动画。");
+                    success = false;
+                }
+            }
+        }
+        return success;
     }
 
     void GameScene::update(float deltaTime)
