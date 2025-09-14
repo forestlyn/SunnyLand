@@ -11,6 +11,7 @@
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
+#include "../../engine/render/animation.h"
 #include "../../engine/physics/physics_engine.h"
 #include "../../engine/physics/collider.h"
 #include <spdlog/spdlog.h>
@@ -171,6 +172,8 @@ namespace game::scene
     void GameScene::update(float deltaTime)
     {
         Scene::update(deltaTime);
+        handleObjectCollisions();
+        handleTileTriggerEvents();
         // spdlog::info("Updating GameScene");
     }
 
@@ -184,7 +187,6 @@ namespace game::scene
     void GameScene::handleInput()
     {
         Scene::handleInput();
-        testHealth();
         // spdlog::info("Handling input in GameScene");
     }
 
@@ -194,20 +196,170 @@ namespace game::scene
         spdlog::info("Closing GameScene");
     }
 
-    void GameScene::testHealth()
+    void GameScene::handleObjectCollisions()
     {
-        if (player_ && context.getInputManager().isActionPressed("attack"))
+        auto &collision_pairs = context.getPhysicsEngine().getCollisionPairs();
+        for (const auto &[objA, objB] : collision_pairs)
         {
-            auto playerComp = player_->getComponent<game::component::PlayerComponent>();
-            if (playerComp)
+            if (!objA || !objB)
+                continue;
+            if ((objA->getTag() == "player" && objB->getTag() == "enemy"))
             {
-                playerComp->takeDamage(1);
+                PlayerVsEnemy(objA, objB);
             }
-            else
+            else if ((objA->getTag() == "enemy" && objB->getTag() == "player"))
             {
-                spdlog::warn("Player does not have a PlayerComponent");
+                PlayerVsEnemy(objB, objA);
+            }
+            else if ((objA->getTag() == "player" && objB->getTag() == "item"))
+            {
+                PlayerVsItem(objA, objB);
+            }
+            else if ((objA->getTag() == "item" && objB->getTag() == "player"))
+            {
+                PlayerVsItem(objB, objA);
+            }
+            else if (objA->getTag() == "player" && objB->getTag() == "Hazard")
+            {
+                auto *player_comp = objA->getComponent<game::component::PlayerComponent>();
+                if (player_comp)
+                {
+                    player_comp->takeDamage(1);
+                }
+            }
+            else if (objA->getTag() == "Hazard" && objB->getTag() == "player")
+            {
+                auto *player_comp = objB->getComponent<game::component::PlayerComponent>();
+                if (player_comp)
+                {
+                    player_comp->takeDamage(1);
+                }
             }
         }
     }
 
+    void GameScene::handleTileTriggerEvents()
+    {
+        auto &tile_trigger_events = context.getPhysicsEngine().getTileTriggerEvents();
+        for (const auto &[obj, tile_type] : tile_trigger_events)
+        {
+            if (!obj)
+                continue;
+            spdlog::info("Handling Tile Trigger Event: obj={} type={}", obj->getName(), static_cast<int>(tile_type));
+            if (obj->getTag() == "player" && tile_type == engine::component::TileType::Hazard)
+            {
+                auto *player_comp = obj->getComponent<game::component::PlayerComponent>();
+                if (player_comp)
+                {
+                    player_comp->takeDamage(1);
+                }
+            }
+        }
+    }
+
+    void GameScene::PlayerVsEnemy(engine::object::GameObject *player, engine::object::GameObject *enemy)
+    {
+        auto *player_collider = player->getComponent<engine::component::ColliderComponent>();
+        auto *enemy_collider = enemy->getComponent<engine::component::ColliderComponent>();
+        if (!player_collider || !enemy_collider)
+            return;
+        auto playerAABB = player_collider->getWorldAABB();
+        auto enemyAABB = enemy_collider->getWorldAABB();
+        auto player_center = playerAABB.position + playerAABB.size * 0.5f;
+        auto enemy_center = enemyAABB.position + enemyAABB.size * 0.5f;
+        auto overlap = glm::vec2(playerAABB.size * 0.5f + enemyAABB.size * 0.5f) - glm::abs(player_center - enemy_center);
+        if (abs(overlap.x) > abs(overlap.y) && player_center.y < enemy_center.y)
+        {
+            // 玩家从上方碰撞敌人，敌人死亡
+            auto *enemy_health = enemy->getComponent<engine::component::HealthComponent>();
+            if (enemy_health)
+            {
+                enemy_health->takeDamage(1);
+                if (!enemy_health->isAlive())
+                {
+                    createEffectAt(enemy_center, enemy->getTag());
+                    enemy->setNeedRemove(true);
+                }
+            }
+            // 让玩家弹跳
+            if (auto *player_physics = player->getComponent<engine::component::PhysicsComponent>(); player_physics)
+            {
+                player_physics->velocity_.y = -300.0f; // 向上弹跳
+            }
+        }
+        else
+        {
+            // 玩家从侧面或下方碰撞敌人，玩家受伤
+            auto *player_comp = player->getComponent<game::component::PlayerComponent>();
+            if (player_comp)
+            {
+                player_comp->takeDamage(1);
+            }
+        }
+    }
+
+    void GameScene::PlayerVsItem(engine::object::GameObject *player, engine::object::GameObject *item)
+    {
+        if (item->getName() == "fruit")
+        {
+            auto *player_comp = player->getComponent<game::component::PlayerComponent>();
+            if (player_comp)
+            {
+                player_comp->heal(1);
+            }
+            else
+            {
+                spdlog::warn("Player object does not have a PlayerComponent");
+            }
+        }
+        else if (item->getName() == "gem")
+        {
+        }
+        auto *item_collider = item->getComponent<engine::component::ColliderComponent>();
+        createEffectAt(item_collider->getWorldAABB().position + item_collider->getWorldAABB().size * 0.5f, item->getTag());
+        item->setNeedRemove(true);
+    }
+
+    void GameScene::createEffectAt(const glm::vec2 &center_pos, const std::string &tag)
+    {
+        // --- 创建游戏对象和变换组件 ---
+        auto effect_obj = std::make_unique<engine::object::GameObject>("effect_" + tag);
+        effect_obj->addComponent<engine::component::TransformComponent>(center_pos);
+
+        // --- 根据标签创建不同的精灵组件和动画---
+        auto animation = std::make_unique<engine::render::Animation>("effect", false);
+        if (tag == "enemy")
+        {
+            effect_obj->addComponent<engine::component::SpriteComponent>("assets/textures/FX/enemy-deadth.png",
+                                                                         &context.getResourceManager(),
+                                                                         engine::utils::Alignment::CENTER);
+            for (auto i = 0; i < 5; ++i)
+            {
+                animation->addAnimationFrame({static_cast<float>(i * 40), 0.0f, 40.0f, 41.0f}, 0.1f);
+            }
+        }
+        else if (tag == "item")
+        {
+            effect_obj->addComponent<engine::component::SpriteComponent>("assets/textures/FX/item-feedback.png",
+                                                                         &context.getResourceManager(),
+                                                                         engine::utils::Alignment::CENTER);
+            for (auto i = 0; i < 4; ++i)
+            {
+                animation->addAnimationFrame({static_cast<float>(i * 32), 0.0f, 32.0f, 32.0f}, 0.1f);
+            }
+        }
+        else
+        {
+            spdlog::warn("未知特效类型: {}", tag);
+            return;
+        }
+
+        // --- 根据创建的动画，添加动画组件，并设置为单次播放 ---
+        auto *animation_component = effect_obj->addComponent<engine::component::AnimationComponent>();
+        animation_component->addAnimation(std::move(animation));
+        animation_component->setOneShotRemoved(true);
+        animation_component->playAnimation("effect");
+        safeAddGameObject(std::move(effect_obj)); // 安全添加特效对象
+        spdlog::debug("创建特效: {}", tag);
+    }
 }

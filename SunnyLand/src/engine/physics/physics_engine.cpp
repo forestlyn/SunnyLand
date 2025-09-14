@@ -6,6 +6,7 @@
 #include "../object/game_object.h"
 #include "collision.h"
 #include <spdlog/spdlog.h>
+#include <set>
 
 namespace engine::physics
 {
@@ -92,6 +93,8 @@ namespace engine::physics
         }
         // 更新碰撞对
         updateCollisionPairs();
+
+        checkTileTriggers();
     }
     void PhysicsEngine::resolveTileLayerCollision(engine::component::PhysicsComponent *component, float deltaTime)
     {
@@ -301,6 +304,55 @@ namespace engine::physics
         }
     }
 
+    void PhysicsEngine::checkTileTriggers()
+    {
+        tile_trigger_events_.clear();
+        // spdlog::info("Checking tile triggers...");
+        for (auto *collider : collider_components_)
+        {
+            if (!collider || !collider->isActive() || collider->isTrigger())
+                continue;
+            auto *obj = collider->getOwner();
+            if (!obj)
+                continue;
+            auto worldAABB = collider->getWorldAABB();
+            auto worldPos = worldAABB.position; // 左上角位置
+            auto worldSize = worldAABB.size;
+            if (worldSize.x <= 0.0f || worldSize.y <= 0.0f)
+                continue;
+            std::set<engine::component::TileType> tile_trigger_set;
+            for (auto *tileLayer : collision_tile_layers_)
+            {
+                if (!tileLayer || tileLayer->isHidden())
+                {
+                    continue;
+                }
+                constexpr float tolerance = 1.0f;
+                auto tileSize = tileLayer->getTileSize();
+                int left = static_cast<int>(floor(worldPos.x / tileSize.x));
+                int right = static_cast<int>(ceil((worldPos.x + worldSize.x - tolerance) / tileSize.x));
+                int top = static_cast<int>(floor(worldPos.y / tileSize.y));
+                int bottom = static_cast<int>(ceil((worldPos.y + worldSize.y - tolerance) / tileSize.y));
+                for (int ty = top; ty <= bottom; ++ty)
+                {
+                    for (int tx = left; tx <= right; ++tx)
+                    {
+                        glm::ivec2 tilePos = glm::ivec2(tx, ty);
+                        auto type = tileLayer->getTileType(tilePos);
+                        if (type == engine::component::TileType::Hazard)
+                        {
+                            tile_trigger_set.insert(type);
+                        }
+                    }
+                }
+            }
+            for (auto type : tile_trigger_set)
+            {
+                tile_trigger_events_.emplace_back(obj, type);
+                spdlog::info("Tile Trigger Event: obj={} type={}", obj->getName(), static_cast<int>(type));
+            }
+        }
+    }
     void PhysicsEngine::resolveSolidObjectCollisions(engine::object::GameObject *move_obj, engine::object::GameObject *solid_obj)
     {
         auto *move_collider = move_obj->getComponent<engine::component::ColliderComponent>();

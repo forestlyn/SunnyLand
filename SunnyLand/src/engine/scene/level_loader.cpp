@@ -242,6 +242,10 @@ namespace engine::scene
                     {
                         gameObj->setTag(tagname.value());
                     }
+                    else if (tile_info.type == engine::component::TileType::Hazard)
+                    {
+                        gameObj->setTag("Hazard");
+                    }
 
                     if (health)
                     {
@@ -376,13 +380,12 @@ namespace engine::scene
                 bool solid = prop.value("value", false);
                 return solid ? engine::component::TileType::Solid : engine::component::TileType::Normal;
             }
-            if (prop.contains("name") && prop["name"] == "unisolid")
+            else if (prop.contains("name") && prop["name"] == "unisolid")
             {
                 bool unisolid = prop.value("value", false);
                 return unisolid ? engine::component::TileType::UniSolid : engine::component::TileType::Normal;
             }
-
-            if (prop.contains("name") && prop["name"] == "slope")
+            else if (prop.contains("name") && prop["name"] == "slope")
             {
                 std::string slope = prop.value("value", "");
                 if (slope == "0_1")
@@ -399,6 +402,12 @@ namespace engine::scene
                     return engine::component::TileType::Slope_2_1;
                 else
                     return engine::component::TileType::Normal;
+            }
+            else if (prop.contains("name") && prop["name"] == "hazard")
+            {
+                bool isHazard = prop.value("value", false);
+                // spdlog::info("Tile is hazard: {}", isHazard);
+                return isHazard ? engine::component::TileType::Hazard : engine::component::TileType::Normal;
             }
         }
         return engine::component::TileType::Normal;

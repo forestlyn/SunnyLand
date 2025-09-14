@@ -27,7 +27,8 @@ namespace engine::component
         Slope_0_2, // 斜坡,0 to 1/2
         Slope_2_0, // 斜坡,1/2 to 0
         Slope_1_2, // 斜坡,1 to 1/2
-        Slope_2_1  // 斜坡,1/2 to 1
+        Slope_2_1, // 斜坡,1/2 to 1
+        Hazard
     };
 
     struct TileInfo

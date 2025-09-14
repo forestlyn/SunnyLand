@@ -28,6 +28,7 @@ namespace engine::physics
         std::vector<engine::component::TileLayerComponent *> collision_tile_layers_; // 碰撞瓦片图层列表
 
         std::vector<std::pair<engine::object::GameObject *, engine::object::GameObject *>> collision_pairs_;
+        std::vector<std::pair<engine::object::GameObject *, engine::component::TileType>> tile_trigger_events_;
         glm::vec2 gravity_ = glm::vec2(0.0f, 980.0f);
         float max_velocity_ = 500.0f;
         std::optional<engine::utils::Rect> world_bound_;
@@ -50,6 +51,7 @@ namespace engine::physics
         void update(float deltaTime);
 
         const std::vector<std::pair<engine::object::GameObject *, engine::object::GameObject *>> &getCollisionPairs() const { return collision_pairs_; }
+        const std::vector<std::pair<engine::object::GameObject *, engine::component::TileType>> &getTileTriggerEvents() const { return tile_trigger_events_; }
 
         void setGravity(const glm::vec2 &gravity) { gravity_ = gravity; }
         glm::vec2 getGravity() const { return gravity_; }
@@ -64,6 +66,7 @@ namespace engine::physics
         void resolveTileLayerCollision(engine::component::PhysicsComponent *component, float deltaTime);
         void resolveSolidObjectCollisions(engine::object::GameObject *move_obj, engine::object::GameObject *solid_obj);
         void updateCollisionPairs();
+        void checkTileTriggers();
         void applyWorldBound(engine::component::PhysicsComponent *component);
         float getTileHeightAtWidth(float width, engine::component::TileType type, const glm::ivec2 &tileSize);
     };

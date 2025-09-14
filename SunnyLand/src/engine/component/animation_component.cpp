@@ -66,7 +66,6 @@ namespace engine::component
                 animationTimer_ = 0.0f;
                 spriteComponent_->setSpriteRect(currentAnimation_->getFrame(0.0f)->src_rect);
                 isPlaying_ = true;
-                isOneShotRemoved_ = false;
             }
         }
         else

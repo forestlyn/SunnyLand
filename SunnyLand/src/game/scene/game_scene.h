@@ -2,6 +2,8 @@
 #include <memory>
 #include "../../engine/scene/scene.h"
 #include <memory>
+#include <string>
+#include <glm/vec2.hpp>
 namespace engine::scene
 {
     class SceneManager;
@@ -32,6 +34,12 @@ namespace game::scene
         [[nodiscard]] bool initPlayer();
         [[nodiscard]] bool initEnemyAndItem();
 
-        void testHealth();
+        void handleObjectCollisions();
+        void handleTileTriggerEvents();
+
+        void PlayerVsEnemy(engine::object::GameObject *player, engine::object::GameObject *enemy);
+        void PlayerVsItem(engine::object::GameObject *player, engine::object::GameObject *item);
+
+        void createEffectAt(const glm::vec2 &center_position, const std::string &effect_name);
     };
 }
