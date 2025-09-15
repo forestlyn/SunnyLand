@@ -17,6 +17,10 @@
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
 #include "../component/player_component.h"
+#include "../component/ai_component.h"
+#include "../component/ai/patrol_behavior.h"
+#include "../component/ai/jump_behavior.h"
+#include "../component/ai/updown_behavior.h"
 
 namespace game::scene
 {
@@ -117,39 +121,54 @@ namespace game::scene
         bool success = true;
         for (auto &game_object : game_objects)
         {
-            if (game_object->getName() == "eagle")
+            if (game_object->getName() == "eagle") // 鹰
             {
-                if (auto *ac = game_object->getComponent<engine::component::AnimationComponent>(); ac)
+                auto *ai_component = game_object->addComponent<game::component::AIComponent>();
+                if (ai_component)
                 {
-                    ac->playAnimation("fly");
+                    // 设置AI行为
+                    auto max_y = game_object->getComponent<engine::component::TransformComponent>()->getPosition().y;
+                    auto min_y = max_y - 80.0f;
+                    auto patrol_behavior = std::make_unique<game::component::ai::UpdownBehavior>(min_y, max_y);
+                    ai_component->setBehavior(std::move(patrol_behavior));
                 }
                 else
                 {
-                    spdlog::error("Eagle对象缺少 AnimationComponent，无法播放动画。");
+                    spdlog::error("Failed to add AIComponent to eagle object");
                     success = false;
                 }
             }
-            if (game_object->getName() == "frog")
+            if (game_object->getName() == "frog") // 青蛙
             {
-                if (auto *ac = game_object->getComponent<engine::component::AnimationComponent>(); ac)
+                auto *ai_component = game_object->addComponent<game::component::AIComponent>();
+                if (ai_component)
                 {
-                    ac->playAnimation("idle");
+                    // 设置AI行为
+                    auto max_x = game_object->getComponent<engine::component::TransformComponent>()->getPosition().x - 10.0f;
+                    auto min_x = max_x - 90.0f;
+                    auto jump_behavior = std::make_unique<game::component::ai::JumpBehavior>(min_x, max_x);
+                    ai_component->setBehavior(std::move(jump_behavior));
                 }
                 else
                 {
-                    spdlog::error("Frog对象缺少 AnimationComponent，无法播放动画。");
+                    spdlog::error("Failed to add AIComponent to frog object");
                     success = false;
                 }
             }
             if (game_object->getName() == "opossum")
             {
-                if (auto *ac = game_object->getComponent<engine::component::AnimationComponent>(); ac)
+                auto *ai_component = game_object->addComponent<game::component::AIComponent>();
+                if (ai_component)
                 {
-                    ac->playAnimation("walk");
+                    // 设置AI行为
+                    auto max_x = game_object->getComponent<engine::component::TransformComponent>()->getPosition().x;
+                    auto min_x = max_x - 200.0f; // 巡逻范围200像素
+                    auto patrol_behavior = std::make_unique<game::component::ai::PatrolBehavior>(min_x, max_x);
+                    ai_component->setBehavior(std::move(patrol_behavior));
                 }
                 else
                 {
-                    spdlog::error("Opossum对象缺少 AnimationComponent，无法播放动画。");
+                    spdlog::error("Failed to add AIComponent to opossum object");
                     success = false;
                 }
             }
@@ -245,7 +264,7 @@ namespace game::scene
         {
             if (!obj)
                 continue;
-            spdlog::info("Handling Tile Trigger Event: obj={} type={}", obj->getName(), static_cast<int>(tile_type));
+            // spdlog::info("Handling Tile Trigger Event: obj={} type={}", obj->getName(), static_cast<int>(tile_type));
             if (obj->getTag() == "player" && tile_type == engine::component::TileType::Hazard)
             {
                 auto *player_comp = obj->getComponent<game::component::PlayerComponent>();

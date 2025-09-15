@@ -60,6 +60,10 @@ add_executable(${TARGET}
                 src/engine/scene/level_loader.cpp
                 src/game/scene/game_scene.cpp
                 src/game/component/player_component.cpp
+                src/game/component/ai_component.cpp
+                src/game/component/ai/patrol_behavior.cpp
+                src/game/component/ai/jump_behavior.cpp
+                src/game/component/ai/updown_behavior.cpp
                 src/game/component/state/idle_state.cpp
                 src/game/component/state/walk_state.cpp
                 src/game/component/state/jump_state.cpp

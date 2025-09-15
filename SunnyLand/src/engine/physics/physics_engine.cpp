@@ -333,9 +333,9 @@ namespace engine::physics
                 int right = static_cast<int>(ceil((worldPos.x + worldSize.x - tolerance) / tileSize.x));
                 int top = static_cast<int>(floor(worldPos.y / tileSize.y));
                 int bottom = static_cast<int>(ceil((worldPos.y + worldSize.y - tolerance) / tileSize.y));
-                for (int ty = top; ty <= bottom; ++ty)
+                for (int ty = top; ty < bottom; ++ty)
                 {
-                    for (int tx = left; tx <= right; ++tx)
+                    for (int tx = left; tx < right; ++tx)
                     {
                         glm::ivec2 tilePos = glm::ivec2(tx, ty);
                         auto type = tileLayer->getTileType(tilePos);
@@ -349,7 +349,7 @@ namespace engine::physics
             for (auto type : tile_trigger_set)
             {
                 tile_trigger_events_.emplace_back(obj, type);
-                spdlog::info("Tile Trigger Event: obj={} type={}", obj->getName(), static_cast<int>(type));
+                // spdlog::info("Tile Trigger Event: obj={} type={}", obj->getName(), static_cast<int>(type));
             }
         }
     }
