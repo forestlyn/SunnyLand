@@ -79,6 +79,11 @@ namespace engine::component
         isPlaying_ = false;
     }
 
+    void AnimationComponent::resumeAnimation()
+    {
+        isPlaying_ = true;
+    }
+
     std::string AnimationComponent::getCurrentAnimationName() const
     {
         return currentAnimation_ ? currentAnimation_->getName() : "";

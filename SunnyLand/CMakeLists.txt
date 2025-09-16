@@ -70,6 +70,7 @@ add_executable(${TARGET}
                 src/game/component/state/fall_state.cpp
                 src/game/component/state/hurt_state.cpp
                 src/game/component/state/dead_state.cpp
+                src/game/component/state/climb_state.cpp
                 )
 
 # 链接库

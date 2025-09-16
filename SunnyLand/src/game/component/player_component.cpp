@@ -55,10 +55,10 @@ namespace game::component
         {
             current_state_->exit();
         }
-        if (current_state_)
-        {
-            // spdlog::info("Exiting state: {}", typeid(*current_state_).name());
-        }
+        // if (current_state_)
+        // {
+        //      spdlog::info("Exiting state: {}", typeid(*current_state_).name());
+        // }
         // spdlog::info("Entering state: {}", typeid(*new_state).name());
         current_state_ = std::move(new_state);
         current_state_->enter();
@@ -94,7 +94,7 @@ namespace game::component
 
     void PlayerComponent::jump()
     {
-        physics_->velocity_.y = -jump_force_;
+        physics_->velocity_.y = -jump_vel_;
     }
 
     void PlayerComponent::move(MoveDirection direction)
@@ -116,6 +116,24 @@ namespace game::component
             sprite_->setIsFlipped(false);
             break;
         default:
+            break;
+        }
+    }
+
+    void PlayerComponent::climb(ClimbDirection direction)
+    {
+        switch (direction)
+        {
+        case ClimbDirection::CLIMBUP:
+            physics_->velocity_.y = -climb_speed_;
+            // spdlog::info("Player climbing up with speed: {}", -climb_speed_);
+            break;
+        case ClimbDirection::CLIMBDOWN:
+            physics_->velocity_.y = climb_speed_;
+            // spdlog::info("Player climbing down with speed: {}", climb_speed_);
+            break;
+        default:
+            physics_->velocity_.y = 0.0f; // 停止垂直移动
             break;
         }
     }

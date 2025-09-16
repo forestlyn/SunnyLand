@@ -30,6 +30,13 @@ namespace game::component
         MoveRIGHT = 1
     };
 
+    enum class ClimbDirection
+    {
+        NONE = 0,
+        CLIMBUP = -1,
+        CLIMBDOWN = 1
+    };
+
     class PlayerComponent final : public engine::component::Component
     {
         friend class engine::object::GameObject;
@@ -47,8 +54,8 @@ namespace game::component
         float move_force_ = 200.0f;     ///< @brief 水平移动力
         float max_speed_ = 120.0f;      ///< @brief 最大移动速度 (像素/秒)
         float friction_factor_ = 0.85f; ///< @brief 摩擦系数 (Idle时缓冲效果，每帧乘以此系数)
-        float jump_force_ = 350.0f;     ///< @brief 跳跃力 (按下"jump"键给的瞬间向上的力)
-
+        float jump_vel_ = 350.0f;       ///< @brief 跳跃力 (按下"jump"键给的瞬间向上的速度)
+        float climb_speed_ = 100.0f;    ///< @brief 爬梯子速度 (像素/秒)
         float stunned_duration_ = 1.0f; // 眩晕持续时间
 
     public:
@@ -67,8 +74,8 @@ namespace game::component
         void setMaxSpeed(float speed) { max_speed_ = speed; }
         float getFrictionFactor() const { return friction_factor_; }
         void setFrictionFactor(float factor) { friction_factor_ = factor; }
-        float getJumpForce() const { return jump_force_; }
-        void setJumpForce(float force) { jump_force_ = force; }
+        float getJumpVel() const { return jump_vel_; }
+        void setJumpVel(float force) { jump_vel_ = force; }
         float getStunnedDuration() const { return stunned_duration_; }
         void setStunnedDuration(float duration) { stunned_duration_ = duration; }
 
@@ -83,6 +90,7 @@ namespace game::component
         void idle();
         void jump();
         void move(MoveDirection direction);
+        void climb(ClimbDirection direction);
         void clampVelocity();
         void playAnimation(const std::string &anim_name);
         void takeDamage(int amount);

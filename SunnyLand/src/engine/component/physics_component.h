@@ -36,6 +36,8 @@ namespace engine::component
         bool collider_above = false;
         bool collider_left = false;
         bool collider_right = false;
+        bool collider_ladder = false;
+        bool is_on_top_ladder = false;
 
     public:
         PhysicsComponent(engine::physics::PhysicsEngine *physicsEngine, bool useGravity = true, float mass = 1.0f);
@@ -71,16 +73,22 @@ namespace engine::component
             collider_above = false;
             collider_left = false;
             collider_right = false;
+            collider_ladder = false;
+            is_on_top_ladder = false;
         }
         void setColliderBelow(bool value) { collider_below = value; }
         void setColliderAbove(bool value) { collider_above = value; }
         void setColliderLeft(bool value) { collider_left = value; }
         void setColliderRight(bool value) { collider_right = value; }
+        void setColliderLadder(bool value) { collider_ladder = value; }
+        void setOnTopLadder(bool value) { is_on_top_ladder = value; }
 
         bool isColliderBelow() const { return collider_below; }
         bool isColliderAbove() const { return collider_above; }
         bool isColliderLeft() const { return collider_left; }
         bool isColliderRight() const { return collider_right; }
+        bool isColliderLadder() const { return collider_ladder; }
+        bool isOnLadderTop() const { return is_on_top_ladder; }
 
     protected:
         void init() override;

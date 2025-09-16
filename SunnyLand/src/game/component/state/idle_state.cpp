@@ -2,6 +2,7 @@
 #include "idle_state.h"
 #include "walk_state.h"
 #include "fall_state.h"
+#include "climb_state.h"
 #include "../player_component.h"
 #include "../../../engine/core/context.h"
 #include "../../../engine/input/input_manager.h"
@@ -41,6 +42,17 @@ namespace game::component::state
         {
             return std::make_unique<WalkState>(player_component_);
         }
+        else if (context.getInputManager().isActionDown("move_up"))
+        {
+            if (auto physics = player_component_->getPhysics(); physics)
+            {
+                if (physics->isColliderLadder())
+                {
+                    return std::make_unique<ClimbState>(player_component_);
+                }
+            }
+        }
+
         return nullptr;
     }
 } // namespace game::component::state

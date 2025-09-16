@@ -409,6 +409,11 @@ namespace engine::scene
                 // spdlog::info("Tile is hazard: {}", isHazard);
                 return isHazard ? engine::component::TileType::Hazard : engine::component::TileType::Normal;
             }
+            else if (prop.contains("name") && prop["name"] == "ladder")
+            {
+                bool isLadder = prop.value("value", false);
+                return isLadder ? engine::component::TileType::Ladder : engine::component::TileType::Normal;
+            }
         }
         return engine::component::TileType::Normal;
     }

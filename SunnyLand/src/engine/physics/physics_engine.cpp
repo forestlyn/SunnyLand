@@ -343,6 +343,13 @@ namespace engine::physics
                         {
                             tile_trigger_set.insert(type);
                         }
+                        else if (type == engine::component::TileType::Ladder)
+                        {
+                            if (auto *physics = collider->getOwner()->getComponent<engine::component::PhysicsComponent>())
+                            {
+                                physics->setColliderLadder(true);
+                            }
+                        }
                     }
                 }
             }
