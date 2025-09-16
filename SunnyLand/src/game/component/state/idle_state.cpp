@@ -8,6 +8,7 @@
 #include "../../../engine/input/input_manager.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/component/sprite_component.h"
+#include "../../../engine/component/transform_component.h"
 #include <glm/common.hpp>
 #include <spdlog/spdlog.h>
 namespace game::component::state
@@ -52,7 +53,17 @@ namespace game::component::state
                 }
             }
         }
-
+        else if (context.getInputManager().isActionDown("move_down"))
+        {
+            if (auto physics = player_component_->getPhysics(); physics)
+            {
+                if (physics->isOnLadderTop())
+                {
+                    player_component_->getTransform()->translate(glm::vec2(0.0f, 2.0f)); // 微调位置，避免刚好在梯子顶端时无法进入Climb状态
+                    return std::make_unique<ClimbState>(player_component_);
+                }
+            }
+        }
         return nullptr;
     }
 } // namespace game::component::state

@@ -80,7 +80,7 @@ namespace game::component::state
         }
         return nullptr;
     }
-    std::unique_ptr<PlayerState> ClimbState::update(float deltaTime, engine::core::Context &context)
+    std::unique_ptr<PlayerState> ClimbState::update(float, engine::core::Context &)
     {
         auto physics = player_component_->getPhysics();
         if (physics->isColliderBelow())

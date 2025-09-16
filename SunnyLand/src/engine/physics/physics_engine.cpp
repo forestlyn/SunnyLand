@@ -241,6 +241,24 @@ namespace engine::physics
                     component->velocity_.y = 0.0f;
                     component->setColliderBelow(true);
                 }
+                else if (x_bottom_left_type == engine::component::TileType::Ladder && x_bottom_right_type == engine::component::TileType::Ladder)
+                {
+                    // 这里判断梯子，为什么只在下落时判断？
+                    // 因为上升时一直上升到与梯子离开，然后进入了下落状态，于是在下落时判断是否在梯子顶上
+                    auto tileLeftPos = glm::ivec2(tilex_bottom_left, tiley - 1);
+                    auto tileRightPos = glm::ivec2(tilex_bottom_right, tiley - 1);
+                    auto leftAboveType = tileLayer->getTileType(tileLeftPos);
+                    auto rightAboveType = tileLayer->getTileType(tileRightPos);
+                    if (component->isUseGravity() &&
+                        leftAboveType != engine::component::TileType::Ladder &&
+                        rightAboveType != engine::component::TileType::Ladder)
+                    {
+                        component->setOnTopLadder(true);
+                        component->setColliderBelow(true);
+                        component->velocity_.y = 0.0f;
+                        newWorldPos.y = tiley * tileSize.y - worldSize.y;
+                    }
+                }
                 else
                 {
                     // 检测脚下的斜坡
