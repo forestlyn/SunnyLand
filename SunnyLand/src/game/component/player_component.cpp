@@ -55,11 +55,11 @@ namespace game::component
         {
             current_state_->exit();
         }
-        // if (current_state_)
-        // {
-        //      spdlog::info("Exiting state: {}", typeid(*current_state_).name());
-        // }
-        // spdlog::info("Entering state: {}", typeid(*new_state).name());
+        if (current_state_)
+        {
+            spdlog::info("Exiting state: {}", typeid(*current_state_).name());
+        }
+        spdlog::info("Entering state: {}", typeid(*new_state).name());
         current_state_ = std::move(new_state);
         current_state_->enter();
     }
@@ -78,6 +78,41 @@ namespace game::component
     }
     void PlayerComponent::update(float delta_time, engine::core::Context &context)
     {
+        if (physics_)
+        {
+            // 更新土狼时间计时器
+            if (physics_->isColliderBelow())
+            {
+                coyote_timer_ = 0.0f; // 在地面上，重置计时器
+            }
+            else
+            {
+                coyote_timer_ += delta_time; // 不在地面上，增加计时器
+            }
+        }
+
+        if (health_->isInvincible())
+        {
+            invincibility_flash_timer_ += delta_time;
+            if (invincibility_flash_timer_ >= invincibility_flash_interval_ * 2)
+            {
+                invincibility_flash_timer_ = 0.0f;
+            }
+            if (invincibility_flash_timer_ < invincibility_flash_interval_)
+            {
+                sprite_->setHidden(true); // 隐藏精灵，实现闪烁效果
+                // spdlog::info("Player is invincible and sprite is hidden for flashing effect.");
+            }
+            else
+            {
+                sprite_->setHidden(false); // 显示精灵
+            }
+        }
+        else if (sprite_->getHidden())
+        {
+            sprite_->setHidden(false); // 确保不在无敌状态时精灵是可见的
+        }
+
         if (current_state_)
         {
             auto new_state = current_state_->update(delta_time, context);
@@ -196,5 +231,10 @@ namespace game::component
         {
             spdlog::warn("PlayerComponent has no HealthComponent to heal.");
         }
+    }
+
+    bool PlayerComponent::isOnGround()
+    {
+        return physics_->isColliderBelow() || coyote_timer_ <= coyote_time_;
     }
 }

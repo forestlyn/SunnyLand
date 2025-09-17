@@ -168,7 +168,6 @@ namespace engine::component
 
     void SpriteComponent::updateSpriteSize()
     {
-
         if (sprite_.getRect().has_value())
         {
             auto rect = sprite_.getRect().value();
@@ -180,7 +179,7 @@ namespace engine::component
 
     void SpriteComponent::render(engine::core::Context &context)
     {
-        if (!is_active_ || !transform_component_ || !resource_manager_)
+        if (!is_active_ || !transform_component_ || !resource_manager_ || is_active_ == false || isHidden_ == true)
         {
             return;
         }
@@ -189,7 +188,7 @@ namespace engine::component
         auto rotation = transform_component_->getRotation();
         context.getRenderer().drawSprite(context.getCamera(), sprite_, pos, scale, rotation);
     }
-    void SpriteComponent::update(float delta_time, engine::core::Context &context)
+    void SpriteComponent::update(float, engine::core::Context &)
     {
     }
 

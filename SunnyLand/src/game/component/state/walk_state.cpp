@@ -23,8 +23,7 @@ namespace game::component::state
     std::unique_ptr<PlayerState> WalkState::update(float delta_time, engine::core::Context &context)
     {
         player_component_->clampVelocity();
-        auto physics = player_component_->getPhysics();
-        if (physics && !physics->isColliderBelow())
+        if (!player_component_->isOnGround())
         {
             return std::make_unique<FallState>(player_component_);
         }

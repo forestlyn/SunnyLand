@@ -58,6 +58,14 @@ namespace game::component
         float climb_speed_ = 100.0f;    ///< @brief 爬梯子速度 (像素/秒)
         float stunned_duration_ = 1.0f; // 眩晕持续时间
 
+        // 土狼时间
+        const float coyote_time_ = 0.1f;
+        float coyote_timer_ = 0.0f;
+
+        // 无敌闪烁时间
+        const float invincibility_flash_interval_ = 0.1f;
+        float invincibility_flash_timer_ = 0.0f;
+
     public:
         PlayerComponent() = default;
         ~PlayerComponent() override = default;
@@ -80,6 +88,8 @@ namespace game::component
         void setStunnedDuration(float duration) { stunned_duration_ = duration; }
 
         void setState(std::unique_ptr<state::PlayerState> new_state);
+
+        bool isOnGround();
 
         // --- 组件相关
         engine::component::TransformComponent *getTransform() const { return transform_; }
