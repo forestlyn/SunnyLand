@@ -7,6 +7,7 @@
 #include "../../../engine/input/input_manager.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/component/sprite_component.h"
+#include "../../../engine/component/audio_component.h"
 #include <glm/common.hpp>
 #include <spdlog/spdlog.h>
 
@@ -16,6 +17,10 @@ namespace game::component::state
     {
         player_component_->jump();
         player_component_->playAnimation("jump");
+        if (auto audio = player_component_->getAudio(); audio)
+        {
+            audio->playSound("jump");
+        }
     }
 
     void JumpState::exit()

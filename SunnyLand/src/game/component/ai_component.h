@@ -10,6 +10,7 @@ namespace engine::component
     class PhysicsComponent;
     class SpriteComponent;
     class AnimationComponent;
+    class AudioComponent;
 } // namespace
 
 namespace engine::object
@@ -30,6 +31,7 @@ namespace game::component
         engine::component::PhysicsComponent *physics_ = nullptr;
         engine::component::SpriteComponent *sprite_ = nullptr;
         engine::component::AnimationComponent *animation_ = nullptr;
+        engine::component::AudioComponent *audio_ = nullptr;
 
     public:
         AIComponent() = default;
@@ -48,6 +50,7 @@ namespace game::component
         engine::component::PhysicsComponent *getPhysicsComponent() const { return physics_; }
         engine::component::SpriteComponent *getSpriteComponent() const { return sprite_; }
         engine::component::AnimationComponent *getAnimationComponent() const { return animation_; }
+        engine::component::AudioComponent *getAudioComponent() const { return audio_; }
 
     private:
         void init() override;

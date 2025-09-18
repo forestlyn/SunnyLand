@@ -7,6 +7,7 @@
 #include "../../../engine/component/sprite_component.h"
 #include "../../../engine/component/health_component.h"
 #include "../../../engine/component/animation_component.h"
+#include "../../../engine/component/audio_component.h"
 
 namespace game::component::ai
 {
@@ -36,15 +37,20 @@ namespace game::component::ai
         auto *physics = ai_component.getPhysicsComponent();
         auto *sprite = ai_component.getSpriteComponent();
         auto *animation = ai_component.getAnimationComponent();
+        auto *audio = ai_component.getAudioComponent();
 
         if (!transform || !physics || !sprite || !animation)
         {
-            spdlog::error("JumpBehavior requires TransformComponent, PhysicsComponent, SpriteComponent, and AnimationComponent.");
+            spdlog::error("JumpBehavior requires TransformComponent, PhysicsComponent, SpriteComponent, AnimationComponent.");
             return;
         }
 
         if (physics->isColliderBelow())
         {
+            if (jump_timer_ <= 0.001f && audio) // 确保只播放一次
+            {
+                audio->playSound("cry", -1, true);
+            }
             jump_timer_ += delta_time;
             physics->velocity_.x = 0.0f; // 停止水平移动
             if (jump_timer_ >= jump_interval_)
@@ -61,6 +67,7 @@ namespace game::component::ai
                 physics->velocity_ = {jump_right_ ? jump_velocity_.x : -jump_velocity_.x, jump_velocity_.y};
                 jump_timer_ = 0.0f;
                 animation->playAnimation("jump");
+
                 sprite->setIsFlipped(jump_right_); // 怪物图片面向为左
             }
             else

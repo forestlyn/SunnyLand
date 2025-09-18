@@ -4,6 +4,7 @@
 #include "../../../engine/object/game_object.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/component/collider_component.h"
+#include "../../../engine/component/audio_component.h"
 #include <glm/common.hpp>
 #include <spdlog/spdlog.h>
 namespace game::component::state
@@ -21,6 +22,10 @@ namespace game::component::state
         if (collider)
         {
             collider->setActive(false); // 禁用碰撞体
+        }
+        if (auto audio = player_component_->getAudio(); audio)
+        {
+            audio->playSound("dead");
         }
     }
 

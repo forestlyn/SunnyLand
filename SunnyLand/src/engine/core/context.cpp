@@ -4,11 +4,15 @@
 #include "../resource/resource_manager.h"
 #include "../input/input_manager.h"
 #include "../physics/physics_engine.h"
+#include "../audio/audio_player.h"
 
 namespace engine::core
 {
-    Context::Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager, engine::physics::PhysicsEngine &physicsEngine)
-        : m_camera(camera), m_renderer(renderer), m_resourceManager(resourceManager), m_inputManager(inputManager), m_physicsEngine(physicsEngine)
+    Context::Context(engine::render::Camera &camera, engine::render::Renderer &renderer,
+                     engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager,
+                     engine::physics::PhysicsEngine &physicsEngine, engine::audio::AudioPlayer &audioPlayer)
+        : m_camera(camera), m_renderer(renderer), m_resourceManager(resourceManager),
+          m_inputManager(inputManager), m_physicsEngine(physicsEngine), m_audioPlayer(audioPlayer)
     {
     }
 
@@ -39,5 +43,10 @@ namespace engine::core
     engine::physics::PhysicsEngine &Context::getPhysicsEngine()
     {
         return m_physicsEngine;
+    }
+
+    engine::audio::AudioPlayer &Context::getAudioPlayer()
+    {
+        return m_audioPlayer;
     }
 }

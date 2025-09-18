@@ -21,6 +21,11 @@ namespace engine::physics
     class PhysicsEngine;
 }
 
+namespace engine::audio
+{
+    class AudioPlayer;
+}
+
 namespace engine::core
 {
     class Context
@@ -31,9 +36,10 @@ namespace engine::core
         engine::resource::ResourceManager &m_resourceManager;
         engine::input::InputManager &m_inputManager;
         engine::physics::PhysicsEngine &m_physicsEngine;
+        engine::audio::AudioPlayer &m_audioPlayer;
 
     public:
-        Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager, engine::physics::PhysicsEngine &physicsEngine);
+        Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager, engine::physics::PhysicsEngine &physicsEngine, engine::audio::AudioPlayer &audioPlayer);
 
         ~Context();
 
@@ -42,5 +48,6 @@ namespace engine::core
         engine::resource::ResourceManager &getResourceManager();
         engine::input::InputManager &getInputManager();
         engine::physics::PhysicsEngine &getPhysicsEngine();
+        engine::audio::AudioPlayer &getAudioPlayer();
     };
 }

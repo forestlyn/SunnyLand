@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.py": "python",
         "ostream": "cpp",
         "algorithm": "cpp",
         "any": "cpp",
@@ -78,6 +79,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "variant": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "set": "cpp"
     }
 }

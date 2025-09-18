@@ -10,6 +10,7 @@
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/animation_component.h"
 #include "../../engine/component/health_component.h"
+#include "../../engine/component/audio_component.h"
 #include "../../engine/object/game_object.h"
 #include "../../engine/input/input_manager.h"
 #include <utility>
@@ -25,10 +26,11 @@ namespace game::component
         sprite_ = m_gameObject->getComponent<engine::component::SpriteComponent>();
         animation_ = m_gameObject->getComponent<engine::component::AnimationComponent>();
         health_ = m_gameObject->getComponent<engine::component::HealthComponent>();
+        audio_ = m_gameObject->getComponent<engine::component::AudioComponent>();
 
-        if (!transform_ || !physics_ || !sprite_ || !animation_ || !health_)
+        if (!transform_ || !physics_ || !sprite_ || !animation_ || !health_ || !audio_)
         {
-            spdlog::error("PlayerComponent requires TransformComponent, PhysicsComponent, SpriteComponent, AnimationComponent, and HealthComponent.");
+            spdlog::error("PlayerComponent requires TransformComponent, PhysicsComponent, SpriteComponent, AnimationComponent, HealthComponent, and AudioComponent.");
         }
 
         // 初始状态为Idle

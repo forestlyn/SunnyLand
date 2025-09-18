@@ -15,6 +15,7 @@ namespace engine::component
     class SpriteComponent;
     class AnimationComponent;
     class HealthComponent;
+    class AudioComponent;
 }
 namespace game::component::state
 {
@@ -47,6 +48,7 @@ namespace game::component
         engine::component::SpriteComponent *sprite_ = nullptr;
         engine::component::AnimationComponent *animation_ = nullptr;
         engine::component::HealthComponent *health_ = nullptr;
+        engine::component::AudioComponent *audio_ = nullptr;
 
         std::unique_ptr<state::PlayerState> current_state_ = nullptr;
         bool is_dead_ = false;
@@ -96,6 +98,8 @@ namespace game::component
         engine::component::PhysicsComponent *getPhysics() const { return physics_; }
         engine::component::SpriteComponent *getSprite() const { return sprite_; }
         engine::component::AnimationComponent *getAnimation() const { return animation_; }
+        engine::component::HealthComponent *getHealth() const { return health_; }
+        engine::component::AudioComponent *getAudio() const { return audio_; }
 
         void idle();
         void jump();

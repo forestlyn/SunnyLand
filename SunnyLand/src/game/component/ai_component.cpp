@@ -6,6 +6,7 @@
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/health_component.h"
 #include "../../engine/component/animation_component.h"
+#include "../../engine/component/audio_component.h"
 
 namespace game::component
 {
@@ -16,6 +17,7 @@ namespace game::component
         sprite_ = m_gameObject->getComponent<engine::component::SpriteComponent>();
         health_ = m_gameObject->getComponent<engine::component::HealthComponent>();
         animation_ = m_gameObject->getComponent<engine::component::AnimationComponent>();
+        audio_ = m_gameObject->getComponent<engine::component::AudioComponent>();
 
         if (!transform_ || !physics_ || !sprite_ || !health_)
         {

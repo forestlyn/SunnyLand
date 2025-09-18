@@ -14,6 +14,7 @@
 #include "../../engine/render/animation.h"
 #include "../../engine/physics/physics_engine.h"
 #include "../../engine/physics/collider.h"
+#include "../../engine/audio/audio_player.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
 #include "../component/player_component.h"
@@ -47,6 +48,12 @@ namespace game::scene
             spdlog::error("Failed to initialize enemy and item");
             context.getInputManager().setShouldExit(true);
         }
+
+        auto &audio_player = context.getAudioPlayer();
+        audio_player.setMusicVolume(0.2f);
+        audio_player.setSoundVolume(0.5f);
+        audio_player.playMusic("assets/audio/hurry_up_and_run.ogg", -1, 1000);
+
         Scene::initialize();
         spdlog::info("GameScene initialized successfully");
     }
@@ -305,6 +312,7 @@ namespace game::scene
             {
                 player_physics->velocity_.y = -300.0f; // 向上弹跳
             }
+            context.getAudioPlayer().playSound("assets/audio/punch2a.mp3");
         }
         else
         {
@@ -336,6 +344,7 @@ namespace game::scene
         }
         auto *item_collider = item->getComponent<engine::component::ColliderComponent>();
         createEffectAt(item_collider->getWorldAABB().position + item_collider->getWorldAABB().size * 0.5f, item->getTag());
+        context.getAudioPlayer().playSound("assets/audio/poka01.mp3");
         item->setNeedRemove(true);
     }
 

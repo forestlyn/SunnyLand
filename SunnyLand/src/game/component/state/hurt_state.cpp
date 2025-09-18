@@ -4,6 +4,7 @@
 #include "fall_state.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/component/sprite_component.h"
+#include "../../../engine/component/audio_component.h"
 #include "../player_component.h"
 namespace game::component::state
 {
@@ -23,6 +24,10 @@ namespace game::component::state
                 knockback_velocity = glm::vec2(-knockback_velocity.x, knockback_velocity.y); // 向右上方击退
             }
             physics->velocity_ = knockback_velocity;
+        }
+        if (auto audio = player_component_->getAudio(); audio)
+        {
+            audio->playSound("hurt");
         }
     }
 

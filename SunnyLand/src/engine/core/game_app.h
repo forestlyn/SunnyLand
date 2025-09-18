@@ -30,6 +30,11 @@ namespace engine::physics
     class PhysicsEngine;
 }
 
+namespace engine::audio
+{
+    class AudioPlayer;
+}
+
 namespace engine::core
 {
     class Time;
@@ -67,6 +72,7 @@ namespace engine::core
         std::unique_ptr<engine::core::Context> context_;
         std::unique_ptr<engine::scene::SceneManager> scene_manager_;
         std::unique_ptr<engine::physics::PhysicsEngine> physics_engine_;
+        std::unique_ptr<engine::audio::AudioPlayer> audio_player_;
 
         [[nodiscard]] bool Init();
         void handleEvents();
@@ -81,9 +87,11 @@ namespace engine::core
         [[nodiscard]] bool initCamera();
         [[nodiscard]] bool initRenderer();
         [[nodiscard]] bool initInputManager();
-        [[nodiscard]] bool initContext();
         [[nodiscard]] bool initSceneManager();
         [[nodiscard]] bool initPhysicsEngine();
+        [[nodiscard]] bool initAudioPlayer();
+
+        [[nodiscard]] bool initContext();
 
         // void testResourceManager();
         // void testRenderer();

@@ -16,6 +16,7 @@
 #include "../scene/scene_manager.h"
 #include "../../game/scene/game_scene.h"
 #include "../physics/physics_engine.h"
+#include "../audio/audio_player.h"
 namespace engine::core
 {
 
@@ -77,6 +78,12 @@ namespace engine::core
         if (!initPhysicsEngine())
         {
             spdlog::error("Failed to initialize PhysicsEngine");
+            return false;
+        }
+
+        if (!initAudioPlayer())
+        {
+            spdlog::error("Failed to initialize AudioPlayer");
             return false;
         }
 
@@ -221,11 +228,27 @@ namespace engine::core
         }
     }
 
+    bool GameApp::initAudioPlayer()
+    {
+        try
+        {
+            audio_player_ = std::make_unique<engine::audio::AudioPlayer>(resource_manager_.get());
+            spdlog::trace("AudioPlayer initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create AudioPlayer instance: {}", e.what());
+            return false;
+        }
+    }
+
     bool GameApp::initContext()
     {
         try
         {
-            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *resource_manager_.get(), *input_manager_.get(), *physics_engine_.get());
+            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(),
+                                                               *resource_manager_.get(), *input_manager_.get(), *physics_engine_.get(), *audio_player_.get());
             spdlog::trace("Context initialized successfully");
             return true;
         }

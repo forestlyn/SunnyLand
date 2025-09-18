@@ -7,6 +7,7 @@
 #include "../component/sprite_component.h"
 #include "../component/animation_component.h"
 #include "../component/health_component.h"
+#include "../component/audio_component.h"
 #include "../render/animation.h"
 #include "../physics/collider.h"
 #include "../physics/physics_engine.h"
@@ -200,6 +201,7 @@ namespace engine::scene
                     auto tileJson = getTileJsonByGid(gid);
                     auto useGravity = getPropertyFromJson<bool>(tileJson, "gravity");
                     auto animationJson = getPropertyFromJson<std::string>(tileJson, "animation");
+                    auto soundJson = getPropertyFromJson<std::string>(tileJson, "sound");
                     auto tagname = getPropertyFromJson<std::string>(tileJson, "tag");
                     auto health = getPropertyFromJson<int>(tileJson, "health");
 
@@ -237,6 +239,23 @@ namespace engine::scene
                     // {
                     //     spdlog::info("No animation property for object '{}'", name);
                     // }
+
+                    if (soundJson)
+                    {
+                        engine::component::AudioComponent *audioComp = gameObj->addComponent<engine::component::AudioComponent>(&scene.getContext().getAudioPlayer(), &scene.getContext().getCamera());
+                        nlohmann::json soundJsonParsed;
+                        try
+                        {
+                            soundJsonParsed = nlohmann::json::parse(*soundJson);
+                        }
+                        catch (const std::exception &e)
+                        {
+                            spdlog::warn("Failed to parse sound JSON for object '{}': {}", name, e.what());
+                            continue;
+                        }
+                        loadSound(soundJsonParsed, audioComp);
+                        spdlog::info("Loaded sound for object '{}'", name);
+                    }
 
                     if (tagname)
                     {
@@ -527,6 +546,28 @@ namespace engine::scene
             spdlog::trace("Animation '{}' loaded.", anim_name);
         }
     }
+
+    void LevelLoader::loadSound(const nlohmann::json &sound_json, engine::component::AudioComponent *audio_component)
+    {
+        if (sound_json.is_null() || !sound_json.is_object())
+        {
+            spdlog::warn("Sound JSON is invalid.");
+            return;
+        }
+        for (auto const &sound : sound_json.items())
+        {
+            std::string sound_id = sound.key();
+            std::string file_path = sound.value().get<std::string>();
+            if (file_path.empty())
+            {
+                spdlog::warn("Sound '{}' has empty file path.", sound_id);
+                continue;
+            }
+            audio_component->addSound(sound_id, file_path);
+            spdlog::trace("Sound '{}' loaded from '{}'.", sound_id, file_path);
+        }
+    }
+
     std::string LevelLoader::resolvePath(const std::string &relative_path, const std::string &file_path)
     {
         // 解析资源路径
