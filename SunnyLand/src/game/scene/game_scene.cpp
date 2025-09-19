@@ -9,6 +9,7 @@
 #include "../../engine/component/animation_component.h"
 #include "../../engine/component/health_component.h"
 #include "../../engine/scene/level_loader.h"
+#include "../../engine/scene/scene_manager.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
 #include "../../engine/render/animation.h"
@@ -62,7 +63,9 @@ namespace game::scene
     {
         // 这里可以添加额外的关卡初始化逻辑
         engine::scene::LevelLoader level_loader;
-        bool success = level_loader.loadLevel("./assets/maps/level1.tmj", *this);
+
+        std::string level_path = getLevelPathByName(scene_name);
+        bool success = level_loader.loadLevel(level_path, *this);
         if (!success)
         {
             spdlog::error("Failed to load level");
@@ -261,6 +264,14 @@ namespace game::scene
                     player_comp->takeDamage(1);
                 }
             }
+            else if (objA->getTag() == "player" && objB->getTag() == "next_level")
+            {
+                toNextLevel(objB);
+            }
+            else if (objA->getTag() == "next_level" && objB->getTag() == "player")
+            {
+                toNextLevel(objA);
+            }
         }
     }
 
@@ -389,5 +400,13 @@ namespace game::scene
         animation_component->playAnimation("effect");
         safeAddGameObject(std::move(effect_obj)); // 安全添加特效对象
         spdlog::debug("创建特效: {}", tag);
+    }
+
+    void GameScene::toNextLevel(engine::object::GameObject *obj)
+    {
+        spdlog::info("进入下一关!");
+        std::string next_level_name = obj->getName();
+        auto new_scene = std::make_unique<GameScene>(next_level_name, context, scene_manager);
+        scene_manager.requestReplaceScene(std::move(new_scene));
     }
 }

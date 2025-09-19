@@ -315,6 +315,7 @@ namespace engine::physics
                     {
                         resolveSolidObjectCollisions(colliderA->getOwner(), colliderB->getOwner());
                     }
+
                     else
                         collision_pairs_.emplace_back(objA, objB);
                 }

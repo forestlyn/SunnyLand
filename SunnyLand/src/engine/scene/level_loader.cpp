@@ -167,6 +167,45 @@ namespace engine::scene
                 if (gid == 0)
                 {
                     // TODO
+                    if (obj.value("polygon", false))
+                    {
+                        spdlog::warn("Polygon objects are not supported yet");
+                    }
+                    else if (obj.value("point", false))
+                    {
+                        spdlog::warn("Point objects are not supported yet");
+                    }
+                    else if (obj.value("ellipse", false))
+                    {
+                        spdlog::warn("Ellipse objects are not supported yet");
+                    }
+                    else
+                    {
+                        std::string name = obj.value("name", "unnamed");
+                        auto tag = getPropertyFromJson<std::string>(obj, "tag");
+                        auto width = obj.value("width", 0.0f);
+                        auto height = obj.value("height", 0.0f);
+                        auto x = obj.value("x", 0.0f);
+                        auto y = obj.value("y", 0.0f);
+                        auto rotation = obj.value("rotation", 0.0f);
+                        auto visible = obj.value("visible", true);
+                        auto trigger = obj.value("trigger", true);
+
+                        auto gameObj = std::make_unique<engine::object::GameObject>(name);
+                        gameObj->addComponent<engine::component::TransformComponent>(glm::vec2(x, y), rotation, glm::vec2(1.0f, 1.0f));
+                        if (width > 0 && height > 0)
+                        {
+                            auto collider = std::make_unique<engine::physics::AABBCollider>(glm::vec2(width, height));
+                            engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
+                            gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+                            colliderComp->setTrigger(trigger);
+                        }
+                        if (tag)
+                        {
+                            gameObj->setTag(tag.value());
+                        }
+                        scene.addGameObject(std::move(gameObj));
+                    }
                 }
                 else
                 {

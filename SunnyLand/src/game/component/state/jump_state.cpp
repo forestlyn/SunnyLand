@@ -31,7 +31,7 @@ namespace game::component::state
     {
         player_component_->clampVelocity();
         auto physics = player_component_->getPhysics();
-        if (physics && physics->velocity_.y > 0.0f)
+        if (physics && physics->velocity_.y >= 0.0f)
         {
             return std::make_unique<FallState>(player_component_);
         }

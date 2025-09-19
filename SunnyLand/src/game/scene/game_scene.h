@@ -41,5 +41,8 @@ namespace game::scene
         void PlayerVsItem(engine::object::GameObject *player, engine::object::GameObject *item);
 
         void createEffectAt(const glm::vec2 &center_position, const std::string &effect_name);
+
+        void toNextLevel(engine::object::GameObject *obj);
+        std::string getLevelPathByName(const std::string &level_name) { return "assets/maps/" + level_name + ".tmj"; }
     };
 }
