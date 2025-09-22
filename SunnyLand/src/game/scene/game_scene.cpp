@@ -17,6 +17,9 @@
 #include "../../engine/physics/physics_engine.h"
 #include "../../engine/physics/collider.h"
 #include "../../engine/audio/audio_player.h"
+#include "../../engine/ui/ui_manager.h"
+#include "../../engine/ui/ui_panel.h"
+#include "../../engine/utils/math.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
 #include "../component/player_component.h"
@@ -55,6 +58,12 @@ namespace game::scene
         if (!initEnemyAndItem())
         {
             spdlog::error("Failed to initialize enemy and item");
+            context.getInputManager().setShouldExit(true);
+        }
+
+        if (!initUI())
+        {
+            spdlog::error("Failed to initialize UIManager");
             context.getInputManager().setShouldExit(true);
         }
 
@@ -204,6 +213,20 @@ namespace game::scene
             }
         }
         return success;
+    }
+
+    bool GameScene::initUI()
+    {
+        if (!ui_manager->init(glm::vec2(600, 600)))
+        {
+            spdlog::error("Failed to initialize UIManager");
+            return false;
+        }
+        else
+        {
+            ui_manager->getUIRoot()->addChild(std::make_unique<engine::ui::UIPanel>(glm::vec2(100, 100), glm::vec2(180, 50), engine::utils::FColor(0.5f, 0.0f, 0.0f, 0.5f)));
+        }
+        return true;
     }
 
     void GameScene::update(float deltaTime)

@@ -148,7 +148,7 @@ namespace engine::core
             spdlog::error("Renderer could not be created! SDL_Error: {}", SDL_GetError());
             return false;
         }
-
+        SDL_SetRenderDrawBlendMode(sdl_renderer_, SDL_BLENDMODE_BLEND);
         int vsync_mode = config_->vsync_enable_ ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
         SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
         spdlog::trace("VSync 设置为: {}", config_->vsync_enable_ ? "Enabled" : "Disabled");

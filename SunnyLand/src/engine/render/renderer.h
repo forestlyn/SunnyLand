@@ -3,6 +3,7 @@
 #include <string>
 #include <optional>
 #include <glm/glm.hpp>
+#include "../utils/math.h"
 struct SDL_Renderer;
 struct SDL_FRect;
 
@@ -39,6 +40,8 @@ namespace engine::render
                           const glm::vec2 &scroll_factor, const glm::bvec2 &repeat = {true, true}, const glm::vec2 &scale = glm::vec2(1.0f, 1.0f));
 
         void drawUISprite(const Sprite &sprite, const glm::vec2 &position, const std::optional<glm::vec2> &size = std::nullopt);
+
+        void drawUIFilledRect(const engine::utils::Rect &rect, const engine::utils::FColor &color);
 
         void present();
 

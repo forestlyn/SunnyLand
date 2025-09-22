@@ -163,6 +163,18 @@ namespace engine::render
         }
     }
 
+    void Renderer::drawUIFilledRect(const engine::utils::Rect &rect, const engine::utils::FColor &color)
+    {
+        setDrawColorFloat(color.r, color.g, color.b, color.a);
+        SDL_FRect sdl_rect = {rect.position.x, rect.position.y, rect.size.x, rect.size.y};
+        if (!SDL_RenderFillRect(renderer_, &sdl_rect))
+        {
+            spdlog::info("Drawing filled rect at ({}, {}) with size ({}, {})", rect.position.x, rect.position.y, rect.size.x, rect.size.y);
+            spdlog::error("Failed to draw filled rect: {}", SDL_GetError());
+        }
+        setDrawColor(0, 0, 0, 255);
+    }
+
     void Renderer::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
     {
         if (!SDL_SetRenderDrawColor(renderer_, r, g, b, a))

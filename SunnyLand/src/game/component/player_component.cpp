@@ -59,9 +59,9 @@ namespace game::component
         }
         if (current_state_)
         {
-            spdlog::info("Exiting state: {}", typeid(*current_state_).name());
+            spdlog::debug("Exiting state: {}", typeid(*current_state_).name());
         }
-        spdlog::info("Entering state: {}", typeid(*new_state).name());
+        spdlog::debug("Entering state: {}", typeid(*new_state).name());
         current_state_ = std::move(new_state);
         current_state_->enter();
     }

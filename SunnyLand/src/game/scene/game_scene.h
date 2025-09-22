@@ -39,6 +39,7 @@ namespace game::scene
         [[nodiscard]] bool initLevel();
         [[nodiscard]] bool initPlayer();
         [[nodiscard]] bool initEnemyAndItem();
+        [[nodiscard]] bool initUI();
 
         void handleObjectCollisions();
         void handleTileTriggerEvents();

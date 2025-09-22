@@ -12,6 +12,10 @@ namespace engine::object
 {
     class GameObject;
 }
+namespace engine::ui
+{
+    class UIManager;
+}
 
 namespace engine::scene
 {
@@ -24,6 +28,7 @@ namespace engine::scene
         SceneManager &scene_manager;
         std::vector<std::unique_ptr<engine::object::GameObject>> game_objects;
         std::vector<std::unique_ptr<engine::object::GameObject>> pending_game_objects;
+        std::unique_ptr<engine::ui::UIManager> ui_manager = nullptr;
         bool is_initialize = false;
 
     public:
@@ -51,6 +56,7 @@ namespace engine::scene
         std::string getName() const;
         engine::core::Context &getContext() const;
         SceneManager &getSceneManager() const;
+        engine::ui::UIManager &getUIManager();
         std::vector<std::unique_ptr<engine::object::GameObject>> &getGameObjects();
 
         void setInitialized(bool initialized);

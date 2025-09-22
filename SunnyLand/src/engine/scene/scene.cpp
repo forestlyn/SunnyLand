@@ -4,11 +4,12 @@
 #include "../core/context.h"
 #include "../physics/physics_engine.h"
 #include "../render/camera.h"
+#include "../ui/ui_manager.h"
 
 namespace engine::scene
 {
     Scene::Scene(std::string scene_name, engine::core::Context &context, SceneManager &scene_manager)
-        : scene_name(std::move(scene_name)), context(context), scene_manager(scene_manager), is_initialize(false)
+        : scene_name(std::move(scene_name)), context(context), scene_manager(scene_manager), ui_manager(std::make_unique<engine::ui::UIManager>()), is_initialize(false)
     {
     }
 
@@ -79,6 +80,12 @@ namespace engine::scene
         {
             return;
         }
+
+        if (ui_manager && ui_manager->handleInput(context))
+        {
+            return; // UI 处理了输入，阻止进一步处理
+        }
+
         for (auto it = game_objects.begin(); it != game_objects.end();)
         {
             if ((*it) && (*it)->isActive() && ((*it)->isNeedRemove() == false))
@@ -116,6 +123,10 @@ namespace engine::scene
                 it = game_objects.erase(it);
             }
         }
+
+        if (ui_manager)
+            ui_manager->update(delta_time, context);
+
         processPendingGameObjects();
     }
 
@@ -130,6 +141,9 @@ namespace engine::scene
             if (obj && obj->isActive())
                 obj->render(context);
         }
+
+        if (ui_manager)
+            ui_manager->render(context);
     }
 
     void Scene::close()
@@ -166,6 +180,16 @@ namespace engine::scene
     SceneManager &Scene::getSceneManager() const
     {
         return scene_manager;
+    }
+
+    engine::ui::UIManager &Scene::getUIManager()
+    {
+        if (!ui_manager)
+        {
+            ui_manager = std::make_unique<engine::ui::UIManager>();
+            spdlog::info("UIManager created for scene: {}", scene_name);
+        }
+        return *ui_manager;
     }
 
     std::vector<std::unique_ptr<engine::object::GameObject>> &Scene::getGameObjects()
