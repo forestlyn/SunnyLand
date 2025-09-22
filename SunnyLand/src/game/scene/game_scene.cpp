@@ -13,6 +13,7 @@
 #include "../../engine/input/input_manager.h"
 #include "../../engine/render/camera.h"
 #include "../../engine/render/animation.h"
+#include "../../engine/render/text_renderer.h"
 #include "../../engine/physics/physics_engine.h"
 #include "../../engine/physics/collider.h"
 #include "../../engine/audio/audio_player.h"
@@ -216,6 +217,7 @@ namespace game::scene
     void GameScene::render()
     {
         Scene::render();
+        testTextRenderer();
         // spdlog::info("Rendering GameScene");
         // testCollision();
     }
@@ -223,7 +225,6 @@ namespace game::scene
     void GameScene::handleInput()
     {
         Scene::handleInput();
-        testSaveAndLoad();
         // spdlog::info("Handling input in GameScene");
     }
 
@@ -436,18 +437,12 @@ namespace game::scene
         scene_manager.requestReplaceScene(std::move(new_scene));
     }
 
-    void GameScene::testSaveAndLoad()
+    void GameScene::testTextRenderer()
     {
-        auto input_manager = context.getInputManager();
-        if (input_manager.isActionPressed("attack"))
-        {
-            session_data_->saveToFile("assets/save.json");
-        }
-        if (input_manager.isActionPressed("pause"))
-        {
-            session_data_->loadFromFile("assets/save.json");
-            spdlog::info("当前生命值: {}", session_data_->getCurrentPlayerHealth());
-            spdlog::info("当前得分: {}", session_data_->getCurrentPlayerScore());
-        }
+        auto &text_renderer = context.getTextRenderer();
+        text_renderer.drawUIText("Score: " + std::to_string(session_data_->getCurrentPlayerScore()),
+                                 "assets/fonts/VonwaonBitmap-16px.ttf", 32, glm::vec2(100), {0, 1.0f, 0, 1.0f}, true);
+        text_renderer.drawText(context.getCamera(), "Health: " + std::to_string(session_data_->getCurrentPlayerHealth()),
+                               "assets/fonts/VonwaonBitmap-16px.ttf", 32, glm::vec2(200), {1.0f, 0, 0, 1.0f}, false);
     }
 }

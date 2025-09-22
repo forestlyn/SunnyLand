@@ -1,6 +1,7 @@
 #include "context.h"
 #include "../render/camera.h"
 #include "../render/renderer.h"
+#include "../render/text_renderer.h"
 #include "../resource/resource_manager.h"
 #include "../input/input_manager.h"
 #include "../physics/physics_engine.h"
@@ -8,10 +9,10 @@
 
 namespace engine::core
 {
-    Context::Context(engine::render::Camera &camera, engine::render::Renderer &renderer,
+    Context::Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::render::TextRenderer &textRenderer,
                      engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager,
                      engine::physics::PhysicsEngine &physicsEngine, engine::audio::AudioPlayer &audioPlayer)
-        : m_camera(camera), m_renderer(renderer), m_resourceManager(resourceManager),
+        : m_camera(camera), m_renderer(renderer), m_textRenderer(textRenderer), m_resourceManager(resourceManager),
           m_inputManager(inputManager), m_physicsEngine(physicsEngine), m_audioPlayer(audioPlayer)
     {
     }
@@ -48,5 +49,10 @@ namespace engine::core
     engine::audio::AudioPlayer &Context::getAudioPlayer()
     {
         return m_audioPlayer;
+    }
+
+    engine::render::TextRenderer &Context::getTextRenderer()
+    {
+        return m_textRenderer;
     }
 }

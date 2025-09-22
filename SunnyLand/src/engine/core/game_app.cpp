@@ -6,6 +6,7 @@
 #include "../resource/resource_manager.h"
 #include "../render/renderer.h"
 #include "../render/camera.h"
+#include "../render/text_renderer.h"
 #include "../input/input_manager.h"
 #include "config.h"
 #include "../object/game_object.h"
@@ -66,6 +67,11 @@ namespace engine::core
         if (!initRenderer())
         {
             spdlog::error("Failed to initialize Renderer");
+            return false;
+        }
+        if (!initTextRenderer())
+        {
+            spdlog::error("Failed to initialize TextRenderer");
             return false;
         }
 
@@ -213,6 +219,21 @@ namespace engine::core
         }
     }
 
+    bool GameApp::initTextRenderer()
+    {
+        try
+        {
+            text_renderer_ = std::make_unique<engine::render::TextRenderer>(sdl_renderer_, resource_manager_.get());
+            spdlog::trace("TextRenderer initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create TextRenderer instance: {}", e.what());
+            return false;
+        }
+    }
+
     bool GameApp::initInputManager()
     {
         try
@@ -247,7 +268,7 @@ namespace engine::core
     {
         try
         {
-            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(),
+            context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *text_renderer_.get(),
                                                                *resource_manager_.get(), *input_manager_.get(), *physics_engine_.get(), *audio_player_.get());
             spdlog::trace("Context initialized successfully");
             return true;

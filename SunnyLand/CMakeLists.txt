@@ -40,6 +40,7 @@ add_executable(${TARGET}
                 src/engine/render/renderer.cpp
                 src/engine/render/camera.cpp
                 src/engine/render/animation.cpp
+                src/engine/render/text_renderer.cpp
                 src/engine/resource/resource_manager.cpp
                 src/engine/resource/audio_manager.cpp
                 src/engine/resource/texture_manager.cpp

@@ -53,6 +53,6 @@ namespace game::scene
 
         void handlePlayerDamage(int damage);
 
-        void testSaveAndLoad();
+        void testTextRenderer();
     };
 }
