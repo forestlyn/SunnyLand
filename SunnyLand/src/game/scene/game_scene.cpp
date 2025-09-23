@@ -240,7 +240,6 @@ namespace game::scene
     void GameScene::render()
     {
         Scene::render();
-        testTextRenderer();
         // spdlog::info("Rendering GameScene");
         // testCollision();
     }
@@ -458,14 +457,5 @@ namespace game::scene
         session_data_->nextLevel(getLevelPathByName(next_level_name));
         auto new_scene = std::make_unique<GameScene>(context, scene_manager, std::move(session_data_));
         scene_manager.requestReplaceScene(std::move(new_scene));
-    }
-
-    void GameScene::testTextRenderer()
-    {
-        auto &text_renderer = context.getTextRenderer();
-        text_renderer.drawUIText("Score: " + std::to_string(session_data_->getCurrentPlayerScore()),
-                                 "assets/fonts/VonwaonBitmap-16px.ttf", 32, glm::vec2(100), {0, 1.0f, 0, 1.0f}, true);
-        text_renderer.drawText(context.getCamera(), "Health: " + std::to_string(session_data_->getCurrentPlayerHealth()),
-                               "assets/fonts/VonwaonBitmap-16px.ttf", 32, glm::vec2(200), {1.0f, 0, 0, 1.0f}, false);
     }
 }

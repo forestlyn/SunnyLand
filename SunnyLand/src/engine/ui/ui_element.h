@@ -14,7 +14,7 @@ namespace engine::ui
 {
     class UIElement
     {
-    private:
+    protected:
         glm::vec2 position_;
         glm::vec2 size_;
         bool visible_ = true;

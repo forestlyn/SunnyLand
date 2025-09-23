@@ -12,7 +12,7 @@ namespace engine::ui
 
     void UIPanel::render(engine::core::Context &context)
     {
-        if (!isVisible())
+        if (!visible_)
             return;
 
         if (background_color_)

@@ -53,7 +53,5 @@ namespace game::scene
         std::string getLevelPathByName(const std::string &level_name) { return "assets/maps/" + level_name + ".tmj"; }
 
         void handlePlayerDamage(int damage);
-
-        void testTextRenderer();
     };
 }

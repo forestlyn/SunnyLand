@@ -48,14 +48,14 @@ namespace engine::render
     }
 
     void TextRenderer::drawText(Camera &camera, const std::string &text, const std::string &font_name, int font_size, const glm::vec2 &position,
-                                const SDL_FColor &color, bool drawShadow, float shadowOffsetX, float shadowOffsetY, const SDL_FColor &shadowColor)
+                                const engine::utils::FColor &color, bool drawShadow, float shadowOffsetX, float shadowOffsetY, const engine::utils::FColor &shadowColor)
     {
         auto screen_pos = camera.worldToScreen(position);
         drawUIText(text, font_name, font_size, screen_pos, color, drawShadow, shadowOffsetX, shadowOffsetY, shadowColor);
     }
 
     void TextRenderer::drawUIText(const std::string &text, const std::string &font_name, int font_size, const glm::vec2 &position,
-                                  const SDL_FColor &color, bool drawShadow, float shadowOffsetX, float shadowOffsetY, const SDL_FColor &shadowColor)
+                                  const engine::utils::FColor &color, bool drawShadow, float shadowOffsetX, float shadowOffsetY, const engine::utils::FColor &shadowColor)
     {
 
         auto font = resource_manager_->getFont(font_name, font_size);

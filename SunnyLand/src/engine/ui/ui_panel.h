@@ -7,7 +7,7 @@ namespace engine::ui
 {
     class UIPanel : public UIElement
     {
-    private:
+    protected:
         std::optional<engine::utils::FColor> background_color_;
 
     public:
