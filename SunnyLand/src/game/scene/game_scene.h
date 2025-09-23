@@ -19,6 +19,11 @@ namespace game::data
 {
     class SessionData;
 }
+namespace engine::ui
+{
+    class UIPanel;
+    class UILabel;
+}
 
 namespace game::scene
 {
@@ -26,6 +31,9 @@ namespace game::scene
     {
         engine::object::GameObject *player_;
         std::shared_ptr<game::data::SessionData> session_data_;
+
+        engine::ui::UIPanel *health_panel_ = nullptr;
+        engine::ui::UILabel *score_label_ = nullptr;
 
     public:
         GameScene(engine::core::Context &context, engine::scene::SceneManager &scene_manager, std::shared_ptr<game::data::SessionData> session_data = nullptr);
@@ -53,5 +61,11 @@ namespace game::scene
         std::string getLevelPathByName(const std::string &level_name) { return "assets/maps/" + level_name + ".tmj"; }
 
         void handlePlayerDamage(int damage);
+        void healPlayer(int heal_amount);
+        void addPlayerScore(int score);
+
+        void initPlayerUI();
+        void updateHealthUI();
+        void updateScoreUI();
     };
 }

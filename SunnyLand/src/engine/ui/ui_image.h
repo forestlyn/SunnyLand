@@ -1,7 +1,8 @@
 #pragma once
 #include "ui_element.h"
 #include "../render/sprite.h"
-#include <string.h>
+#include <optional>
+#include <string>
 namespace engine::ui
 {
     class UIImage : public UIElement
@@ -10,7 +11,7 @@ namespace engine::ui
         engine::render::Sprite sprite_;
 
     public:
-        UIImage(const std::string &sprite_id, const glm::vec2 &position, const glm::vec2 &size);
+        UIImage(const std::string &sprite_id, const glm::vec2 &position, const glm::vec2 &size, std::optional<SDL_FRect> rect = std::nullopt, const bool &is_flip = false);
         ~UIImage() override = default;
         UIImage(const UIImage &) = delete;
         UIImage &operator=(const UIImage &) = delete;

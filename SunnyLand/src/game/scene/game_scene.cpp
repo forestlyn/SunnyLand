@@ -19,6 +19,8 @@
 #include "../../engine/audio/audio_player.h"
 #include "../../engine/ui/ui_manager.h"
 #include "../../engine/ui/ui_panel.h"
+#include "../../engine/ui/ui_image.h"
+#include "../../engine/ui/ui_label.h"
 #include "../../engine/utils/math.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
@@ -224,7 +226,7 @@ namespace game::scene
         }
         else
         {
-            ui_manager->getUIRoot()->addChild(std::make_unique<engine::ui::UIPanel>(glm::vec2(100, 100), glm::vec2(180, 50), engine::utils::FColor(0.5f, 0.0f, 0.0f, 0.5f)));
+            initPlayerUI();
         }
         return true;
     }
@@ -324,6 +326,11 @@ namespace game::scene
             }
         }
     }
+    void GameScene::addPlayerScore(int score)
+    {
+        session_data_->addScore(score);
+        updateScoreUI();
+    }
 
     void GameScene::handlePlayerDamage(int damage)
     {
@@ -336,6 +343,17 @@ namespace game::scene
             {
                 // TODO: 玩家死亡处理
             }
+            updateHealthUI();
+        }
+    }
+    void GameScene::healPlayer(int heal_amount)
+    {
+        auto *player_comp = player_->getComponent<game::component::PlayerComponent>();
+        if (player_comp)
+        {
+            player_comp->heal(heal_amount);
+            session_data_->setCurrentPlayerHealth(player_comp->getHealth()->getCurrentHealth());
+            updateHealthUI();
         }
     }
 
@@ -368,7 +386,7 @@ namespace game::scene
             {
                 player_physics->velocity_.y = -300.0f; // 向上弹跳
             }
-            session_data_->addScore(10);
+            addPlayerScore(10);
             context.getAudioPlayer().playSound("assets/audio/punch2a.mp3");
         }
         else
@@ -386,20 +404,11 @@ namespace game::scene
     {
         if (item->getName() == "fruit")
         {
-            auto *player_comp = player->getComponent<game::component::PlayerComponent>();
-            if (player_comp)
-            {
-                player_comp->heal(1);
-                session_data_->setCurrentPlayerHealth(player_comp->getHealth()->getCurrentHealth());
-            }
-            else
-            {
-                spdlog::warn("Player object does not have a PlayerComponent");
-            }
+            healPlayer(1);
         }
         else if (item->getName() == "gem")
         {
-            session_data_->addScore(5);
+            addPlayerScore(5);
         }
         auto *item_collider = item->getComponent<engine::component::ColliderComponent>();
         createEffectAt(item_collider->getWorldAABB().position + item_collider->getWorldAABB().size * 0.5f, item->getTag());
@@ -458,4 +467,54 @@ namespace game::scene
         auto new_scene = std::make_unique<GameScene>(context, scene_manager, std::move(session_data_));
         scene_manager.requestReplaceScene(std::move(new_scene));
     }
+#pragma region UI
+    void GameScene::initPlayerUI()
+    {
+        if (!ui_manager)
+            return;
+        auto health_panel = std::make_unique<engine::ui::UIPanel>(glm::vec2(10, 10));
+        for (int i = 0; i < session_data_->getMaxPlayerHealth(); ++i)
+        {
+            auto heart_image = std::make_unique<engine::ui::UIImage>("assets/textures/UI/Heart-bg.png", glm::vec2(i * 34.0f, 0), glm::vec2(32, 32));
+            health_panel->addChild(std::move(heart_image));
+        }
+        for (int i = 0; i < session_data_->getMaxPlayerHealth(); ++i)
+        {
+            auto heart_image = std::make_unique<engine::ui::UIImage>("assets/textures/UI/Heart.png", glm::vec2(i * 34.0f, 0), glm::vec2(32, 32));
+            health_panel->addChild(std::move(heart_image));
+        }
+        health_panel_ = health_panel.get();
+        ui_manager->addUIElement(std::move(health_panel));
+        updateHealthUI();
+
+        auto score_label = std::make_unique<engine::ui::UILabel>(context.getTextRenderer(), "Score: 0", "assets/fonts/VonwaonBitmap-16px.ttf", 24, engine::utils::FColor{1.0f, 1.0f, 0.0f, 1.0f}, glm::vec2(10, 50));
+        score_label_ = score_label.get();
+        ui_manager->addUIElement(std::move(score_label));
+        updateScoreUI();
+    }
+    void GameScene::updateHealthUI()
+    {
+        if (!ui_manager)
+            return;
+        auto *health_panel = ui_manager->getUIRoot()->getChildren().front().get();
+        if (!health_panel)
+            return;
+        int current_health = session_data_->getCurrentPlayerHealth();
+        int max_health = session_data_->getMaxPlayerHealth();
+        for (int i = max_health; i < max_health * 2; ++i)
+        {
+            auto *heart_image = health_panel->getChildren()[i].get();
+            if (heart_image)
+            {
+                heart_image->setVisible(i < current_health + max_health);
+            }
+        }
+    }
+    void GameScene::updateScoreUI()
+    {
+        if (!ui_manager || !score_label_)
+            return;
+        score_label_->setText("Score: " + std::to_string(session_data_->getCurrentPlayerScore()));
+    }
+#pragma endregion UI
 }
