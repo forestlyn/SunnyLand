@@ -67,5 +67,10 @@ namespace game::scene
         void initPlayerUI();
         void updateHealthUI();
         void updateScoreUI();
+
+        void testButtonClicked();
+        void testButtonHovered();
+        void testButtonHoverExited();
+        void createTestButton();
     };
 }

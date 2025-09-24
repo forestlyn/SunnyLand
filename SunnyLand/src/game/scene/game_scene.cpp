@@ -21,6 +21,7 @@
 #include "../../engine/ui/ui_panel.h"
 #include "../../engine/ui/ui_image.h"
 #include "../../engine/ui/ui_label.h"
+#include "../../engine/ui/ui_button.h"
 #include "../../engine/utils/math.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
@@ -227,6 +228,7 @@ namespace game::scene
         else
         {
             initPlayerUI();
+            createTestButton();
         }
         return true;
     }
@@ -517,4 +519,27 @@ namespace game::scene
         score_label_->setText("Score: " + std::to_string(session_data_->getCurrentPlayerScore()));
     }
 #pragma endregion UI
+
+    void GameScene::testButtonClicked()
+    {
+        spdlog::info("Test button clicked!");
+    }
+    void GameScene::testButtonHovered()
+    {
+        spdlog::info("Test button hovered!");
+    }
+    void GameScene::testButtonHoverExited()
+    {
+        spdlog::info("Test button hover exited!");
+    }
+    void GameScene::createTestButton()
+    {
+        auto test_button = std::make_unique<engine::ui::UIButton>(context, "assets/textures/UI/buttons/Start1.png", "assets/textures/UI/buttons/Start2.png", "assets/textures/UI/buttons/Start3.png", glm::vec2(100.0f, 100.0f),
+                                                                  glm::vec2(0.0f), // 采用图片大小
+                                                                  [this]()
+                                                                  { this->testButtonClicked(); }, [this]()
+                                                                  { this->testButtonHovered(); }, [this]()
+                                                                  { this->testButtonHoverExited(); });
+        ui_manager->addUIElement(std::move(test_button));
+    }
 }
