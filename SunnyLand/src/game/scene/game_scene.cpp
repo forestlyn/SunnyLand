@@ -71,8 +71,7 @@ namespace game::scene
         }
 
         auto &audio_player = context.getAudioPlayer();
-        audio_player.setMusicVolume(0.2f);
-        audio_player.setSoundVolume(0.5f);
+
         audio_player.playMusic("assets/audio/hurry_up_and_run.ogg", -1, 1000);
 
         Scene::initialize();
@@ -112,6 +111,7 @@ namespace game::scene
         }
         auto world_size = main_obj->getComponent<engine::component::TileLayerComponent>()->getWorldSize();
         context.getCamera().setLimitBounds(engine::utils::Rect(glm::vec2(0), world_size));
+        context.getCamera().setPosition(glm::vec2(0.0f, 0.0f));
         context.getPhysicsEngine().setWorldBound(engine::utils::Rect(glm::vec2(0), world_size));
 
         return true;
@@ -228,7 +228,6 @@ namespace game::scene
         else
         {
             initPlayerUI();
-            createTestButton();
         }
         return true;
     }
@@ -519,27 +518,4 @@ namespace game::scene
         score_label_->setText("Score: " + std::to_string(session_data_->getCurrentPlayerScore()));
     }
 #pragma endregion UI
-
-    void GameScene::testButtonClicked()
-    {
-        spdlog::info("Test button clicked!");
-    }
-    void GameScene::testButtonHovered()
-    {
-        spdlog::info("Test button hovered!");
-    }
-    void GameScene::testButtonHoverExited()
-    {
-        spdlog::info("Test button hover exited!");
-    }
-    void GameScene::createTestButton()
-    {
-        auto test_button = std::make_unique<engine::ui::UIButton>(context, "assets/textures/UI/buttons/Start1.png", "assets/textures/UI/buttons/Start2.png", "assets/textures/UI/buttons/Start3.png", glm::vec2(100.0f, 100.0f),
-                                                                  glm::vec2(0.0f), // 采用图片大小
-                                                                  [this]()
-                                                                  { this->testButtonClicked(); }, [this]()
-                                                                  { this->testButtonHovered(); }, [this]()
-                                                                  { this->testButtonHoverExited(); });
-        ui_manager->addUIElement(std::move(test_button));
-    }
 }

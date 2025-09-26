@@ -11,7 +11,7 @@ namespace engine::ui
         engine::render::Sprite sprite_;
 
     public:
-        UIImage(const std::string &sprite_id, const glm::vec2 &position, const glm::vec2 &size, std::optional<SDL_FRect> rect = std::nullopt, const bool &is_flip = false);
+        UIImage(const std::string &sprite_id, const glm::vec2 &position = glm::vec2(0.0f), const glm::vec2 &size = glm::vec2(0.0f), std::optional<SDL_FRect> rect = std::nullopt, const bool &is_flip = false);
         ~UIImage() override = default;
         UIImage(const UIImage &) = delete;
         UIImage &operator=(const UIImage &) = delete;

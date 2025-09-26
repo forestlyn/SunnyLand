@@ -97,7 +97,7 @@ namespace engine::render
             spdlog::error("Failed to create TTF_Text for text: {}", text);
             return glm::vec2(0.0f, 0.0f);
         }
-        if (TTF_GetTextSize(text_obj, &w, &h) != 0)
+        if (!TTF_GetTextSize(text_obj, &w, &h))
         {
             spdlog::error("Failed to get text size for text: {} with font: {} size: {}, error: {}", text, font_name, font_size, SDL_GetError());
             return glm::vec2(0.0f, 0.0f);

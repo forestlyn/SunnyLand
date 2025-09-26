@@ -126,6 +126,7 @@ namespace engine::scene
             if (scenes_stack.back())
             {
                 scenes_stack.back()->close();
+                scenes_stack.pop_back();
             }
         }
         else
