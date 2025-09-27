@@ -1,5 +1,7 @@
 #include "game_scene.h"
+#include "menu_scene.h"
 #include "../../engine/core/context.h"
+#include "../../engine/core/game_state.h"
 #include "../../engine/object/game_object.h"
 #include "../../engine/component/transform_component.h"
 #include "../../engine/component/sprite_component.h"
@@ -251,6 +253,13 @@ namespace game::scene
     {
         Scene::handleInput();
         // spdlog::info("Handling input in GameScene");
+        if (context.getInputManager().isActionPressed("pause"))
+        {
+            auto menu_scene = std::make_unique<game::scene::MenuScene>(context, scene_manager, session_data_);
+            scene_manager.requestPushScene(std::move(menu_scene));
+            context.getGameState().setCurrentState(engine::core::State::PAUSED);
+            spdlog::info("GameScene: pause action detected, pushing MenuScene");
+        }
     }
 
     void GameScene::close()

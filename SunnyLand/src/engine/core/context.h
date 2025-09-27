@@ -29,6 +29,7 @@ namespace engine::audio
 
 namespace engine::core
 {
+    class GameState;
     class Context
     {
     private:
@@ -39,9 +40,10 @@ namespace engine::core
         engine::input::InputManager &m_inputManager;
         engine::physics::PhysicsEngine &m_physicsEngine;
         engine::audio::AudioPlayer &m_audioPlayer;
+        engine::core::GameState &m_gameState;
 
     public:
-        Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::render::TextRenderer &textRenderer, engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager, engine::physics::PhysicsEngine &physicsEngine, engine::audio::AudioPlayer &audioPlayer);
+        Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::render::TextRenderer &textRenderer, engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager, engine::physics::PhysicsEngine &physicsEngine, engine::audio::AudioPlayer &audioPlayer, engine::core::GameState &gameState);
 
         ~Context();
 
@@ -52,5 +54,6 @@ namespace engine::core
         engine::physics::PhysicsEngine &getPhysicsEngine();
         engine::audio::AudioPlayer &getAudioPlayer();
         engine::render::TextRenderer &getTextRenderer();
+        engine::core::GameState &getGameState();
     };
 }

@@ -25,8 +25,8 @@ namespace game::data
     void SessionData::nextLevel(const std::string &level_path)
     {
         current_level_path = level_path;
-        current_player_health = level_health;
-        current_player_score = level_score;
+        level_health = current_player_health;
+        level_score = current_player_score;
     }
 
     void SessionData::loadFromFile(const std::string &file_path)

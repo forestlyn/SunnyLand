@@ -1,5 +1,6 @@
 #include "helps_scene.h"
 #include "../../engine/core/context.h"
+#include "../../engine/core/game_state.h"
 #include "../../engine/scene/scene_manager.h"
 #include "../../engine/ui/ui_button.h"
 #include "../../engine/ui/ui_label.h"
@@ -60,7 +61,7 @@ namespace game::scene
 
         spdlog::trace("Creating HelpsScene UI...");
 
-        auto window_size = glm::vec2(640.0f, 360.0f);
+        auto window_size = context.getGameState().getLogicalSize();
         if (!ui_manager->init(window_size))
         {
             spdlog::error("Failed to initialize UIManager");

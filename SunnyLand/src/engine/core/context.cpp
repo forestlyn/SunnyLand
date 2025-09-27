@@ -11,9 +11,9 @@ namespace engine::core
 {
     Context::Context(engine::render::Camera &camera, engine::render::Renderer &renderer, engine::render::TextRenderer &textRenderer,
                      engine::resource::ResourceManager &resourceManager, engine::input::InputManager &inputManager,
-                     engine::physics::PhysicsEngine &physicsEngine, engine::audio::AudioPlayer &audioPlayer)
+                     engine::physics::PhysicsEngine &physicsEngine, engine::audio::AudioPlayer &audioPlayer, engine::core::GameState &gameState)
         : m_camera(camera), m_renderer(renderer), m_textRenderer(textRenderer), m_resourceManager(resourceManager),
-          m_inputManager(inputManager), m_physicsEngine(physicsEngine), m_audioPlayer(audioPlayer)
+          m_inputManager(inputManager), m_physicsEngine(physicsEngine), m_audioPlayer(audioPlayer), m_gameState(gameState)
     {
     }
 
@@ -54,5 +54,9 @@ namespace engine::core
     engine::render::TextRenderer &Context::getTextRenderer()
     {
         return m_textRenderer;
+    }
+    engine::core::GameState &Context::getGameState()
+    {
+        return m_gameState;
     }
 }

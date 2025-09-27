@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "../object/game_object.h"
+#include "../core/game_state.h"
 #include <spdlog/spdlog.h>
 #include "../core/context.h"
 #include "../physics/physics_engine.h"
@@ -107,9 +108,12 @@ namespace engine::scene
         {
             return;
         }
+        if (context.getGameState().isInPlayingState())
+        {
+            context.getPhysicsEngine().update(delta_time);
+            context.getCamera().update(delta_time);
+        }
 
-        context.getPhysicsEngine().update(delta_time);
-        context.getCamera().update(delta_time);
         for (auto it = game_objects.begin(); it != game_objects.end();)
         {
             if ((*it) && (*it)->isActive() && ((*it)->isNeedRemove() == false))

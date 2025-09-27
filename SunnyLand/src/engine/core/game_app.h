@@ -41,6 +41,7 @@ namespace engine::core
     class Time;
     class Config;
     class Context;
+    class GameState;
 
     /// @brief The main application class for the game.
     /// Manages the game loop, window, and renderer.
@@ -75,6 +76,7 @@ namespace engine::core
         std::unique_ptr<engine::scene::SceneManager> scene_manager_;
         std::unique_ptr<engine::physics::PhysicsEngine> physics_engine_;
         std::unique_ptr<engine::audio::AudioPlayer> audio_player_;
+        std::unique_ptr<engine::core::GameState> game_state_;
 
         [[nodiscard]] bool Init();
         void handleEvents();
@@ -93,6 +95,7 @@ namespace engine::core
         [[nodiscard]] bool initSceneManager();
         [[nodiscard]] bool initPhysicsEngine();
         [[nodiscard]] bool initAudioPlayer();
+        [[nodiscard]] bool initGameState();
 
         [[nodiscard]] bool initContext();
 

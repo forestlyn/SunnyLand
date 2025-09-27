@@ -3,6 +3,7 @@
 #include <SDL3_image/SDL_image.h>
 #include <spdlog/spdlog.h>
 #include "time.h"
+#include "game_state.h"
 #include "../resource/resource_manager.h"
 #include "../render/renderer.h"
 #include "../render/camera.h"
@@ -90,6 +91,12 @@ namespace engine::core
         if (!initAudioPlayer())
         {
             spdlog::error("Failed to initialize AudioPlayer");
+            return false;
+        }
+
+        if (!initGameState())
+        {
+            spdlog::error("Failed to initialize GameState");
             return false;
         }
 
@@ -269,7 +276,7 @@ namespace engine::core
         try
         {
             context_ = std::make_unique<engine::core::Context>(*camera_.get(), *renderer_.get(), *text_renderer_.get(),
-                                                               *resource_manager_.get(), *input_manager_.get(), *physics_engine_.get(), *audio_player_.get());
+                                                               *resource_manager_.get(), *input_manager_.get(), *physics_engine_.get(), *audio_player_.get(), *game_state_.get());
             spdlog::trace("Context initialized successfully");
             return true;
         }
@@ -306,6 +313,21 @@ namespace engine::core
         catch (const std::exception &e)
         {
             spdlog::error("Failed to create PhysicsEngine instance: {}", e.what());
+            return false;
+        }
+    }
+
+    bool GameApp::initGameState()
+    {
+        try
+        {
+            game_state_ = std::make_unique<engine::core::GameState>(sdl_renderer_, window_);
+            spdlog::trace("GameState initialized successfully");
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::error("Failed to create GameState instance: {}", e.what());
             return false;
         }
     }

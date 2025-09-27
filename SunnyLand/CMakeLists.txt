@@ -33,6 +33,7 @@ find_package(spdlog REQUIRED)
 add_executable(${TARGET} 
                 src/main.cpp
                 src/engine/core/game_app.cpp
+                src/engine/core/game_state.cpp
                 src/engine/core/context.cpp
                 src/engine/core/time.cpp
                 src/engine/input/input_manager.cpp
@@ -74,6 +75,7 @@ add_executable(${TARGET}
                 src/game/scene/game_scene.cpp
                 src/game/scene/title_scene.cpp
                 src/game/scene/helps_scene.cpp
+                src/game/scene/menu_scene.cpp
                 src/game/component/player_component.cpp
                 src/game/component/ai_component.cpp
                 src/game/component/ai/patrol_behavior.cpp

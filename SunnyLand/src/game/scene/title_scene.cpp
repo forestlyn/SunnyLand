@@ -1,6 +1,7 @@
 #include "title_scene.h"
 #include "../../engine/core/context.h"
 #include "../../engine/scene/scene_manager.h"
+#include "../../engine/core/game_state.h"
 #include "../../engine/ui/ui_button.h"
 #include "../../engine/ui/ui_label.h"
 #include "../../engine/ui/ui_panel.h"
@@ -72,7 +73,7 @@ namespace game::scene
     bool TitleScene::initUI()
     {
         spdlog::trace("创建 TitleScene UI...");
-        auto window_size = glm::vec2(640.0f, 360.0f);
+        auto window_size = context.getGameState().getLogicalSize();
 
         if (!ui_manager->init(window_size))
         {
@@ -186,8 +187,11 @@ namespace game::scene
     void TitleScene::onClickStartButton()
     {
         spdlog::info("Start button clicked");
+        if (session_data_)
+            session_data_->reset();
         auto game_scene = std::make_unique<game::scene::GameScene>(context, scene_manager, session_data_);
         scene_manager.requestReplaceScene(std::move(game_scene));
+        context.getGameState().setCurrentState(engine::core::State::PLAYING);
     }
     void TitleScene::onClickLoadButton()
     {
@@ -195,6 +199,7 @@ namespace game::scene
         session_data_->loadFromFile("assets/save.json");
         auto game_scene = std::make_unique<game::scene::GameScene>(context, scene_manager, session_data_);
         scene_manager.requestReplaceScene(std::move(game_scene));
+        context.getGameState().setCurrentState(engine::core::State::PLAYING);
     }
     void TitleScene::onClickHelpsButton()
     {
