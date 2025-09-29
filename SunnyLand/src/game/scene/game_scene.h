@@ -51,9 +51,13 @@ namespace game::scene
 
         void handleObjectCollisions();
         void handleTileTriggerEvents();
+        void handleGameOver(bool is_win);
 
         void PlayerVsEnemy(engine::object::GameObject *player, engine::object::GameObject *enemy);
         void PlayerVsItem(engine::object::GameObject *player, engine::object::GameObject *item);
+
+        // 掉出地图外就是死亡
+        void checkPlayerDead();
 
         void createEffectAt(const glm::vec2 &center_position, const std::string &effect_name);
 

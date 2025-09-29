@@ -33,6 +33,8 @@ namespace game::scene
     {
         spdlog::info("Initializing MenuScene");
 
+        context.getGameState().setCurrentState(engine::core::State::PAUSED);
+        // 初始化 UI
         if (!initUI())
         {
             spdlog::error("Failed to initialize MenuScene UI");
@@ -151,12 +153,13 @@ namespace game::scene
         spdlog::info("Back to title button clicked");
         auto title_scene = std::make_unique<game::scene::TitleScene>(context, scene_manager, session_data_);
         scene_manager.requestReplaceScene(std::move(title_scene));
-        context.getGameState().setCurrentState(engine::core::State::TITLE);
     }
 
     void MenuScene::onClickQuitButton()
     {
         spdlog::info("Quit button clicked");
+        if (session_data_)
+            session_data_->syncMaxScore("assets/save.json");
         context.getInputManager().setShouldExit(true);
     }
 }

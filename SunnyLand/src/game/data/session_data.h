@@ -9,6 +9,7 @@ namespace game::data
         int max_player_score = 0;
         int current_player_health = 3;
         int current_player_score = 0;
+        bool is_win_ = false;
 
         std::string current_level_path = "assets/maps/level1.tmj";
         int level_health = 3; // 进入关卡时的生命值
@@ -30,6 +31,7 @@ namespace game::data
         std::string getCurrentLevelPath() const { return current_level_path; }
         int getLevelHealth() const { return level_health; }
         int getLevelScore() const { return level_score; }
+        bool isWin() const { return is_win_; }
 
         // Setter methods
         void setMaxPlayerHealth(int health) { max_player_health = health; }
@@ -39,12 +41,14 @@ namespace game::data
         void setCurrentLevelPath(const std::string &path) { current_level_path = path; }
         void setLevelHealth(int health) { level_health = health; }
         void setLevelScore(int score) { level_score = score; }
+        void setIsWin(bool win) { is_win_ = win; }
 
         void addScore(int score);
 
         void reset();
         void nextLevel(const std::string &level_path);
 
+        bool syncMaxScore(const std::string &file_path);
         void loadFromFile(const std::string &file_path);
         void saveToFile(const std::string &file_path) const;
     };

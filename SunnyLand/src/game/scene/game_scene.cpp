@@ -1,5 +1,6 @@
 #include "game_scene.h"
 #include "menu_scene.h"
+#include "end_scene.h"
 #include "../../engine/core/context.h"
 #include "../../engine/core/game_state.h"
 #include "../../engine/object/game_object.h"
@@ -50,6 +51,10 @@ namespace game::scene
     void GameScene::initialize()
     {
         spdlog::info("Initializing GameScene");
+
+        session_data_->syncMaxScore("assets/save.json");
+        context.getGameState().setCurrentState(engine::core::State::PLAYING);
+
         if (!initLevel())
         {
             spdlog::error("Failed to initialize level");
@@ -136,6 +141,20 @@ namespace game::scene
                 spdlog::error("Failed to add PlayerComponent to player object");
                 return false;
             }
+
+            auto health_comp = player_->getComponent<engine::component::HealthComponent>();
+            if (health_comp)
+            {
+                health_comp->setMaxHealth(session_data_->getMaxPlayerHealth());
+                health_comp->setCurrentHealth(session_data_->getCurrentPlayerHealth());
+                spdlog::info("Player health set to {}/{}", health_comp->getCurrentHealth(), health_comp->getMaxHealth());
+            }
+            else
+            {
+                spdlog::error("Player object does not have a HealthComponent");
+                return false;
+            }
+
             auto transform = player_->getComponent<engine::component::TransformComponent>();
             if (transform)
                 context.getCamera().setFollowTarget(transform);
@@ -239,6 +258,7 @@ namespace game::scene
         Scene::update(deltaTime);
         handleObjectCollisions();
         handleTileTriggerEvents();
+        checkPlayerDead();
         // spdlog::info("Updating GameScene");
     }
 
@@ -315,6 +335,14 @@ namespace game::scene
             {
                 toNextLevel(objA);
             }
+            else if (objA->getTag() == "player" && objB->getName() == "win")
+            {
+                handleGameOver(true);
+            }
+            else if (objA->getName() == "win" && objB->getTag() == "player")
+            {
+                handleGameOver(true);
+            }
         }
     }
 
@@ -336,6 +364,16 @@ namespace game::scene
             }
         }
     }
+
+    void GameScene::handleGameOver(bool is_win)
+    {
+        if (session_data_)
+            session_data_->setIsWin(is_win);
+        auto end_scene = std::make_unique<game::scene::EndScene>(context, scene_manager, session_data_);
+        scene_manager.requestPushScene(std::move(end_scene));
+        context.getGameState().setCurrentState(engine::core::State::GAME_OVER);
+    }
+
     void GameScene::addPlayerScore(int score)
     {
         session_data_->addScore(score);
@@ -424,6 +462,16 @@ namespace game::scene
         createEffectAt(item_collider->getWorldAABB().position + item_collider->getWorldAABB().size * 0.5f, item->getTag());
         context.getAudioPlayer().playSound("assets/audio/poka01.mp3");
         item->setNeedRemove(true);
+    }
+
+    void GameScene::checkPlayerDead()
+    {
+        auto player_pos = player_->getComponent<engine::component::TransformComponent>()->getPosition();
+        auto world_bound = context.getPhysicsEngine().getWorldBound().value();
+        if (player_pos.y > world_bound.position.y + world_bound.size.y + 100.0f)
+        {
+            handleGameOver(false);
+        }
     }
 
     void GameScene::createEffectAt(const glm::vec2 &center_pos, const std::string &tag)

@@ -43,6 +43,13 @@ namespace game::scene
             spdlog::error("Failed to load title scene level");
             context.getInputManager().setShouldExit(true);
         }
+
+        context.getGameState().setCurrentState(engine::core::State::TITLE);
+        context.getCamera().setPosition(glm::vec2(0.0f, 0.0f));
+        context.getCamera().setLimitBounds(std::nullopt);
+
+        session_data_->syncMaxScore("assets/save.json");
+
         if (!initUI())
         {
             spdlog::error("Failed to initialize TitleScene UI");
@@ -191,7 +198,6 @@ namespace game::scene
             session_data_->reset();
         auto game_scene = std::make_unique<game::scene::GameScene>(context, scene_manager, session_data_);
         scene_manager.requestReplaceScene(std::move(game_scene));
-        context.getGameState().setCurrentState(engine::core::State::PLAYING);
     }
     void TitleScene::onClickLoadButton()
     {
@@ -199,7 +205,6 @@ namespace game::scene
         session_data_->loadFromFile("assets/save.json");
         auto game_scene = std::make_unique<game::scene::GameScene>(context, scene_manager, session_data_);
         scene_manager.requestReplaceScene(std::move(game_scene));
-        context.getGameState().setCurrentState(engine::core::State::PLAYING);
     }
     void TitleScene::onClickHelpsButton()
     {
@@ -210,6 +215,9 @@ namespace game::scene
     void TitleScene::onClickQuitButton()
     {
         spdlog::info("Quit button clicked");
+        if (session_data_)
+            session_data_->syncMaxScore("assets/save.json");
+
         context.getInputManager().setShouldExit(true);
     }
 }
