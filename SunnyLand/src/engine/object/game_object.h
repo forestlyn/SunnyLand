@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include "../component/component.h"
 #include <unordered_map>
 #include <memory>
@@ -24,7 +25,7 @@ namespace engine::object
         bool m_is_active;
 
     public:
-        GameObject(const std::string &name = "", const std::string &tag = "");
+        GameObject(std::string_view name = "", std::string_view tag = "");
         virtual ~GameObject();
 
         GameObject(const GameObject &) = delete;
@@ -32,10 +33,10 @@ namespace engine::object
         GameObject(GameObject &&) = delete;
         GameObject &operator=(GameObject &&) = delete;
 
-        void setName(const std::string &name) { m_name = name; }
-        const std::string &getName() const { return m_name; }
-        void setTag(const std::string &tag) { m_tag = tag; }
-        const std::string &getTag() const { return m_tag; }
+        void setName(std::string_view name) { m_name = name; }
+        std::string_view getName() const { return m_name; }
+        void setTag(std::string_view tag) { m_tag = tag; }
+        std::string_view getTag() const { return m_tag; }
         void setNeedRemove(bool needRemove) { m_need_remove = needRemove; }
         bool isNeedRemove() const { return m_need_remove; }
         void setActive(bool isActive) { m_is_active = isActive; }

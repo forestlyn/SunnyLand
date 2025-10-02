@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 namespace engine::resource
 {
     class ResourceManager;
@@ -24,14 +25,14 @@ namespace engine::audio
         /// @param sound_path The path of the sound effect to play.
         /// @param channels The channel to play the sound on (-1 for any available channel).
         /// @return The channel the sound is playing on, or -1 if it couldn't be played.
-        int playSound(const std::string &sound_path, int channels = -1);
+        int playSound(std::string_view sound_path, int channels = -1);
 
         /// @brief Play music.
         /// @param music_path The path of the music to play.
         /// @param loops The number of times to loop the music (-1 for infinite).
         /// @param fade_in_ms The duration of the fade-in effect in milliseconds.
         /// @return True if the music started playing, false otherwise.
-        bool playMusic(const std::string &music_path, int loops = -1, int fade_in_ms = 0);
+        bool playMusic(std::string_view music_path, int loops = -1, int fade_in_ms = 0);
 
         /// @brief Stop the currently playing music.
         /// @param fade_out_ms The duration of the fade-out effect in milliseconds.

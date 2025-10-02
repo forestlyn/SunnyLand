@@ -9,8 +9,8 @@
 
 namespace engine::scene
 {
-    Scene::Scene(std::string scene_name, engine::core::Context &context, SceneManager &scene_manager)
-        : scene_name(std::move(scene_name)), context(context), scene_manager(scene_manager), ui_manager(std::make_unique<engine::ui::UIManager>()), is_initialize(false)
+    Scene::Scene(std::string_view scene_name, engine::core::Context &context, SceneManager &scene_manager)
+        : scene_name(scene_name), context(context), scene_manager(scene_manager), ui_manager(std::make_unique<engine::ui::UIManager>()), is_initialize(false)
     {
     }
 
@@ -58,7 +58,7 @@ namespace engine::scene
         game_object->setNeedRemove(true);
     }
 
-    engine::object::GameObject *Scene::findGameObjectByName(const std::string &name)
+    engine::object::GameObject *Scene::findGameObjectByName(std::string_view name)
     {
         for (const auto &obj : game_objects)
         {
@@ -166,12 +166,12 @@ namespace engine::scene
         is_initialize = false;
     }
 
-    void Scene::setName(const std::string &name)
+    void Scene::setName(std::string_view name)
     {
         scene_name = name;
     }
 
-    std::string Scene::getName() const
+    std::string_view Scene::getName() const
     {
         return scene_name;
     }

@@ -1,8 +1,8 @@
 #pragma once
-
 #include "component.h"
 #include <glm/vec2.hpp>
 #include <string>
+#include <string_view>
 #include "../render/sprite.h"
 
 namespace engine::core
@@ -25,7 +25,7 @@ namespace engine::component
         bool is_hidden;
 
     public:
-        ParallaxComponent(const std::string &texture_id, glm::vec2 scroll_factor, glm::bvec2 repeat);
+        ParallaxComponent(std::string_view texture_id, glm::vec2 scroll_factor, glm::bvec2 repeat);
 
         const engine::render::Sprite &GetSprite() const { return m_sprite; }
         const glm::vec2 &GetScrollFactor() const { return m_scroll_factor; }

@@ -1,6 +1,7 @@
 
 #pragma once
 #include <string>
+#include <string_view>
 #include <memory>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <unordered_map>
@@ -47,14 +48,14 @@ namespace engine::resource
         AudioManager &operator=(AudioManager &&) = delete;
 
     private:
-        Mix_Chunk *loadSound(const std::string &filePath);
-        Mix_Chunk *getSound(const std::string &filePath);
-        void unloadSound(const std::string &filePath);
+        Mix_Chunk *loadSound(std::string_view filePath);
+        Mix_Chunk *getSound(std::string_view filePath);
+        void unloadSound(std::string_view filePath);
         void clearSounds();
 
-        Mix_Music *loadMusic(const std::string &filePath);
-        Mix_Music *getMusic(const std::string &filePath);
-        void unloadMusic(const std::string &filePath);
+        Mix_Music *loadMusic(std::string_view filePath);
+        Mix_Music *getMusic(std::string_view filePath);
+        void unloadMusic(std::string_view filePath);
         void clearMusics();
 
         void clearAudio();

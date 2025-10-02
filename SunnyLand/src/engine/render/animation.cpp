@@ -2,7 +2,7 @@
 
 namespace engine::render
 {
-    Animation::Animation(const std::string &name, bool loop)
+    Animation::Animation(std::string_view name, bool loop)
         : name_(name), total_duration_(0.0f), is_loop_(loop)
     {
     }

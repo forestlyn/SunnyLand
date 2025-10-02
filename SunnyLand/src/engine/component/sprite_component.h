@@ -2,6 +2,7 @@
 #include "component.h"
 #include <glm/glm.hpp>
 #include <string>
+#include <string_view>
 #include <optional>
 #include <SDL3/SDL_rect.h>
 #include "../utils/alignment.h"
@@ -23,7 +24,7 @@ namespace engine::component
         friend class engine::object::GameObject;
 
     public:
-        SpriteComponent(const std::string &texture_path,
+        SpriteComponent(std::string_view texture_path,
                         engine::resource::ResourceManager *resource_manager,
                         engine::utils::Alignment alignment = engine::utils::Alignment::NONE,
                         std::optional<SDL_FRect> source_rect_opt = std::nullopt,
@@ -41,7 +42,7 @@ namespace engine::component
 
         void updateOffset();
 
-        std::string getTextureId() const;
+        std::string_view getTextureId() const;
         engine::render::Sprite *getSprite();
         bool getIsFlipped() const;
         void setIsFlipped(bool flipped);
@@ -50,7 +51,7 @@ namespace engine::component
         engine::utils::Alignment getAlignment() const;
         bool getHidden() const;
 
-        void setSpriteById(const std::string &texture_path, std::optional<SDL_FRect> source_rect_opt = std::nullopt, const bool is_flipped = false);
+        void setSpriteById(std::string_view texture_path, std::optional<SDL_FRect> source_rect_opt = std::nullopt, const bool is_flipped = false);
         void setSpriteRect(std::optional<SDL_FRect> source_rect_opt);
         void setOffset(glm::vec2 offset);
         void setAlignment(engine::utils::Alignment alignment);

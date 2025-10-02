@@ -4,8 +4,8 @@
 namespace engine::ui
 {
     UILabel::UILabel(engine::render::TextRenderer &text_renderer,
-                     const std::string &text,
-                     const std::string &font_id,
+                     std::string_view text,
+                     std::string_view font_id,
                      int font_size,
                      engine::utils::FColor text_color,
                      glm::vec2 position)
@@ -30,13 +30,13 @@ namespace engine::ui
         UIElement::render(context); // 渲染子元素
     }
 
-    void UILabel::setText(const std::string &text)
+    void UILabel::setText(std::string_view text)
     {
         text_ = text;
         updateSize();
     }
 
-    void UILabel::setFontId(const std::string &font_id)
+    void UILabel::setFontId(std::string_view font_id)
     {
         font_id_ = font_id;
         updateSize();

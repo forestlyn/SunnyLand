@@ -51,13 +51,13 @@ namespace engine::component
         if (animation)
         {
             spdlog::trace("Animation '{}' added to AnimationComponent.", animation->getName());
-            animations_[animation->getName()] = std::move(animation);
+            animations_[std::string(animation->getName())] = std::move(animation);
         }
     }
 
-    void AnimationComponent::playAnimation(const std::string &name)
+    void AnimationComponent::playAnimation(std::string_view name)
     {
-        auto it = animations_.find(name);
+        auto it = animations_.find(std::string(name));
         if (it != animations_.end())
         {
             if (currentAnimation_ != it->second.get())
@@ -84,7 +84,7 @@ namespace engine::component
         isPlaying_ = true;
     }
 
-    std::string AnimationComponent::getCurrentAnimationName() const
+    std::string_view AnimationComponent::getCurrentAnimationName() const
     {
         return currentAnimation_ ? currentAnimation_->getName() : "";
     }

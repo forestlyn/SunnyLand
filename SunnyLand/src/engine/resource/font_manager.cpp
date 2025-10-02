@@ -21,7 +21,7 @@ namespace engine::resource
         spdlog::trace("FontManager destroyed and font resources cleaned up.");
     }
 
-    TTF_Font *FontManager::loadFont(const std::string &filePath, int size)
+    TTF_Font *FontManager::loadFont(std::string_view filePath, int size)
     {
         FontKey key(filePath, size);
         auto it = mFontCache.find(key);
@@ -31,10 +31,10 @@ namespace engine::resource
         }
 
         spdlog::debug("Loading font: {} at size {}", filePath, size);
-        TTF_Font *font = TTF_OpenFont(filePath.c_str(), size);
+        TTF_Font *font = TTF_OpenFont(filePath.data(), size);
         if (!font)
         {
-            throw std::runtime_error("Failed to load font: " + filePath + ". SDL_ttf Error: " + std::string(SDL_GetError()));
+            throw std::runtime_error("Failed to load font: " + std::string(filePath) + ". SDL_ttf Error: " + std::string(SDL_GetError()));
         }
 
         mFontCache[key] = std::unique_ptr<TTF_Font, TTFDeleter>(font);
@@ -42,7 +42,7 @@ namespace engine::resource
         return font;
     }
 
-    TTF_Font *FontManager::getFont(const std::string &filePath, int size)
+    TTF_Font *FontManager::getFont(std::string_view filePath, int size)
     {
         if (filePath.empty() || size <= 0)
         {
@@ -64,7 +64,7 @@ namespace engine::resource
         }
     }
 
-    void FontManager::unloadFont(const std::string &filePath, int size)
+    void FontManager::unloadFont(std::string_view filePath, int size)
     {
         FontKey key(filePath, size);
         auto it = mFontCache.find(key);

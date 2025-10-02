@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include <map>
 #include "component.h"
 namespace engine::audio
@@ -37,13 +38,13 @@ namespace engine::component
         /// @brief Add a sound to the audio component.
         /// @param sound_id The ID of the sound to add.
         /// @param file_path The file path of the sound to add.
-        void addSound(const std::string &sound_id, const std::string &file_path);
+        void addSound(std::string_view sound_id, std::string_view file_path);
 
         /// @brief Play a sound effect.
         /// @param sound_id The ID of the sound to play.
         /// @param channels The channel to play the sound on (-1 for any available channel).
         /// @param useSpatial Whether to use spatial audio.
-        void playSound(const std::string &sound_id, int channels = -1, bool useSpatial = false);
+        void playSound(std::string_view sound_id, int channels = -1, bool useSpatial = false);
 
     protected:
         void init() override;

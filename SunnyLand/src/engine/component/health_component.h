@@ -1,6 +1,5 @@
 #pragma once
 #include "component.h"
-#include <string>
 #include <glm/vec2.hpp>
 namespace engine::core
 {

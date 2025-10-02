@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include <memory>
 #include "component.h"
 #include <unordered_map>
@@ -40,11 +41,11 @@ namespace engine::component
         AnimationComponent &operator=(AnimationComponent &&) = delete;
 
         void addAnimation(std::unique_ptr<engine::render::Animation> animation);
-        void playAnimation(const std::string &name);
+        void playAnimation(std::string_view name);
         void stopAnimation();
         void resumeAnimation();
 
-        std::string getCurrentAnimationName() const;
+        std::string_view getCurrentAnimationName() const;
         bool isAnimationPlaying() const { return isPlaying_; }
         bool isAnimationFinished() const;
         bool isOneShotRemoved() const { return isOneShotRemoved_; }

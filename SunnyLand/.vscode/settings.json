@@ -80,6 +80,7 @@
         "xutility": "cpp",
         "variant": "cpp",
         "typeindex": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "string_view": "cpp"
     }
 }

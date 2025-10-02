@@ -29,22 +29,22 @@ namespace engine::resource
         fontManager_->clearFonts();
     }
 
-    SDL_Texture *ResourceManager::loadTexture(const std::string &filePath)
+    SDL_Texture *ResourceManager::loadTexture(std::string_view filePath)
     {
         return textureManager_->loadTexture(filePath);
     }
 
-    SDL_Texture *ResourceManager::getTexture(const std::string &filePath)
+    SDL_Texture *ResourceManager::getTexture(std::string_view filePath)
     {
         return textureManager_->getTexture(filePath);
     }
 
-    glm::vec2 ResourceManager::getTextureSize(const std::string &filePath)
+    glm::vec2 ResourceManager::getTextureSize(std::string_view filePath)
     {
         return textureManager_->getTextureSize(filePath);
     }
 
-    void ResourceManager::unloadTexture(const std::string &filePath)
+    void ResourceManager::unloadTexture(std::string_view filePath)
     {
         textureManager_->unloadTexture(filePath);
     }
@@ -54,17 +54,17 @@ namespace engine::resource
         textureManager_->clearTextures();
     }
 
-    Mix_Chunk *ResourceManager::loadSound(const std::string &filePath)
+    Mix_Chunk *ResourceManager::loadSound(std::string_view filePath)
     {
         return audioManager_->loadSound(filePath);
     }
 
-    Mix_Chunk *ResourceManager::getSound(const std::string &filePath)
+    Mix_Chunk *ResourceManager::getSound(std::string_view filePath)
     {
         return audioManager_->getSound(filePath);
     }
 
-    void ResourceManager::unloadSound(const std::string &filePath)
+    void ResourceManager::unloadSound(std::string_view filePath)
     {
         audioManager_->unloadSound(filePath);
     }
@@ -74,17 +74,17 @@ namespace engine::resource
         audioManager_->clearSounds();
     }
 
-    Mix_Music *ResourceManager::loadMusic(const std::string &filePath)
+    Mix_Music *ResourceManager::loadMusic(std::string_view filePath)
     {
         return audioManager_->loadMusic(filePath);
     }
 
-    Mix_Music *ResourceManager::getMusic(const std::string &filePath)
+    Mix_Music *ResourceManager::getMusic(std::string_view filePath)
     {
         return audioManager_->getMusic(filePath);
     }
 
-    void ResourceManager::unloadMusic(const std::string &filePath)
+    void ResourceManager::unloadMusic(std::string_view filePath)
     {
         audioManager_->unloadMusic(filePath);
     }
@@ -99,17 +99,17 @@ namespace engine::resource
         audioManager_->clearAudio();
     }
 
-    TTF_Font *ResourceManager::loadFont(const std::string &filePath, int size)
+    TTF_Font *ResourceManager::loadFont(std::string_view filePath, int size)
     {
         return fontManager_->loadFont(filePath, size);
     }
 
-    TTF_Font *ResourceManager::getFont(const std::string &filePath, int size)
+    TTF_Font *ResourceManager::getFont(std::string_view filePath, int size)
     {
         return fontManager_->getFont(filePath, size);
     }
 
-    void ResourceManager::unloadFont(const std::string &filePath, int size)
+    void ResourceManager::unloadFont(std::string_view filePath, int size)
     {
         fontManager_->unloadFont(filePath, size);
     }

@@ -1,6 +1,7 @@
 #pragma once
 #include "../ui/ui_element.h"
 #include <string>
+#include <string_view>
 #include "../utils/math.h"
 #include "../render/text_renderer.h"
 
@@ -22,8 +23,8 @@ namespace engine::ui
 
     public:
         UILabel(engine::render::TextRenderer &text_renderer,
-                const std::string &text,
-                const std::string &font_id,
+                std::string_view text,
+                std::string_view font_id,
                 int font_size = 16,
                 engine::utils::FColor text_color = {1.0f, 1.0f, 1.0f, 1.0f},
                 glm::vec2 position = glm::vec2(0));
@@ -36,11 +37,11 @@ namespace engine::ui
         void render(engine::core::Context &context) override;
 
         // Getters and Setters
-        void setText(const std::string &text);
-        std::string getText() const { return text_; }
+        void setText(std::string_view text);
+        std::string_view getText() const { return text_; }
 
-        void setFontId(const std::string &font_id);
-        std::string getFontId() const { return font_id_; }
+        void setFontId(std::string_view font_id);
+        std::string_view getFontId() const { return font_id_; }
 
         void setFontSize(int font_size);
         int getFontSize() const { return font_size_; }

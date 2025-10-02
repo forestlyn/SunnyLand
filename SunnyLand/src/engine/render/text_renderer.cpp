@@ -47,14 +47,14 @@ namespace engine::render
         TTF_Quit();
     }
 
-    void TextRenderer::drawText(Camera &camera, const std::string &text, const std::string &font_name, int font_size, const glm::vec2 &position,
+    void TextRenderer::drawText(Camera &camera, std::string_view text, std::string_view font_name, int font_size, const glm::vec2 &position,
                                 const engine::utils::FColor &color, bool drawShadow, float shadowOffsetX, float shadowOffsetY, const engine::utils::FColor &shadowColor)
     {
         auto screen_pos = camera.worldToScreen(position);
         drawUIText(text, font_name, font_size, screen_pos, color, drawShadow, shadowOffsetX, shadowOffsetY, shadowColor);
     }
 
-    void TextRenderer::drawUIText(const std::string &text, const std::string &font_name, int font_size, const glm::vec2 &position,
+    void TextRenderer::drawUIText(std::string_view text, std::string_view font_name, int font_size, const glm::vec2 &position,
                                   const engine::utils::FColor &color, bool drawShadow, float shadowOffsetX, float shadowOffsetY, const engine::utils::FColor &shadowColor)
     {
 
@@ -64,7 +64,7 @@ namespace engine::render
             spdlog::error("Font not found: {} with size {}", font_name, font_size);
             return;
         }
-        TTF_Text *text_obj = TTF_CreateText(text_engine_, font, text.c_str(), 0);
+        TTF_Text *text_obj = TTF_CreateText(text_engine_, font, text.data(), 0);
         if (!text_obj)
         {
             spdlog::error("Failed to create TTF_Text for text: {}", text);
@@ -82,7 +82,7 @@ namespace engine::render
         TTF_DestroyText(text_obj);
     }
 
-    glm::vec2 TextRenderer::getTextSize(const std::string &text, const std::string &font_name, int font_size) const
+    glm::vec2 TextRenderer::getTextSize(std::string_view text, std::string_view font_name, int font_size) const
     {
         auto font = resource_manager_->getFont(font_name, font_size);
         if (!font)
@@ -91,7 +91,7 @@ namespace engine::render
             return glm::vec2(0.0f, 0.0f);
         }
         int w = 0, h = 0;
-        TTF_Text *text_obj = TTF_CreateText(text_engine_, font, text.c_str(), 0);
+        TTF_Text *text_obj = TTF_CreateText(text_engine_, font, text.data(), 0);
         if (!text_obj)
         {
             spdlog::error("Failed to create TTF_Text for text: {}", text);

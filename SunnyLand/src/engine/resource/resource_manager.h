@@ -28,25 +28,25 @@ namespace engine::resource
         ResourceManager(ResourceManager &&) = delete;
         ResourceManager &operator=(ResourceManager &&) = delete;
 
-        SDL_Texture *loadTexture(const std::string &filePath);
-        SDL_Texture *getTexture(const std::string &filePath);
-        glm::vec2 getTextureSize(const std::string &filePath);
-        void unloadTexture(const std::string &filePath);
+        SDL_Texture *loadTexture(std::string_view filePath);
+        SDL_Texture *getTexture(std::string_view filePath);
+        glm::vec2 getTextureSize(std::string_view filePath);
+        void unloadTexture(std::string_view filePath);
         void clearTextures();
 
-        Mix_Chunk *loadSound(const std::string &filePath);
-        Mix_Chunk *getSound(const std::string &filePath);
-        void unloadSound(const std::string &filePath);
+        Mix_Chunk *loadSound(std::string_view filePath);
+        Mix_Chunk *getSound(std::string_view filePath);
+        void unloadSound(std::string_view filePath);
         void clearSounds();
-        Mix_Music *loadMusic(const std::string &filePath);
-        Mix_Music *getMusic(const std::string &filePath);
-        void unloadMusic(const std::string &filePath);
+        Mix_Music *loadMusic(std::string_view filePath);
+        Mix_Music *getMusic(std::string_view filePath);
+        void unloadMusic(std::string_view filePath);
         void clearMusics();
         void clearAudio();
 
-        TTF_Font *loadFont(const std::string &filePath, int size);
-        TTF_Font *getFont(const std::string &filePath, int size);
-        void unloadFont(const std::string &filePath, int size);
+        TTF_Font *loadFont(std::string_view filePath, int size);
+        TTF_Font *getFont(std::string_view filePath, int size);
+        void unloadFont(std::string_view filePath, int size);
         void clearFonts();
     };
 }

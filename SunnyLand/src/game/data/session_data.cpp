@@ -1,6 +1,7 @@
 #include "session_data.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <filesystem>
 #include <spdlog/spdlog.h>
 namespace game::data
 {
@@ -23,18 +24,19 @@ namespace game::data
         current_level_path = "assets/maps/level1.tmj";
     }
 
-    void SessionData::nextLevel(const std::string &level_path)
+    void SessionData::nextLevel(std::string_view level_path)
     {
         current_level_path = level_path;
         level_health = current_player_health;
         level_score = current_player_score;
     }
 
-    bool SessionData::syncMaxScore(const std::string &file_path)
+    bool SessionData::syncMaxScore(std::string_view file_path)
     {
         try
         {
-            std::fstream file(file_path);
+            std::filesystem::path path(file_path);
+            std::fstream file(path);
             if (!file.is_open())
             {
                 spdlog::warn("Session data file not found: {}", file_path);
@@ -63,11 +65,12 @@ namespace game::data
         }
     }
 
-    void SessionData::loadFromFile(const std::string &file_path)
+    void SessionData::loadFromFile(std::string_view file_path)
     {
         try
         {
-            std::ifstream file(file_path);
+            std::filesystem::path path(file_path);
+            std::ifstream file(path);
             if (!file.is_open())
             {
                 spdlog::warn("Session data file not found: {}", file_path);
@@ -90,7 +93,7 @@ namespace game::data
         }
     }
 
-    void SessionData::saveToFile(const std::string &file_path) const
+    void SessionData::saveToFile(std::string_view file_path) const
     {
         try
         {
@@ -102,7 +105,8 @@ namespace game::data
             j["current_level_path"] = current_level_path;
             j["level_health"] = level_health;
             j["level_score"] = level_score;
-            std::ofstream file(file_path);
+            std::filesystem::path path(file_path);
+            std::ofstream file(path);
             file << j.dump(4);
             file.close();
         }

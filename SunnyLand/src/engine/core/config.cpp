@@ -2,10 +2,11 @@
 #include "config.h"
 #include <spdlog/spdlog.h>
 #include <fstream>
+#include <filesystem>
 
 namespace engine::core
 {
-    Config::Config(const std::string &config_file_path)
+    Config::Config(std::string_view config_file_path)
     {
         if (!loadFromFile(config_file_path))
         {
@@ -14,11 +15,12 @@ namespace engine::core
         }
     }
 
-    bool Config::loadFromFile(const std::string &file_path)
+    bool Config::loadFromFile(std::string_view file_path)
     {
         try
         {
-            std::ifstream file(file_path);
+            std::filesystem::path p(file_path);
+            std::ifstream file(p);
             if (!file.is_open())
             {
                 spdlog::error("Could not open config file: {}", file_path);
@@ -37,12 +39,13 @@ namespace engine::core
         }
     }
 
-    void Config::saveToFile(const std::string &file_path) const
+    void Config::saveToFile(std::string_view file_path) const
     {
         try
         {
             nlohmann::ordered_json j = toJson();
-            std::ofstream file(file_path);
+            std::filesystem::path p(file_path);
+            std::ofstream file(p);
             if (!file.is_open())
             {
                 spdlog::error("Could not open config file for writing: {}", file_path);

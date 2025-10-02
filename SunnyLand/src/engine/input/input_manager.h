@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include <string_view>
 #include <variant>
 #include <vector>
 #include <SDL3/SDL_render.h>
@@ -40,9 +41,9 @@ namespace engine::input
 
         void update();
 
-        bool isActionDown(const std::string &action_name) const;
-        bool isActionPressed(const std::string &action_name) const;
-        bool isActionReleased(const std::string &action_name) const;
+        bool isActionDown(std::string_view action_name) const;
+        bool isActionPressed(std::string_view action_name) const;
+        bool isActionReleased(std::string_view action_name) const;
 
         glm::vec2 getMousePosition() const;
         glm::vec2 getLogicalMousePosition() const;
@@ -54,9 +55,9 @@ namespace engine::input
         void processEvent(const SDL_Event &event);
         void initMappings(const engine::core::Config &config);
 
-        void updateActionState(const std::string &action_name, bool is_down, bool is_repeat);
-        SDL_Scancode scancodeFromString(const std::string &key) const;
-        Uint32 mouseButtonFromString(const std::string &button) const;
+        void updateActionState(std::string_view action_name, bool is_down, bool is_repeat);
+        SDL_Scancode scancodeFromString(std::string_view key) const;
+        Uint32 mouseButtonFromString(std::string_view button) const;
     };
 
 } // namespace engine::input

@@ -27,14 +27,14 @@ namespace engine::component
         spdlog::trace("AudioComponent initialized.");
     }
 
-    void AudioComponent::addSound(const std::string &sound_id, const std::string &file_path)
+    void AudioComponent::addSound(std::string_view sound_id, std::string_view file_path)
     {
-        sounds_map[sound_id] = file_path;
+        sounds_map[std::string(sound_id)] = std::string(file_path);
     }
 
-    void AudioComponent::playSound(const std::string &sound_id, int channels, bool useSpatial)
+    void AudioComponent::playSound(std::string_view sound_id, int channels, bool useSpatial)
     {
-        auto it = sounds_map.find(sound_id);
+        auto it = sounds_map.find(std::string(sound_id));
         if (it != sounds_map.end())
         {
             if (useSpatial && transform_ && camera_)

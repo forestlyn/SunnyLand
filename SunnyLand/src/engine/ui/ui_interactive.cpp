@@ -14,22 +14,22 @@ namespace engine::ui
         setState(std::make_unique<engine::ui::state::UINormalState>(this));
     }
 
-    void UIInteractive::addSprite(const std::string &name, std::unique_ptr<engine::render::Sprite> sprite)
+    void UIInteractive::addSprite(std::string_view name, std::unique_ptr<engine::render::Sprite> sprite)
     {
         if (size_ == glm::vec2(0.0f))
         {
-            size_ = context_.getResourceManager().getTextureSize(sprite->getConstTextureId());
+            size_ = context_.getResourceManager().getTextureSize(sprite->getTextureId());
         }
-        sprites_[name] = std::move(sprite);
+        sprites_[std::string(name)] = std::move(sprite);
         if (!current_sprite_)
         {
-            current_sprite_ = sprites_[name].get();
+            current_sprite_ = sprites_[std::string(name)].get();
         }
     }
 
-    void UIInteractive::setCurrentSprite(const std::string &name)
+    void UIInteractive::setCurrentSprite(std::string_view name)
     {
-        auto it = sprites_.find(name);
+        auto it = sprites_.find(std::string(name));
         if (it != sprites_.end())
         {
             current_sprite_ = it->second.get();
@@ -57,14 +57,14 @@ namespace engine::ui
         }
     }
 
-    void UIInteractive::addSound(const std::string &name, const std::string &file_path)
+    void UIInteractive::addSound(std::string_view name, std::string_view file_path)
     {
-        sounds_[name] = file_path;
+        sounds_[std::string(name)] = std::string(file_path);
     }
 
-    void UIInteractive::playSound(const std::string &name)
+    void UIInteractive::playSound(std::string_view name)
     {
-        auto it = sounds_.find(name);
+        auto it = sounds_.find(std::string(name));
         if (it != sounds_.end())
         {
             context_.getAudioPlayer().playSound(it->second);

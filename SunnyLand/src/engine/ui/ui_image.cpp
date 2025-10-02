@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 namespace engine::ui
 {
-    UIImage::UIImage(const std::string &sprite_id, glm::vec2 position,
+    UIImage::UIImage(std::string_view sprite_id, glm::vec2 position,
                      glm::vec2 size, std::optional<SDL_FRect> rect, bool is_flip)
         : UIElement(std::move(position), std::move(size)), sprite_(sprite_id, rect, is_flip)
     {
@@ -17,7 +17,7 @@ namespace engine::ui
 
     void UIImage::render(engine::core::Context &context)
     {
-        if (!visible_ || sprite_.getConstTextureId().empty())
+        if (!visible_ || sprite_.getTextureId().empty())
             return;
         auto position = getScreenPosition();
         if (size_.x <= 0 || size_.y <= 0)

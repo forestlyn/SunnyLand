@@ -44,9 +44,9 @@ namespace engine::input
         }
     }
 
-    bool InputManager::isActionDown(const std::string &action_name) const
+    bool InputManager::isActionDown(std::string_view action_name) const
     {
-        if (auto it = m_actionStates.find(action_name); it != m_actionStates.end())
+        if (auto it = m_actionStates.find(std::string(action_name)); it != m_actionStates.end())
         {
             return it->second == ActionState::PRESSED_THIS_FRAME || it->second == ActionState::HELD_DOWN;
         }
@@ -54,9 +54,9 @@ namespace engine::input
         return false;
     }
 
-    bool InputManager::isActionPressed(const std::string &action_name) const
+    bool InputManager::isActionPressed(std::string_view action_name) const
     {
-        if (auto it = m_actionStates.find(action_name); it != m_actionStates.end())
+        if (auto it = m_actionStates.find(std::string(action_name)); it != m_actionStates.end())
         {
             return it->second == ActionState::PRESSED_THIS_FRAME;
         }
@@ -64,9 +64,9 @@ namespace engine::input
         return false;
     }
 
-    bool InputManager::isActionReleased(const std::string &action_name) const
+    bool InputManager::isActionReleased(std::string_view action_name) const
     {
-        if (auto it = m_actionStates.find(action_name); it != m_actionStates.end())
+        if (auto it = m_actionStates.find(std::string(action_name)); it != m_actionStates.end())
         {
             return it->second == ActionState::RELEASED_THIS_FRAME;
         }
@@ -186,9 +186,9 @@ namespace engine::input
         }
     }
 
-    void InputManager::updateActionState(const std::string &action_name, bool is_down, bool is_repeat)
+    void InputManager::updateActionState(std::string_view action_name, bool is_down, bool is_repeat)
     {
-        auto it = m_actionStates.find(action_name);
+        auto it = m_actionStates.find(std::string(action_name));
         if (it == m_actionStates.end())
         {
             spdlog::warn("Action '{}' is not recognized", action_name);
@@ -214,12 +214,12 @@ namespace engine::input
         }
     }
 
-    SDL_Scancode InputManager::scancodeFromString(const std::string &key) const
+    SDL_Scancode InputManager::scancodeFromString(std::string_view key) const
     {
-        return SDL_GetScancodeFromName(key.c_str());
+        return SDL_GetScancodeFromName(key.data());
     }
 
-    Uint32 InputManager::mouseButtonFromString(const std::string &button_name) const
+    Uint32 InputManager::mouseButtonFromString(std::string_view button_name) const
     {
         // Map string representation of mouse buttons to SDL mouse button codes
         if (button_name == "MouseLeft")

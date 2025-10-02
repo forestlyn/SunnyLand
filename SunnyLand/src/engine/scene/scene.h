@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include <vector>
 #include <memory>
 
@@ -32,7 +33,7 @@ namespace engine::scene
         bool is_initialize = false;
 
     public:
-        Scene(std::string scene_name, engine::core::Context &context, SceneManager &scene_manager);
+        Scene(std::string_view scene_name, engine::core::Context &context, SceneManager &scene_manager);
         virtual ~Scene();
 
         Scene(const Scene &) = delete;
@@ -44,7 +45,7 @@ namespace engine::scene
         void safeAddGameObject(std::unique_ptr<engine::object::GameObject> &&game_object);
         void removeGameObject(engine::object::GameObject *game_object);
         void safeRemoveGameObject(engine::object::GameObject *game_object);
-        engine::object::GameObject *findGameObjectByName(const std::string &name);
+        engine::object::GameObject *findGameObjectByName(std::string_view name);
 
         virtual void initialize();
         virtual void handleInput();
@@ -52,8 +53,8 @@ namespace engine::scene
         virtual void render();
         virtual void close();
 
-        void setName(const std::string &name);
-        std::string getName() const;
+        void setName(std::string_view name);
+        std::string_view getName() const;
         engine::core::Context &getContext() const;
         SceneManager &getSceneManager() const;
         engine::ui::UIManager &getUIManager();

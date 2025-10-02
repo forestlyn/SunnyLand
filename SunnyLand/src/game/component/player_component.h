@@ -3,6 +3,7 @@
 #include "state/player_state.h"
 #include <memory>
 #include <string>
+#include <string_view>
 namespace engine::input
 {
     class InputManager;
@@ -106,7 +107,7 @@ namespace game::component
         void move(MoveDirection direction);
         void climb(ClimbDirection direction);
         void clampVelocity();
-        void playAnimation(const std::string &anim_name);
+        void playAnimation(std::string_view anim_name);
         void takeDamage(int amount);
         void heal(int amount);
 

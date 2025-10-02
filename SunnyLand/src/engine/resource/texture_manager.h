@@ -37,10 +37,10 @@ namespace engine::resource
         TextureManager &operator=(TextureManager &&) = delete;
 
     private:
-        SDL_Texture *loadTexture(const std::string &filePath);
-        SDL_Texture *getTexture(const std::string &filePath);
-        glm::vec2 getTextureSize(const std::string &filePath);
-        void unloadTexture(const std::string &filePath);
+        SDL_Texture *loadTexture(std::string_view filePath);
+        SDL_Texture *getTexture(std::string_view filePath);
+        glm::vec2 getTextureSize(std::string_view filePath);
+        void unloadTexture(std::string_view filePath);
         void clearTextures();
     };
 }

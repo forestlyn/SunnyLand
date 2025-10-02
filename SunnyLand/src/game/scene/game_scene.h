@@ -3,6 +3,7 @@
 #include "../../engine/scene/scene.h"
 #include <memory>
 #include <string>
+#include <string_view>
 #include <glm/vec2.hpp>
 namespace engine::scene
 {
@@ -59,10 +60,10 @@ namespace game::scene
         // 掉出地图外就是死亡
         void checkPlayerDead();
 
-        void createEffectAt(glm::vec2 center_position, const std::string &effect_name);
+        void createEffectAt(glm::vec2 center_position, std::string_view effect_name);
 
         void toNextLevel(engine::object::GameObject *obj);
-        std::string getLevelPathByName(const std::string &level_name) { return "assets/maps/" + level_name + ".tmj"; }
+        std::string getLevelPathByName(std::string_view level_name) { return "assets/maps/" + std::string(level_name) + ".tmj"; }
 
         void handlePlayerDamage(int damage);
         void healPlayer(int heal_amount);

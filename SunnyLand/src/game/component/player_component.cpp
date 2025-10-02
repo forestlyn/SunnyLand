@@ -185,7 +185,7 @@ namespace game::component
         physics_->velocity_.x *= friction_factor_;
     }
 
-    void PlayerComponent::playAnimation(const std::string &anim_name)
+    void PlayerComponent::playAnimation(std::string_view anim_name)
     {
         if (animation_)
         {

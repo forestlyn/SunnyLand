@@ -3,6 +3,7 @@
 #include "../render/sprite.h"
 #include <optional>
 #include <string>
+#include <string_view>
 namespace engine::ui
 {
     class UIImage : public UIElement
@@ -11,7 +12,7 @@ namespace engine::ui
         engine::render::Sprite sprite_;
 
     public:
-        UIImage(const std::string &sprite_id, glm::vec2 position = glm::vec2(0.0f), glm::vec2 size = glm::vec2(0.0f), std::optional<SDL_FRect> rect = std::nullopt, bool is_flip = false);
+        UIImage(std::string_view sprite_id, glm::vec2 position = glm::vec2(0.0f), glm::vec2 size = glm::vec2(0.0f), std::optional<SDL_FRect> rect = std::nullopt, bool is_flip = false);
         ~UIImage() override = default;
         UIImage(const UIImage &) = delete;
         UIImage &operator=(const UIImage &) = delete;
@@ -24,8 +25,8 @@ namespace engine::ui
         void setSprite(const engine::render::Sprite &sprite) { sprite_ = sprite; }
         engine::render::Sprite &getSprite() { return sprite_; }
 
-        void setSpriteId(const std::string &sprite_id) { sprite_.setTextureId(sprite_id); }
-        std::string getSpriteId() const { return sprite_.getTextureId(); }
+        void setSpriteId(std::string_view sprite_id) { sprite_.setTextureId(sprite_id); }
+        std::string_view getSpriteId() const { return sprite_.getTextureId(); }
 
         void setSpriteRect(std::optional<SDL_FRect> rect) { sprite_.setRect(std::move(rect)); }
         std::optional<SDL_FRect> getSpriteRect() const { return sprite_.getRect(); }

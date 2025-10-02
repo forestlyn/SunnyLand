@@ -90,7 +90,7 @@ namespace game::scene
         // 这里可以添加额外的关卡初始化逻辑
         engine::scene::LevelLoader level_loader;
 
-        std::string level_path = session_data_->getCurrentLevelPath();
+        std::string_view level_path = session_data_->getCurrentLevelPath();
         bool success = level_loader.loadLevel(level_path, *this);
         if (!success)
         {
@@ -474,10 +474,10 @@ namespace game::scene
         }
     }
 
-    void GameScene::createEffectAt(glm::vec2 center_pos, const std::string &tag)
+    void GameScene::createEffectAt(glm::vec2 center_pos, std::string_view tag)
     {
         // --- 创建游戏对象和变换组件 ---
-        auto effect_obj = std::make_unique<engine::object::GameObject>("effect_" + tag);
+        auto effect_obj = std::make_unique<engine::object::GameObject>("effect_" + std::string(tag));
         effect_obj->addComponent<engine::component::TransformComponent>(std::move(center_pos));
 
         // --- 根据标签创建不同的精灵组件和动画---
@@ -520,7 +520,7 @@ namespace game::scene
     void GameScene::toNextLevel(engine::object::GameObject *obj)
     {
         spdlog::info("进入下一关!");
-        std::string next_level_name = obj->getName();
+        std::string_view next_level_name = obj->getName();
         session_data_->nextLevel(getLevelPathByName(next_level_name));
         auto new_scene = std::make_unique<GameScene>(context, scene_manager, std::move(session_data_));
         scene_manager.requestReplaceScene(std::move(new_scene));

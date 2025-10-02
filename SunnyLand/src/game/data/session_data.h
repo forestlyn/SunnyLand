@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 namespace game::data
 {
     class SessionData
@@ -28,7 +29,7 @@ namespace game::data
         int getCurrentPlayerHealth() const { return current_player_health; }
         int getMaxPlayerScore() const { return max_player_score; }
         int getCurrentPlayerScore() const { return current_player_score; }
-        std::string getCurrentLevelPath() const { return current_level_path; }
+        std::string_view getCurrentLevelPath() const { return current_level_path; }
         int getLevelHealth() const { return level_health; }
         int getLevelScore() const { return level_score; }
         bool isWin() const { return is_win_; }
@@ -38,7 +39,7 @@ namespace game::data
         void setCurrentPlayerHealth(int health) { current_player_health = health; }
         void setMaxPlayerScore(int score) { max_player_score = score; }
         void setCurrentPlayerScore(int score) { current_player_score = score; }
-        void setCurrentLevelPath(const std::string &path) { current_level_path = path; }
+        void setCurrentLevelPath(std::string_view path) { current_level_path = path; }
         void setLevelHealth(int health) { level_health = health; }
         void setLevelScore(int score) { level_score = score; }
         void setIsWin(bool win) { is_win_ = win; }
@@ -46,10 +47,10 @@ namespace game::data
         void addScore(int score);
 
         void reset();
-        void nextLevel(const std::string &level_path);
+        void nextLevel(std::string_view level_path);
 
-        bool syncMaxScore(const std::string &file_path);
-        void loadFromFile(const std::string &file_path);
-        void saveToFile(const std::string &file_path) const;
+        bool syncMaxScore(std::string_view file_path);
+        void loadFromFile(std::string_view file_path);
+        void saveToFile(std::string_view file_path) const;
     };
 }

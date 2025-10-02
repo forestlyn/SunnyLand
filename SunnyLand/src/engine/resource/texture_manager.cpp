@@ -21,16 +21,16 @@ namespace engine::resource
         spdlog::trace("TextureManager destroyed and texture resources cleaned up.");
     }
 
-    SDL_Texture *TextureManager::loadTexture(const std::string &filePath)
+    SDL_Texture *TextureManager::loadTexture(std::string_view filePath)
     {
-        auto it = mTextureCache.find(filePath);
+        auto it = mTextureCache.find(std::string(filePath));
         if (it != mTextureCache.end())
         {
             return it->second.get();
         }
 
         spdlog::debug("Loading texture: {}", filePath);
-        SDL_Texture *texture = IMG_LoadTexture(renderer_, filePath.c_str());
+        SDL_Texture *texture = IMG_LoadTexture(renderer_, filePath.data());
         if (!texture)
         {
             spdlog::error("Failed to load texture: {}. SDL_image Error: {}", filePath, SDL_GetError());
@@ -38,14 +38,14 @@ namespace engine::resource
         }
         SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 
-        mTextureCache[filePath] = std::unique_ptr<SDL_Texture, SDLTextureDeleter>(texture);
+        mTextureCache[std::string(filePath)] = std::unique_ptr<SDL_Texture, SDLTextureDeleter>(texture);
         spdlog::debug("Texture loaded: {}", filePath);
         return texture;
     }
 
-    SDL_Texture *TextureManager::getTexture(const std::string &filePath)
+    SDL_Texture *TextureManager::getTexture(std::string_view filePath)
     {
-        auto it = mTextureCache.find(filePath);
+        auto it = mTextureCache.find(std::string(filePath));
         if (it != mTextureCache.end())
         {
             // spdlog::trace("Retrieving texture: {}", filePath);
@@ -58,7 +58,7 @@ namespace engine::resource
         }
     }
 
-    glm::vec2 TextureManager::getTextureSize(const std::string &filePath)
+    glm::vec2 TextureManager::getTextureSize(std::string_view filePath)
     {
         SDL_Texture *it = getTexture(filePath);
         if (it)
@@ -74,9 +74,9 @@ namespace engine::resource
         }
     }
 
-    void TextureManager::unloadTexture(const std::string &filePath)
+    void TextureManager::unloadTexture(std::string_view filePath)
     {
-        auto it = mTextureCache.find(filePath);
+        auto it = mTextureCache.find(std::string(filePath));
         if (it == mTextureCache.end())
         {
             spdlog::warn("Attempted to unload texture that is not loaded: {}", filePath);

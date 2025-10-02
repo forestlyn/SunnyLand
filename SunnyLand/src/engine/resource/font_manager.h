@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include <utility> // for std::pair
 #include <memory>
 #include <unordered_map>
@@ -44,9 +45,9 @@ namespace engine::resource
         FontManager &operator=(FontManager &&) = delete;
 
     private:
-        TTF_Font *loadFont(const std::string &filePath, int size);
-        TTF_Font *getFont(const std::string &filePath, int size);
-        void unloadFont(const std::string &filePath, int size);
+        TTF_Font *loadFont(std::string_view filePath, int size);
+        TTF_Font *getFont(std::string_view filePath, int size);
+        void unloadFont(std::string_view filePath, int size);
         void clearFonts();
     };
 }

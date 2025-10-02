@@ -11,7 +11,7 @@ namespace engine::audio
     {
     }
 
-    int AudioPlayer::playSound(const std::string &sound_id, int channels)
+    int AudioPlayer::playSound(std::string_view sound_id, int channels)
     {
         Mix_Chunk *sound = resource_manager_->getSound(sound_id);
         if (sound)
@@ -26,7 +26,7 @@ namespace engine::audio
         return -1;
     }
 
-    bool AudioPlayer::playMusic(const std::string &music_id, int loops, int fade_in_ms)
+    bool AudioPlayer::playMusic(std::string_view music_id, int loops, int fade_in_ms)
     {
         if (current_music_path_ == music_id && Mix_PlayingMusic())
         {

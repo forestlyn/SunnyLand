@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <string_view>
 
 namespace engine::core
 {
@@ -33,14 +34,14 @@ namespace engine::core
             // 可以继续添加更多默认动作
         };
 
-        explicit Config(const std::string &config_file_path);
+        explicit Config(std::string_view config_file_path);
         Config(const Config &) = delete;
         Config &operator=(const Config &) = delete;
         Config(Config &&) = delete;
         Config &operator=(Config &&) = delete;
 
-        bool loadFromFile(const std::string &file_path);
-        void saveToFile(const std::string &file_path) const;
+        bool loadFromFile(std::string_view file_path);
+        void saveToFile(std::string_view file_path) const;
 
     private:
         void fromJson(const nlohmann::json &j);

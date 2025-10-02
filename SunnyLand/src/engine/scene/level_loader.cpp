@@ -24,11 +24,12 @@
 
 namespace engine::scene
 {
-    bool LevelLoader::loadLevel(const std::string &map_path, Scene &scene)
+    bool LevelLoader::loadLevel(std::string_view map_path, Scene &scene)
     {
 
         // 读取关卡文件
-        std::ifstream file(map_path);
+        std::filesystem::path path(map_path);
+        std::ifstream file(path);
         if (!file.is_open())
         {
             spdlog::error("Failed to open level file: {}", map_path);
@@ -210,7 +211,7 @@ namespace engine::scene
                 else
                 {
                     auto tile_info = getTileInfoByGid(gid);
-                    if (tile_info.sprite.getConstTextureId().empty())
+                    if (tile_info.sprite.getTextureId().empty())
                     {
                         spdlog::warn("Object gid {} has no valid sprite", gid);
                         continue;
@@ -336,13 +337,14 @@ namespace engine::scene
             spdlog::warn("Object layer is missing objects array");
         }
     }
-    void LevelLoader::loadTileset(const std::string &tileset_path, int first_gid)
+    void LevelLoader::loadTileset(std::string_view tileset_path, int first_gid)
     {
         // 加载瓦片集
         try
         {
             nlohmann::json tileset_data;
-            std::ifstream(tileset_path) >> tileset_data;
+            auto tileset_data_path = std::filesystem::path(tileset_path);
+            std::ifstream(tileset_data_path) >> tileset_data;
             tileset_data["path"] = tileset_path;
             m_tileset_data[first_gid] = std::move(tileset_data);
         }
@@ -607,7 +609,7 @@ namespace engine::scene
         }
     }
 
-    std::string LevelLoader::resolvePath(const std::string &relative_path, const std::string &file_path)
+    std::string LevelLoader::resolvePath(std::string_view relative_path, std::string_view file_path)
     {
         // 解析资源路径
         try
@@ -620,7 +622,7 @@ namespace engine::scene
         catch (const std::exception &e)
         {
             spdlog::error("Failed to resolve path: {}", e.what());
-            return file_path;
+            return std::string(relative_path);
         }
     }
 }

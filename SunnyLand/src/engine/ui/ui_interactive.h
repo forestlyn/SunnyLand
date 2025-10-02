@@ -2,6 +2,7 @@
 #include "ui_element.h"
 #include "state/ui_state.h"
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <memory>
 #include <glm/vec2.hpp>
@@ -38,15 +39,15 @@ namespace engine::ui
         virtual void onEnterHover() {}
         virtual void onExitHover() {}
 
-        void addSprite(const std::string &name, std::unique_ptr<engine::render::Sprite> sprite);
-        void setCurrentSprite(const std::string &name);
+        void addSprite(std::string_view name, std::unique_ptr<engine::render::Sprite> sprite);
+        void setCurrentSprite(std::string_view name);
         engine::render::Sprite *getCurrentSprite() const { return current_sprite_; }
 
         void setState(std::unique_ptr<engine::ui::state::UIState> new_state);
         engine::ui::state::UIState *getState() const { return state_.get(); }
 
-        void addSound(const std::string &name, const std::string &file_path);
-        void playSound(const std::string &name);
+        void addSound(std::string_view name, std::string_view file_path);
+        void playSound(std::string_view name);
 
         void setInteractive(bool interactive) { interactive_ = interactive; }
         bool isInteractive() const { return interactive_; }

@@ -34,30 +34,30 @@ namespace engine::resource
         spdlog::trace("AudioManager destroyed and audio resources cleaned up.");
     }
 
-    Mix_Chunk *AudioManager::loadSound(const std::string &filePath)
+    Mix_Chunk *AudioManager::loadSound(std::string_view filePath)
     {
-        auto it = mAudioChunks.find(filePath);
+        auto it = mAudioChunks.find(std::string(filePath));
         if (it != mAudioChunks.end())
         {
             return it->second.get();
         }
 
         spdlog::debug("Loading sound: {}", filePath);
-        Mix_Chunk *chunk = Mix_LoadWAV(filePath.c_str());
+        Mix_Chunk *chunk = Mix_LoadWAV(filePath.data());
         if (!chunk)
         {
             spdlog::error("Failed to load sound: {}. SDL_mixer Error: {}", filePath, SDL_GetError());
             return nullptr;
         }
 
-        mAudioChunks[filePath] = std::unique_ptr<Mix_Chunk, SDLMixChunkDeleter>(chunk);
+        mAudioChunks[std::string(filePath)] = std::unique_ptr<Mix_Chunk, SDLMixChunkDeleter>(chunk);
         spdlog::debug("Sound loaded: {}", filePath);
         return chunk;
     }
 
-    Mix_Chunk *AudioManager::getSound(const std::string &filePath)
+    Mix_Chunk *AudioManager::getSound(std::string_view filePath)
     {
-        auto it = mAudioChunks.find(filePath);
+        auto it = mAudioChunks.find(std::string(filePath));
         if (it != mAudioChunks.end())
         {
             spdlog::debug("Retrieving sound: {}", filePath);
@@ -70,9 +70,9 @@ namespace engine::resource
         }
     }
 
-    void AudioManager::unloadSound(const std::string &filePath)
+    void AudioManager::unloadSound(std::string_view filePath)
     {
-        auto it = mAudioChunks.find(filePath);
+        auto it = mAudioChunks.find(std::string(filePath));
         if (it == mAudioChunks.end())
         {
             spdlog::warn("Attempted to unload sound that is not loaded: {}", filePath);
@@ -94,29 +94,29 @@ namespace engine::resource
         }
     }
 
-    Mix_Music *AudioManager::loadMusic(const std::string &filePath)
+    Mix_Music *AudioManager::loadMusic(std::string_view filePath)
     {
-        auto it = mMusicTracks.find(filePath);
+        auto it = mMusicTracks.find(std::string(filePath));
         if (it != mMusicTracks.end())
         {
             return it->second.get();
         }
         spdlog::debug("Loading music: {}", filePath);
-        Mix_Music *music = Mix_LoadMUS(filePath.c_str());
+        Mix_Music *music = Mix_LoadMUS(filePath.data());
         if (!music)
         {
             spdlog::error("Failed to load music: {}. SDL_mixer Error: {}", filePath, SDL_GetError());
             return nullptr;
         }
 
-        mMusicTracks[filePath] = std::unique_ptr<Mix_Music, SDLMixMusicDeleter>(music);
+        mMusicTracks[std::string(filePath)] = std::unique_ptr<Mix_Music, SDLMixMusicDeleter>(music);
         spdlog::debug("Music loaded: {}", filePath);
         return music;
     }
 
-    Mix_Music *AudioManager::getMusic(const std::string &filePath)
+    Mix_Music *AudioManager::getMusic(std::string_view filePath)
     {
-        auto it = mMusicTracks.find(filePath);
+        auto it = mMusicTracks.find(std::string(filePath));
         if (it != mMusicTracks.end())
         {
             spdlog::debug("Retrieving music: {}", filePath);
@@ -129,9 +129,9 @@ namespace engine::resource
         }
     }
 
-    void AudioManager::unloadMusic(const std::string &filePath)
+    void AudioManager::unloadMusic(std::string_view filePath)
     {
-        auto it = mMusicTracks.find(filePath);
+        auto it = mMusicTracks.find(std::string(filePath));
         if (it == mMusicTracks.end())
         {
             spdlog::warn("Attempted to unload music that is not loaded: {}", filePath);

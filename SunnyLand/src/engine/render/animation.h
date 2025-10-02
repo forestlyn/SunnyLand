@@ -2,6 +2,7 @@
 #include <vector>
 #include <SDL3/SDL_rect.h>
 #include <string>
+#include <string_view>
 namespace engine::render
 {
     struct AnimationFrame
@@ -19,7 +20,7 @@ namespace engine::render
         bool is_loop_;
 
     public:
-        Animation(const std::string &name = "default", bool loop = true);
+        Animation(std::string_view name = "default", bool loop = true);
         ~Animation() = default;
         Animation(const Animation &) = delete;
         Animation &operator=(const Animation &) = delete;
@@ -29,8 +30,8 @@ namespace engine::render
         void addAnimationFrame(SDL_FRect src_rect, float duration);
         const AnimationFrame *getFrame(float time) const;
 
-        const std::string &getName() const { return name_; }
-        void setName(const std::string &name) { name_ = name; }
+        std::string_view getName() const { return name_; }
+        void setName(std::string_view name) { name_ = name; }
         float getTotalDuration() const { return total_duration_; }
         const std::vector<AnimationFrame> &getFrames() const { return frames_; }
         size_t getFrameCount() const { return frames_.size(); }

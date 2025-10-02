@@ -1,6 +1,6 @@
 #pragma once
-
 #include <string>
+#include <string_view>
 #include <nlohmann/json.hpp>
 #include <glm/vec2.hpp>
 #include <map>
@@ -30,7 +30,7 @@ namespace engine::scene
 
     public:
         LevelLoader() = default;
-        [[nodiscard]] bool loadLevel(const std::string &map_path, Scene &scene); ///< @brief 从文件加载关卡数据
+        [[nodiscard]] bool loadLevel(std::string_view map_path, Scene &scene); ///< @brief 从文件加载关卡数据
 
     private:
         void loadImageLayer(const nlohmann::json &layer_json, Scene &scene);  ///< @brief 加载图片图层
@@ -44,22 +44,22 @@ namespace engine::scene
         std::optional<engine::utils::Rect> getColliderRect(const nlohmann::json &tileJson);
         std::optional<nlohmann::json> getTileJsonByGid(int gid);
 
-        void loadTileset(const std::string &tileset_path, int first_gid);
+        void loadTileset(std::string_view tileset_path, int first_gid);
 
         void loadAnimation(const nlohmann::json &animation_json, engine::component::AnimationComponent *animation_component, const glm::vec2 &sprite_size);
 
         void loadSound(const nlohmann::json &sound_json, engine::component::AudioComponent *audio_component);
 
-        std::string resolvePath(const std::string &relative_path, const std::string &file_path);
+        std::string resolvePath(std::string_view relative_path, std::string_view file_path);
 
         template <typename T>
-        std::optional<T> getPropertyFromJson(const nlohmann::json &json, const std::string &property_name)
+        std::optional<T> getPropertyFromJson(const nlohmann::json &json, std::string_view property_name)
         {
             if (json.contains("properties") && json["properties"].is_array())
             {
                 for (const auto &prop : json["properties"])
                 {
-                    if (prop.contains("name") && prop["name"] == property_name && prop.contains("value"))
+                    if (prop.contains("name") && prop["name"] == std::string(property_name) && prop.contains("value"))
                     {
                         return prop["value"].get<T>();
                     }

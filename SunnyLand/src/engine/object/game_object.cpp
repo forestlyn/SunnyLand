@@ -3,7 +3,7 @@
 
 namespace engine::object
 {
-    GameObject::GameObject(const std::string &name, const std::string &tag)
+    GameObject::GameObject(std::string_view name, std::string_view tag)
         : m_name(name), m_tag(tag), m_need_remove(false), m_is_active(true)
     {
         spdlog::trace("Creating GameObject: {}", m_name);

@@ -8,7 +8,7 @@
 #include "transform_component.h"
 namespace engine::component
 {
-    SpriteComponent::SpriteComponent(const std::string &texture_path,
+    SpriteComponent::SpriteComponent(std::string_view texture_path,
                                      engine::resource::ResourceManager *resource_manager,
                                      engine::utils::Alignment alignment,
                                      std::optional<SDL_FRect> source_rect_opt,
@@ -100,7 +100,7 @@ namespace engine::component
         }
     }
 
-    std::string SpriteComponent::getTextureId() const
+    std::string_view SpriteComponent::getTextureId() const
     {
         return sprite_.getTextureId();
     }
@@ -135,7 +135,7 @@ namespace engine::component
         return alignment_;
     }
 
-    void SpriteComponent::setSpriteById(const std::string &texture_path, const std::optional<SDL_FRect> source_rect_opt, const bool is_flipped)
+    void SpriteComponent::setSpriteById(std::string_view texture_path, const std::optional<SDL_FRect> source_rect_opt, const bool is_flipped)
     {
         if (!resource_manager_)
         {
@@ -174,7 +174,7 @@ namespace engine::component
             sprite_size_ = {rect.w, rect.h};
         }
         else
-            sprite_size_ = resource_manager_->getTextureSize(sprite_.getConstTextureId());
+            sprite_size_ = resource_manager_->getTextureSize(sprite_.getTextureId());
     }
 
     void SpriteComponent::render(engine::core::Context &context)

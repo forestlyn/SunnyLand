@@ -10,7 +10,7 @@
 namespace engine::component
 {
 
-    ParallaxComponent::ParallaxComponent(const std::string &texture_id, glm::vec2 scroll_factor, glm::bvec2 repeat)
+    ParallaxComponent::ParallaxComponent(std::string_view texture_id, glm::vec2 scroll_factor, glm::bvec2 repeat)
         : m_sprite(engine::render::Sprite(texture_id)), m_scroll_factor(std::move(scroll_factor)), m_repeat(std::move(repeat)), is_hidden(false)
     {
         spdlog::trace("ParallaxComponent created");
