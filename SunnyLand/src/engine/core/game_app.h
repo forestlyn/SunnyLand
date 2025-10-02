@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-
+#include <functional>
 struct SDL_Window;
 struct SDL_Renderer;
 namespace engine::resource
@@ -59,11 +59,13 @@ namespace engine::core
         [[nodiscard]] bool IsRunning() const { return is_running_; }
 
         void run();
+        void setSceneFunc(std::function<void(engine::scene::SceneManager &)> func);
 
     private:
         SDL_Window *window_ = nullptr;
         SDL_Renderer *sdl_renderer_ = nullptr;
         bool is_running_ = false;
+        std::function<void(engine::scene::SceneManager &)> scene_func_;
 
         std::unique_ptr<engine::core::Time> time_;
         std::unique_ptr<engine::resource::ResourceManager> resource_manager_;

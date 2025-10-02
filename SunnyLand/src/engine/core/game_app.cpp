@@ -16,7 +16,6 @@
 #include "../component/sprite_component.h"
 #include "../utils/alignment.h"
 #include "../scene/scene_manager.h"
-#include "../../game/scene/title_scene.h"
 #include "../physics/physics_engine.h"
 #include "../audio/audio_player.h"
 namespace engine::core
@@ -36,6 +35,12 @@ namespace engine::core
     bool GameApp::Init()
     {
         spdlog::info("Initializing GameApp");
+
+        if (!scene_func_)
+        {
+            spdlog::error("Scene function not set. Please set the scene function before running the game.");
+            return false;
+        }
 
         if (!initConfig())
         {
@@ -112,13 +117,19 @@ namespace engine::core
             return false;
         }
 
-        auto scene = std::make_unique<game::scene::TitleScene>(*context_, *scene_manager_);
-        scene_manager_->requestPushScene(std::move(scene));
+        // Call the user-provided scene function to set up the initial scene
+        scene_func_(*scene_manager_.get());
 
         is_running_ = true;
         spdlog::trace("GameApp initialized successfully");
         return true;
     }
+
+    void GameApp::setSceneFunc(std::function<void(engine::scene::SceneManager &)> func)
+    {
+        scene_func_ = std::move(func);
+    }
+
     bool GameApp::initConfig()
     {
         try
@@ -404,81 +415,4 @@ namespace engine::core
         SDL_Quit();
         is_running_ = false;
     }
-
-    // void GameApp::testResourceManager()
-    // {
-    //     resource_manager_->loadTexture("assets/textures/Actors/eagle-attack.png");
-    //     resource_manager_->loadFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
-    //     resource_manager_->loadSound("assets/audio/button_click.wav");
-
-    //     resource_manager_->unloadTexture("assets/textures/Actors/eagle-attack.png");
-    //     resource_manager_->unloadFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
-    //     resource_manager_->unloadSound("assets/audio/button_click.wav");
-    // }
-
-    // void GameApp::testRenderer()
-    // {
-    //     engine::render::Sprite sprite_world("assets/textures/Actors/frog.png");
-    //     engine::render::Sprite sprite_ui("assets/textures/UI/buttons/Start1.png");
-    //     engine::render::Sprite sprite_parallax("assets/textures/Layers/back.png");
-
-    //     static float rotation = 0.0f;
-    //     rotation += 0.1f;
-
-    //     // 注意渲染顺序
-    //     renderer_->drawParallax(*camera_, sprite_parallax, glm::vec2(100, 100), glm::vec2(0.5f, 0.5f), glm::bvec2(true, false));
-    //     renderer_->drawSprite(*camera_, sprite_world, glm::vec2(200, 200), glm::vec2(1.0f, 1.0f), rotation);
-    //     renderer_->drawUISprite(sprite_ui, glm::vec2(100, 100));
-    // }
-
-    // void GameApp::testCamera()
-    // {
-    //     auto key_state = SDL_GetKeyboardState(nullptr);
-    //     if (key_state[SDL_SCANCODE_UP])
-    //         camera_->move(glm::vec2(0, -1));
-    //     if (key_state[SDL_SCANCODE_DOWN])
-    //         camera_->move(glm::vec2(0, 1));
-    //     if (key_state[SDL_SCANCODE_LEFT])
-    //         camera_->move(glm::vec2(-1, 0));
-    //     if (key_state[SDL_SCANCODE_RIGHT])
-    //         camera_->move(glm::vec2(1, 0));
-    // }
-
-    // void GameApp::testInputManager()
-    // {
-    //     std::vector<std::string> actions = {
-    //         "move_up",
-    //         "move_down",
-    //         "move_left",
-    //         "move_right",
-    //         "jump",
-    //         "attack",
-    //         "pause",
-    //         "MouseLeftClick",
-    //         "MouseRightClick"};
-
-    //     for (const auto &action : actions)
-    //     {
-    //         if (input_manager_->isActionPressed(action))
-    //         {
-    //             spdlog::info(" {} 按下 ", action);
-    //         }
-    //         if (input_manager_->isActionReleased(action))
-    //         {
-    //             spdlog::info(" {} 抬起 ", action);
-    //         }
-    //         if (input_manager_->isActionDown(action))
-    //         {
-    //             spdlog::info(" {} 按下中 ", action);
-    //         }
-    //     }
-    // }
-    // void GameApp::testGameObject()
-    // {
-    //     game_object.addComponent<engine::component::TransformComponent>(glm::vec2(100, 100));
-    //     game_object.addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png", resource_manager_.get(), engine::utils::Alignment::CENTER);
-    //     game_object.getComponent<engine::component::TransformComponent>()->setScale(glm::vec2(1.0f, 1.0f));
-    //     game_object.getComponent<engine::component::TransformComponent>()->setRotation(0.0f);
-    // }
-
 } // namespace engine::core
