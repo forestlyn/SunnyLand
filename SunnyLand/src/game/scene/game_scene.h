@@ -59,7 +59,7 @@ namespace game::scene
         // 掉出地图外就是死亡
         void checkPlayerDead();
 
-        void createEffectAt(const glm::vec2 &center_position, const std::string &effect_name);
+        void createEffectAt(glm::vec2 center_position, const std::string &effect_name);
 
         void toNextLevel(engine::object::GameObject *obj);
         std::string getLevelPathByName(const std::string &level_name) { return "assets/maps/" + level_name + ".tmj"; }

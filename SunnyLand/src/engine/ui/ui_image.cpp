@@ -4,9 +4,9 @@
 #include <spdlog/spdlog.h>
 namespace engine::ui
 {
-    UIImage::UIImage(const std::string &sprite_id, const glm::vec2 &position,
-                     const glm::vec2 &size, std::optional<SDL_FRect> rect, const bool &is_flip)
-        : UIElement(position, size), sprite_(sprite_id, rect, is_flip)
+    UIImage::UIImage(const std::string &sprite_id, glm::vec2 position,
+                     glm::vec2 size, std::optional<SDL_FRect> rect, bool is_flip)
+        : UIElement(std::move(position), std::move(size)), sprite_(sprite_id, rect, is_flip)
     {
         if (sprite_id.empty())
         {

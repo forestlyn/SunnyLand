@@ -31,7 +31,7 @@ namespace engine::core
         return glm::vec2(static_cast<float>(width), static_cast<float>(height));
     }
 
-    void GameState::setWindowSize(const glm::vec2 &size)
+    void GameState::setWindowSize(glm::vec2 size)
     {
         if (!window_)
         {
@@ -54,7 +54,7 @@ namespace engine::core
         return glm::vec2(static_cast<float>(width), static_cast<float>(height));
     }
 
-    void GameState::setLogicalSize(const glm::vec2 &size)
+    void GameState::setLogicalSize(glm::vec2 size)
     {
         if (!sdl_renderer_)
         {

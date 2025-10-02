@@ -25,7 +25,7 @@ namespace engine::component
         bool is_hidden;
 
     public:
-        ParallaxComponent(const std::string &texture_id, const glm::vec2 &scroll_factor, const glm::bvec2 &repeat);
+        ParallaxComponent(const std::string &texture_id, glm::vec2 scroll_factor, glm::bvec2 repeat);
 
         const engine::render::Sprite &GetSprite() const { return m_sprite; }
         const glm::vec2 &GetScrollFactor() const { return m_scroll_factor; }
@@ -33,8 +33,8 @@ namespace engine::component
         bool IsHidden() const { return is_hidden; }
 
         void SetSprite(const engine::render::Sprite &sprite) { m_sprite = sprite; }
-        void SetScrollFactor(const glm::vec2 &scroll_factor) { m_scroll_factor = scroll_factor; }
-        void SetRepeat(const glm::bvec2 &repeat) { m_repeat = repeat; }
+        void SetScrollFactor(glm::vec2 scroll_factor) { m_scroll_factor = std::move(scroll_factor); }
+        void SetRepeat(glm::bvec2 repeat) { m_repeat = std::move(repeat); }
         void SetHidden(bool hidden) { is_hidden = hidden; }
 
     protected:

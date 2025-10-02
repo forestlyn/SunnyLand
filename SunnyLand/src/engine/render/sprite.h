@@ -23,9 +23,9 @@ namespace engine::render
         void setTextureId(const std::string &id) { texture_id = id; }
 
         std::optional<SDL_FRect> getRect() const { return rect; }
-        void setRect(const std::optional<SDL_FRect> &r) { rect = r; }
+        void setRect(std::optional<SDL_FRect> r) { rect = std::move(r); }
 
         bool getIsFlip() const { return is_flip; }
-        void setIsFlip(const bool &flip) { is_flip = flip; }
+        void setIsFlip(bool flip) { is_flip = flip; }
     };
 }

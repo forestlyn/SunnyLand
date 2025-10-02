@@ -148,16 +148,16 @@ namespace engine::component
         updateOffset();
     }
 
-    void SpriteComponent::setSpriteRect(const std::optional<SDL_FRect> &source_rect_opt)
+    void SpriteComponent::setSpriteRect(std::optional<SDL_FRect> source_rect_opt)
     {
-        sprite_.setRect(source_rect_opt);
+        sprite_.setRect(std::move(source_rect_opt));
         updateSpriteSize();
         updateOffset();
     }
 
-    void SpriteComponent::setOffset(const glm::vec2 &offset)
+    void SpriteComponent::setOffset(glm::vec2 offset)
     {
-        offset_ = offset;
+        offset_ = std::move(offset);
     }
 
     void SpriteComponent::setAlignment(engine::utils::Alignment alignment)

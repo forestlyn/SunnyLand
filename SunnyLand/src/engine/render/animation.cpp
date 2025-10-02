@@ -7,9 +7,9 @@ namespace engine::render
     {
     }
 
-    void Animation::addAnimationFrame(const SDL_FRect &src_rect, float duration)
+    void Animation::addAnimationFrame(SDL_FRect src_rect, float duration)
     {
-        frames_.push_back({src_rect, duration});
+        frames_.push_back({std::move(src_rect), duration});
         total_duration_ += duration;
     }
 

@@ -11,7 +11,7 @@ namespace engine::ui
         engine::render::Sprite sprite_;
 
     public:
-        UIImage(const std::string &sprite_id, const glm::vec2 &position = glm::vec2(0.0f), const glm::vec2 &size = glm::vec2(0.0f), std::optional<SDL_FRect> rect = std::nullopt, const bool &is_flip = false);
+        UIImage(const std::string &sprite_id, glm::vec2 position = glm::vec2(0.0f), glm::vec2 size = glm::vec2(0.0f), std::optional<SDL_FRect> rect = std::nullopt, bool is_flip = false);
         ~UIImage() override = default;
         UIImage(const UIImage &) = delete;
         UIImage &operator=(const UIImage &) = delete;
@@ -27,10 +27,10 @@ namespace engine::ui
         void setSpriteId(const std::string &sprite_id) { sprite_.setTextureId(sprite_id); }
         std::string getSpriteId() const { return sprite_.getTextureId(); }
 
-        void setSpriteRect(const std::optional<SDL_FRect> &rect) { sprite_.setRect(rect); }
+        void setSpriteRect(std::optional<SDL_FRect> rect) { sprite_.setRect(std::move(rect)); }
         std::optional<SDL_FRect> getSpriteRect() const { return sprite_.getRect(); }
 
-        void setSpriteFlip(const bool &is_flip) { sprite_.setIsFlip(is_flip); }
+        void setSpriteFlip(bool is_flip) { sprite_.setIsFlip(is_flip); }
         bool getSpriteFlip() const { return sprite_.getIsFlip(); }
     };
 }

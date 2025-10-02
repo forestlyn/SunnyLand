@@ -25,8 +25,8 @@ namespace engine::ui
                 const std::string &text,
                 const std::string &font_id,
                 int font_size = 16,
-                const engine::utils::FColor &text_color = {1.0f, 1.0f, 1.0f, 1.0f},
-                const glm::vec2 &position = glm::vec2(0));
+                engine::utils::FColor text_color = {1.0f, 1.0f, 1.0f, 1.0f},
+                glm::vec2 position = glm::vec2(0));
         ~UILabel() override = default;
         UILabel(const UILabel &) = delete;
         UILabel &operator=(const UILabel &) = delete;
@@ -45,7 +45,7 @@ namespace engine::ui
         void setFontSize(int font_size);
         int getFontSize() const { return font_size_; }
 
-        void setTextColor(const engine::utils::FColor &color);
+        void setTextColor(engine::utils::FColor color);
         engine::utils::FColor getTextColor() const { return text_color_; }
 
     private:

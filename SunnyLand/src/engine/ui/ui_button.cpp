@@ -17,7 +17,7 @@ namespace engine::ui
                        std::function<void()> on_click_callback,
                        std::function<void()> on_enter_hover_callback,
                        std::function<void()> on_exit_hover_callback)
-        : UIInteractive(context, position, size), on_click_callback_(on_click_callback), on_enter_hover_callback_(on_enter_hover_callback), on_exit_hover_callback_(on_exit_hover_callback)
+        : UIInteractive(context, std::move(position), std::move(size)), on_click_callback_(std::move(on_click_callback)), on_enter_hover_callback_(std::move(on_enter_hover_callback)), on_exit_hover_callback_(std::move(on_exit_hover_callback))
     {
         addSprite("normal", std::make_unique<engine::render::Sprite>(normal_sprite_id));
         addSprite("hover", std::make_unique<engine::render::Sprite>(hover_sprite_id));

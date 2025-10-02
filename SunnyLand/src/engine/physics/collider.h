@@ -18,7 +18,7 @@ namespace engine::physics
         virtual ColliderType getType() const = 0;
 
         glm::vec2 getAABBSize() const { return aabb_size_; }
-        void setAABBSize(const glm::vec2 &size) { aabb_size_ = size; }
+        void setAABBSize(glm::vec2 size) { aabb_size_ = std::move(size); }
     };
 
     class AABBCollider final : public Collider
@@ -27,9 +27,9 @@ namespace engine::physics
         glm::vec2 size_;
 
     public:
-        explicit AABBCollider(const glm::vec2 &size) : size_(size)
+        explicit AABBCollider(glm::vec2 size) : size_(std::move(size))
         {
-            setAABBSize(size);
+            setAABBSize(size_);
         }
 
         ~AABBCollider() override = default;
@@ -37,10 +37,10 @@ namespace engine::physics
         ColliderType getType() const override { return ColliderType::BOX; }
 
         glm::vec2 getSize() const { return size_; }
-        void setSize(const glm::vec2 &size)
+        void setSize(glm::vec2 size)
         {
-            size_ = size;
-            setAABBSize(size);
+            size_ = std::move(size);
+            setAABBSize(size_);
         }
     };
 

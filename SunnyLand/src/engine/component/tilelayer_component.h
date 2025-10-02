@@ -72,7 +72,7 @@ namespace engine::component
         glm::ivec2 getTileSize() const { return tile_size_; }
         glm::ivec2 getMapSize() const { return map_size_; }
         glm::vec2 getOffset() const { return offset_; }
-        void setOffset(const glm::vec2 &offset) { offset_ = offset; }
+        void setOffset(glm::vec2 offset) { offset_ = std::move(offset); }
         glm::vec2 getWorldSize() const
         {
             return glm::vec2(tile_size_.x * map_size_.x, tile_size_.y * map_size_.y);

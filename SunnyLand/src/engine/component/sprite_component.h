@@ -50,9 +50,9 @@ namespace engine::component
         engine::utils::Alignment getAlignment() const;
         bool getHidden() const;
 
-        void setSpriteById(const std::string &texture_path, const std::optional<SDL_FRect> source_rect_opt = std::nullopt, const bool is_flipped = false);
-        void setSpriteRect(const std::optional<SDL_FRect> &source_rect_opt);
-        void setOffset(const glm::vec2 &offset);
+        void setSpriteById(const std::string &texture_path, std::optional<SDL_FRect> source_rect_opt = std::nullopt, const bool is_flipped = false);
+        void setSpriteRect(std::optional<SDL_FRect> source_rect_opt);
+        void setOffset(glm::vec2 offset);
         void setAlignment(engine::utils::Alignment alignment);
         void setHidden(bool hidden);
 

@@ -15,11 +15,11 @@ namespace engine::component
     public:
         TransformComponent(glm::vec2 position = {0.0f, 0.0f}, float rotation = 0.0f, glm::vec2 scale = {1.0f, 1.0f});
 
-        void setPosition(const glm::vec2 &position);
+        void setPosition(glm::vec2 position);
         glm::vec2 getPosition() const;
         void setRotation(float rotation);
         float getRotation() const;
-        void setScale(const glm::vec2 &scale);
+        void setScale(glm::vec2 scale);
         glm::vec2 getScale() const;
 
         void translate(const glm::vec2 &offset);

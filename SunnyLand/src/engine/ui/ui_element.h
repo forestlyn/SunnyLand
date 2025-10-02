@@ -24,7 +24,7 @@ namespace engine::ui
         std::vector<std::unique_ptr<UIElement>> children_;
 
     public:
-        explicit UIElement(const glm::vec2 &position = glm::vec2(0), const glm::vec2 &size = glm::vec2(0));
+        explicit UIElement(glm::vec2 position = glm::vec2(0), glm::vec2 size = glm::vec2(0));
         virtual ~UIElement() = default;
         UIElement(const UIElement &) = delete;
         UIElement &operator=(const UIElement &) = delete;
@@ -35,10 +35,10 @@ namespace engine::ui
         virtual void update(float delta_time, engine::core::Context &context);
         virtual void render(engine::core::Context &context);
 
-        void setPosition(const glm::vec2 &position) { position_ = position; }
+        void setPosition(glm::vec2 position) { position_ = std::move(position); }
         glm::vec2 getPosition() const { return position_; }
 
-        void setSize(const glm::vec2 &size) { size_ = size; }
+        void setSize(glm::vec2 size) { size_ = std::move(size); }
         glm::vec2 getSize() const { return size_; }
 
         void setVisible(bool visible) { visible_ = visible; }

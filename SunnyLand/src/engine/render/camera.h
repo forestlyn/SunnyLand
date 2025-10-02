@@ -19,7 +19,7 @@ namespace engine::render
         void clampPosition();
 
     public:
-        Camera(const glm::vec2 &viewport_size, const glm::vec2 &position = glm::vec2(0.0f, 0.0f), const std::optional<engine::utils::Rect> &limit_bounds = std::nullopt);
+        Camera(glm::vec2 viewport_size, glm::vec2 position = glm::vec2(0.0f, 0.0f), std::optional<engine::utils::Rect> limit_bounds = std::nullopt);
 
         Camera(const Camera &) = delete;
         Camera &operator=(const Camera &) = delete;
@@ -34,13 +34,13 @@ namespace engine::render
         void move(const glm::vec2 &offset);
 
         glm::vec2 getViewportSize() const;
-        void setViewportSize(const glm::vec2 &size);
+        void setViewportSize(glm::vec2 size);
 
         glm::vec2 getPosition() const;
-        void setPosition(const glm::vec2 &position);
+        void setPosition(glm::vec2 position);
 
         std::optional<engine::utils::Rect> getLimitBounds() const;
-        void setLimitBounds(const std::optional<engine::utils::Rect> &bounds);
+        void setLimitBounds(std::optional<engine::utils::Rect> bounds);
 
         void setFollowTarget(engine::component::TransformComponent *target) { follow_target_ = target; }
         engine::component::TransformComponent *getFollowTarget() const { return follow_target_; }

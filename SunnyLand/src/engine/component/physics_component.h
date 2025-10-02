@@ -51,7 +51,7 @@ namespace engine::component
         void setUseGravity(bool useGravity) { useGravity_ = useGravity; }
         void setMass(float mass) { mass_ = mass; }
         void setEnabled(bool enabled) { enabled_ = enabled; }
-        void setVelocity(const glm::vec2 &velocity) { velocity_ = velocity; }
+        void setVelocity(glm::vec2 velocity) { velocity_ = std::move(velocity); }
         void addForce(const glm::vec2 &force)
         {
             if (enabled_)

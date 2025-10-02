@@ -29,13 +29,13 @@ namespace engine::core
         GameState &operator=(GameState &&) = delete;
 
         State getCurrentState() const { return current_state_; }
-        void setCurrentState(State state) { current_state_ = state; }
+        void setCurrentState(State state) { current_state_ = std::move(state); }
 
         glm::vec2 getWindowSize() const;
-        void setWindowSize(const glm::vec2 &size);
+        void setWindowSize(glm::vec2 size);
 
         glm::vec2 getLogicalSize() const;
-        void setLogicalSize(const glm::vec2 &size);
+        void setLogicalSize(glm::vec2 size);
 
         bool isInTitleState() const { return current_state_ == State::TITLE; }
         bool isInPlayingState() const { return current_state_ == State::PLAYING; }

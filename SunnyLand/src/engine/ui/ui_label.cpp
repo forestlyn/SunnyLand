@@ -7,9 +7,9 @@ namespace engine::ui
                      const std::string &text,
                      const std::string &font_id,
                      int font_size,
-                     const engine::utils::FColor &text_color,
-                     const glm::vec2 &position)
-        : UIElement(position, glm::vec2(0)), text_renderer_(text_renderer), text_(text), font_id_(font_id), font_size_(font_size), text_color_(text_color)
+                     engine::utils::FColor text_color,
+                     glm::vec2 position)
+        : UIElement(std::move(position), glm::vec2(0)), text_renderer_(text_renderer), text_(text), font_id_(font_id), font_size_(font_size), text_color_(std::move(text_color))
     {
         // 初始时计算文本尺寸
         if (!text_.empty() && !font_id_.empty() && font_size_ > 0)
@@ -51,9 +51,9 @@ namespace engine::ui
         }
     }
 
-    void UILabel::setTextColor(const engine::utils::FColor &color)
+    void UILabel::setTextColor(engine::utils::FColor color)
     {
-        text_color_ = color;
+        text_color_ = std::move(color);
     }
 
     void UILabel::updateSize()

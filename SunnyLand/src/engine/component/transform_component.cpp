@@ -7,7 +7,7 @@ namespace engine::component
 {
 
     TransformComponent::TransformComponent(glm::vec2 position, float rotation, glm::vec2 scale)
-        : position_(position), rotation_(rotation), scale_(scale)
+        : position_(std::move(position)), rotation_(rotation), scale_(std::move(scale))
     {
     }
 
@@ -16,9 +16,9 @@ namespace engine::component
         // Update the transform component based on the context
     }
 
-    void TransformComponent::setPosition(const glm::vec2 &position)
+    void TransformComponent::setPosition(glm::vec2 position)
     {
-        position_ = position;
+        position_ = std::move(position);
     }
 
     glm::vec2 TransformComponent::getPosition() const
@@ -36,9 +36,9 @@ namespace engine::component
         return rotation_;
     }
 
-    void TransformComponent::setScale(const glm::vec2 &scale)
+    void TransformComponent::setScale(glm::vec2 scale)
     {
-        scale_ = scale;
+        scale_ = std::move(scale);
         if (m_gameObject)
         {
             SpriteComponent *spriteComponent = m_gameObject->getComponent<SpriteComponent>();

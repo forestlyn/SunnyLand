@@ -26,7 +26,7 @@ namespace engine::render
         Animation(Animation &&) = delete;
         Animation &operator=(Animation &&) = delete;
 
-        void addAnimationFrame(const SDL_FRect &src_rect, float duration);
+        void addAnimationFrame(SDL_FRect src_rect, float duration);
         const AnimationFrame *getFrame(float time) const;
 
         const std::string &getName() const { return name_; }

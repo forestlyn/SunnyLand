@@ -53,13 +53,13 @@ namespace engine::physics
         const std::vector<std::pair<engine::object::GameObject *, engine::object::GameObject *>> &getCollisionPairs() const { return collision_pairs_; }
         const std::vector<std::pair<engine::object::GameObject *, engine::component::TileType>> &getTileTriggerEvents() const { return tile_trigger_events_; }
 
-        void setGravity(const glm::vec2 &gravity) { gravity_ = gravity; }
+        void setGravity(glm::vec2 gravity) { gravity_ = std::move(gravity); }
         glm::vec2 getGravity() const { return gravity_; }
 
         void setMaxVelocity(float maxVelocity) { max_velocity_ = maxVelocity; }
         float getMaxVelocity() const { return max_velocity_; }
 
-        void setWorldBound(const std::optional<engine::utils::Rect> &bound) { world_bound_ = bound; }
+        void setWorldBound(std::optional<engine::utils::Rect> bound) { world_bound_ = std::move(bound); }
         std::optional<engine::utils::Rect> getWorldBound() const { return world_bound_; }
 
     private:
