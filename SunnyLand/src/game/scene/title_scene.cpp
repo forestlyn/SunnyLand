@@ -56,8 +56,6 @@ namespace game::scene
         }
 
         auto &audio_player = context.getAudioPlayer();
-        audio_player.setMusicVolume(0.2f);
-        audio_player.setSoundVolume(0.5f);
         audio_player.playMusic("assets/audio/platformer_level03_loop.ogg", -1);
 
         Scene::initialize();

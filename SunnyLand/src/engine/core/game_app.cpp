@@ -117,6 +117,9 @@ namespace engine::core
             return false;
         }
 
+        audio_player_->setMusicVolume(config_->music_volume_);
+        audio_player_->setSoundVolume(config_->sound_volume_);
+
         // Call the user-provided scene function to set up the initial scene
         scene_func_(*scene_manager_.get());
 
