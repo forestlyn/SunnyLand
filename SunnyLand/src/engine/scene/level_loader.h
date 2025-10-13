@@ -16,11 +16,17 @@ namespace engine::utils
 {
     struct Rect;
 }
+namespace engine::object
+{
+    class ObjectBuilder;
+}
 namespace engine::scene
 {
     class Scene;
     class LevelLoader
     {
+        friend class engine::object::ObjectBuilder;
+
     private:
         std::string m_map_path;
         glm::ivec2 m_map_size;
