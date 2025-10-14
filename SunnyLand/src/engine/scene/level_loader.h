@@ -20,6 +20,11 @@ namespace engine::object
 {
     class ObjectBuilder;
 }
+
+namespace engine::core
+{
+    class Context;
+}
 namespace engine::scene
 {
     class Scene;
@@ -34,9 +39,14 @@ namespace engine::scene
         glm::ivec2 m_tile_size;
         std::map<int, nlohmann::json> m_tileset_data;
 
+        std::unique_ptr<engine::object::ObjectBuilder> m_object_builder = nullptr;
+
     public:
-        LevelLoader() = default;
+        LevelLoader(engine::core::Context &context);
+        ~LevelLoader() = default;
         [[nodiscard]] bool loadLevel(std::string_view map_path, Scene &scene); ///< @brief 从文件加载关卡数据
+
+        void setObjectBuilder(std::unique_ptr<engine::object::ObjectBuilder> object_builder);
 
     private:
         void loadImageLayer(const nlohmann::json &layer_json, Scene &scene);  ///< @brief 加载图片图层

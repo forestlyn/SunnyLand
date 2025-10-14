@@ -18,6 +18,7 @@
 #include "../../engine/ui/ui_label.h"
 #include "../../engine/ui/ui_button.h"
 #include "../data/session_data.h"
+#include "../object/object_builder.h"
 #include "game_scene.h"
 #include "helps_scene.h"
 #include <spdlog/spdlog.h>
@@ -37,7 +38,8 @@ namespace game::scene
     {
         spdlog::info("Initializing TitleScene");
 
-        engine::scene::LevelLoader level_loader;
+        engine::scene::LevelLoader level_loader(context);
+        level_loader.setObjectBuilder(std::make_unique<game::object::ObjectBuilderSL>(context, level_loader));
         if (!level_loader.loadLevel("assets/maps/level0.tmj", *this))
         {
             spdlog::error("Failed to load title scene level");

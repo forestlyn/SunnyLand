@@ -30,7 +30,8 @@ namespace game::component
 
         if (!transform_ || !physics_ || !sprite_ || !animation_ || !health_ || !audio_)
         {
-            spdlog::error("PlayerComponent requires TransformComponent, PhysicsComponent, SpriteComponent, AnimationComponent, HealthComponent, and AudioComponent.");
+            spdlog::error("PlayerComponent requires TransformComponent:{}, PhysicsComponent:{}, SpriteComponent:{}, AnimationComponent:{}, HealthComponent:{}, and AudioComponent:{}.",
+                          transform_ != nullptr, physics_ != nullptr, sprite_ != nullptr, animation_ != nullptr, health_ != nullptr, audio_ != nullptr);
         }
 
         // 初始状态为Idle

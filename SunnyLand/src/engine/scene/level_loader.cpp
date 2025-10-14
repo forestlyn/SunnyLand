@@ -12,6 +12,7 @@
 #include "../physics/collider.h"
 #include "../physics/physics_engine.h"
 #include "../object/game_object.h"
+#include "../object/object_builder.h"
 #include "../scene/scene.h"
 #include "../core/context.h"
 #include "../render/sprite.h"
@@ -24,6 +25,17 @@
 
 namespace engine::scene
 {
+
+    LevelLoader::LevelLoader(engine::core::Context &context)
+        : m_object_builder(std::make_unique<engine::object::ObjectBuilder>(context, *this))
+    {
+    }
+
+    void LevelLoader::setObjectBuilder(std::unique_ptr<engine::object::ObjectBuilder> object_builder)
+    {
+        m_object_builder = std::move(object_builder);
+    }
+
     bool LevelLoader::loadLevel(std::string_view map_path, Scene &scene)
     {
 
@@ -159,6 +171,11 @@ namespace engine::scene
 
     void LevelLoader::loadObjectLayer(const nlohmann::json &layer_json, Scene &scene)
     {
+        if (!m_object_builder)
+        {
+            spdlog::error("ObjectBuilder is not set. Cannot load object layer.");
+            return;
+        }
         // 加载对象图层
         if (layer_json.contains("objects") && layer_json["objects"].is_array())
         {
@@ -167,169 +184,25 @@ namespace engine::scene
                 int gid = obj.value("gid", 0);
                 if (gid == 0)
                 {
-                    // TODO
-                    if (obj.value("polygon", false))
-                    {
-                        spdlog::warn("Polygon objects are not supported yet");
-                    }
-                    else if (obj.value("point", false))
-                    {
-                        spdlog::warn("Point objects are not supported yet");
-                    }
-                    else if (obj.value("ellipse", false))
-                    {
-                        spdlog::warn("Ellipse objects are not supported yet");
-                    }
-                    else
-                    {
-                        std::string name = obj.value("name", "unnamed");
-                        auto tag = getPropertyFromJson<std::string>(obj, "tag");
-                        auto width = obj.value("width", 0.0f);
-                        auto height = obj.value("height", 0.0f);
-                        auto x = obj.value("x", 0.0f);
-                        auto y = obj.value("y", 0.0f);
-                        auto rotation = obj.value("rotation", 0.0f);
-                        auto visible = obj.value("visible", true);
-                        auto trigger = obj.value("trigger", true);
-
-                        auto gameObj = std::make_unique<engine::object::GameObject>(name);
-                        gameObj->addComponent<engine::component::TransformComponent>(glm::vec2(x, y), rotation, glm::vec2(1.0f, 1.0f));
-                        if (width > 0 && height > 0)
-                        {
-                            auto collider = std::make_unique<engine::physics::AABBCollider>(glm::vec2(width, height));
-                            engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
-                            gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
-                            colliderComp->setTrigger(trigger);
-                        }
-                        if (tag)
-                        {
-                            gameObj->setTag(tag.value());
-                        }
-                        scene.addGameObject(std::move(gameObj));
-                    }
+                    m_object_builder->Configuration(&obj)->build();
                 }
                 else
                 {
                     auto tile_info = getTileInfoByGid(gid);
-                    if (tile_info.sprite.getTextureId().empty())
-                    {
-                        spdlog::warn("Object gid {} has no valid sprite", gid);
-                        continue;
-                    }
-
-                    auto name = obj.value("name", "unnamed");
-                    auto x = obj.value("x", 0.0f);
-                    auto y = obj.value("y", 0.0f);
-                    auto width = obj.value("width", 0.0f);
-                    auto height = obj.value("height", 0.0f);
-                    auto rotation = obj.value("rotation", 0.0f);
-                    auto visible = obj.value("visible", true);
-
-                    auto src_rect = tile_info.sprite.getRect();
-                    if (!src_rect.has_value() || src_rect->w == 0 || src_rect->h == 0)
-                    {
-                        spdlog::warn("Object gid {} has invalid sprite rect", gid);
-                        continue;
-                    }
-                    auto scale = glm::vec2(width / src_rect->w, height / src_rect->h);
-
-                    auto gameObj = std::make_unique<engine::object::GameObject>(name);
-                    gameObj->addComponent<engine::component::TransformComponent>(glm::vec2(x, y - height), rotation, scale);
-                    engine::component::SpriteComponent *spriteComp = gameObj->addComponent<engine::component::SpriteComponent>(std::move(tile_info.sprite), &(scene.getContext().getResourceManager()));
-                    spriteComp->setHidden(!visible);
-
                     auto tileJson = getTileJsonByGid(gid);
-                    auto useGravity = getPropertyFromJson<bool>(tileJson, "gravity");
-                    auto animationJson = getPropertyFromJson<std::string>(tileJson, "animation");
-                    auto soundJson = getPropertyFromJson<std::string>(tileJson, "sound");
-                    auto tagname = getPropertyFromJson<std::string>(tileJson, "tag");
-                    auto health = getPropertyFromJson<int>(tileJson, "health");
-
-                    if (tile_info.type == engine::component::TileType::Solid)
+                    if (tileJson.has_value())
                     {
-                        auto collider = std::make_unique<engine::physics::AABBCollider>(glm::vec2(src_rect->w, src_rect->h));
-                        gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
-                        gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
-                        gameObj->setTag("Solid");
+                        m_object_builder->Configuration(&obj, &tileJson.value(), tile_info)->build();
                     }
-                    else if (auto rect = getColliderRect(tileJson); rect)
+                    else
                     {
-                        auto collider = std::make_unique<engine::physics::AABBCollider>(rect->size);
-                        engine::component::ColliderComponent *colliderComp = gameObj->addComponent<engine::component::ColliderComponent>(&scene.getContext().getPhysicsEngine(), std::move(collider));
-                        colliderComp->setOffset(rect->position);
-                        gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+                        spdlog::error("{} no tileJson", gid);
+                        continue;
                     }
-                    if (animationJson)
-                    {
-                        engine::component::AnimationComponent *animComp = gameObj->addComponent<engine::component::AnimationComponent>();
-                        nlohmann::json animationJsonParsed;
-                        try
-                        {
-                            animationJsonParsed = nlohmann::json::parse(*animationJson);
-                        }
-                        catch (const std::exception &e)
-                        {
-                            spdlog::warn("Failed to parse animation JSON for object '{}': {}", name, e.what());
-                            continue;
-                        }
-                        loadAnimation(animationJsonParsed, animComp, glm::vec2(width, height));
-                        spdlog::info("Loaded animation for object '{}'", name);
-                    }
-                    // else
-                    // {
-                    //     spdlog::info("No animation property for object '{}'", name);
-                    // }
-
-                    if (soundJson)
-                    {
-                        engine::component::AudioComponent *audioComp = gameObj->addComponent<engine::component::AudioComponent>(&scene.getContext().getAudioPlayer(), &scene.getContext().getCamera());
-                        nlohmann::json soundJsonParsed;
-                        try
-                        {
-                            soundJsonParsed = nlohmann::json::parse(*soundJson);
-                        }
-                        catch (const std::exception &e)
-                        {
-                            spdlog::warn("Failed to parse sound JSON for object '{}': {}", name, e.what());
-                            continue;
-                        }
-                        loadSound(soundJsonParsed, audioComp);
-                        spdlog::info("Loaded sound for object '{}'", name);
-                    }
-
-                    if (tagname)
-                    {
-                        gameObj->setTag(tagname.value());
-                    }
-                    else if (tile_info.type == engine::component::TileType::Hazard)
-                    {
-                        gameObj->setTag("Hazard");
-                    }
-
-                    if (health)
-                    {
-                        auto healthComp = gameObj->addComponent<engine::component::HealthComponent>(health.value());
-                        if (!healthComp)
-                        {
-                            spdlog::warn("Failed to add HealthComponent to object '{}'", name);
-                        }
-                    }
-                    if (useGravity)
-                    {
-                        auto physicsComp = gameObj->getComponent<engine::component::PhysicsComponent>();
-                        if (physicsComp)
-                        {
-                            physicsComp->setUseGravity(useGravity.value());
-                        }
-                        else
-                        {
-                            spdlog::warn("对象 '{}' 在设置重力信息时没有物理组件，请检查地图设置。", gameObj->getName());
-                            gameObj->addComponent<engine::component::PhysicsComponent>(&scene.getContext().getPhysicsEngine(), useGravity.value());
-                        }
-                    }
-                    scene.addGameObject(std::move(gameObj));
-                    spdlog::trace("Object loaded: {} at ({}, {})", name, x, y);
                 }
+
+                auto gameObj = m_object_builder->getGameObject();
+                scene.addGameObject(std::move(gameObj));
             }
         }
         else

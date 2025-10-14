@@ -91,6 +91,7 @@ add_executable(${TARGET}
                 src/game/component/state/dead_state.cpp
                 src/game/component/state/climb_state.cpp
                 src/game/data/session_data.cpp
+                src/game/object/object_builder.cpp
                 )
 
 # 链接库

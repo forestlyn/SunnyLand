@@ -34,6 +34,7 @@
 #include "../component/ai/jump_behavior.h"
 #include "../component/ai/updown_behavior.h"
 #include "../data/session_data.h"
+#include "../object/object_builder.h"
 
 namespace game::scene
 {
@@ -65,11 +66,6 @@ namespace game::scene
             spdlog::error("Failed to initialize player");
             context.getInputManager().setShouldExit(true);
         }
-        if (!initEnemyAndItem())
-        {
-            spdlog::error("Failed to initialize enemy and item");
-            context.getInputManager().setShouldExit(true);
-        }
 
         if (!initUI())
         {
@@ -87,8 +83,8 @@ namespace game::scene
 
     bool GameScene::initLevel()
     {
-        // 这里可以添加额外的关卡初始化逻辑
-        engine::scene::LevelLoader level_loader;
+        engine::scene::LevelLoader level_loader = engine::scene::LevelLoader(context);
+        level_loader.setObjectBuilder(std::make_unique<game::object::ObjectBuilderSL>(context, level_loader));
 
         std::string_view level_path = session_data_->getCurrentLevelPath();
         bool success = level_loader.loadLevel(level_path, *this);
@@ -135,13 +131,6 @@ namespace game::scene
         }
         else
         {
-            auto player_component = player_->addComponent<game::component::PlayerComponent>();
-            if (!player_component)
-            {
-                spdlog::error("Failed to add PlayerComponent to player object");
-                return false;
-            }
-
             auto health_comp = player_->getComponent<engine::component::HealthComponent>();
             if (health_comp)
             {
@@ -152,15 +141,6 @@ namespace game::scene
             else
             {
                 spdlog::error("Player object does not have a HealthComponent");
-                return false;
-            }
-
-            auto transform = player_->getComponent<engine::component::TransformComponent>();
-            if (transform)
-                context.getCamera().setFollowTarget(transform);
-            else
-            {
-                spdlog::error("Player object does not have a TransformComponent");
                 return false;
             }
         }
