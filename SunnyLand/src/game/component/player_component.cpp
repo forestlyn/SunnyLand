@@ -60,25 +60,13 @@ namespace game::component
         }
         if (current_state_)
         {
-            spdlog::debug("Exiting state: {}", typeid(*current_state_).name());
+            spdlog::warn("Exiting state: {}", typeid(*current_state_).name());
         }
-        spdlog::debug("Entering state: {}", typeid(*new_state).name());
+        spdlog::warn("Entering state: {}", typeid(*new_state).name());
         current_state_ = std::move(new_state);
         current_state_->enter();
     }
 
-    void PlayerComponent::handleInput(engine::core::Context &context)
-    {
-        if (current_state_)
-        {
-            // spdlog::info("Handling input in state: {}", typeid(*current_state_).name());
-            auto new_state = current_state_->handleInput(context);
-            if (new_state)
-            {
-                setState(std::move(new_state));
-            }
-        }
-    }
     void PlayerComponent::update(float delta_time, engine::core::Context &context)
     {
         if (physics_)
@@ -132,58 +120,51 @@ namespace game::component
 
     void PlayerComponent::jump()
     {
-        physics_->velocity_.y = -jump_vel_;
-    }
-
-    void PlayerComponent::move(MoveDirection direction)
-    {
-        switch (direction)
+        std::unique_ptr<state::PlayerState> new_state = current_state_->Jump();
+        if (new_state)
         {
-        case MoveDirection::MoveLEFT:
-            if (physics_->velocity_.x > 0)
-                physics_->velocity_.x = 0.0f; // 如果当前向右移动，先停止
-            physics_->addForce({-move_force_, 0.0f});
-            // spdlog::info("Player moved left with force: {}", -move_force_);
-            sprite_->setIsFlipped(true);
-            break;
-        case MoveDirection::MoveRIGHT:
-            if (physics_->velocity_.x < 0)
-                physics_->velocity_.x = 0.0f; // 如果当前向左移动，先停止
-            physics_->addForce({move_force_, 0.0f});
-            // spdlog::info("Player moved right with force: {}", move_force_);
-            sprite_->setIsFlipped(false);
-            break;
-        default:
-            break;
+            setState(std::move(new_state));
+            return;
         }
     }
 
-    void PlayerComponent::climb(ClimbDirection direction)
+    void PlayerComponent::climbUp()
     {
-        switch (direction)
+        std::unique_ptr<state::PlayerState> new_state = current_state_->ClimbUp();
+        if (new_state)
         {
-        case ClimbDirection::CLIMBUP:
-            physics_->velocity_.y = -climb_speed_;
-            // spdlog::info("Player climbing up with speed: {}", -climb_speed_);
-            break;
-        case ClimbDirection::CLIMBDOWN:
-            physics_->velocity_.y = climb_speed_;
-            // spdlog::info("Player climbing down with speed: {}", climb_speed_);
-            break;
-        default:
-            physics_->velocity_.y = 0.0f; // 停止垂直移动
-            break;
+            setState(std::move(new_state));
+            return;
+        }
+    }
+    void PlayerComponent::climbDown()
+    {
+        std::unique_ptr<state::PlayerState> new_state = current_state_->ClimbDown();
+        if (new_state)
+        {
+            setState(std::move(new_state));
+            return;
         }
     }
 
-    void PlayerComponent::clampVelocity()
+    void PlayerComponent::moveLeft()
     {
-        physics_->velocity_.x = glm::clamp(physics_->velocity_.x, -max_speed_, max_speed_);
+        std::unique_ptr<state::PlayerState> new_state = current_state_->MoveLeft();
+        if (new_state)
+        {
+            setState(std::move(new_state));
+            return;
+        }
     }
 
-    void PlayerComponent::idle()
+    void PlayerComponent::moveRight()
     {
-        physics_->velocity_.x *= friction_factor_;
+        std::unique_ptr<state::PlayerState> new_state = current_state_->MoveRight();
+        if (new_state)
+        {
+            setState(std::move(new_state));
+            return;
+        }
     }
 
     void PlayerComponent::playAnimation(std::string_view anim_name)

@@ -38,10 +38,4 @@ namespace game::component::state
         // 死亡状态下不进行任何更新
         return nullptr;
     }
-
-    std::unique_ptr<PlayerState> DeadState::handleInput(engine::core::Context &)
-    {
-        // 死亡状态下不处理任何输入
-        return nullptr;
-    }
 } // namespace game::component::state

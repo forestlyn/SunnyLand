@@ -35,9 +35,16 @@
 #include "../component/ai/updown_behavior.h"
 #include "../data/session_data.h"
 #include "../object/object_builder.h"
+#include "../component/command/left_command.h"
+#include "../component/command/right_command.h"
+#include "../component/command/up_command.h"
+#include "../component/command/down_command.h"
+#include "../component/command/jump_command.h"
 
 namespace game::scene
 {
+    GameScene::~GameScene() = default;
+
     GameScene::GameScene(engine::core::Context &context, engine::scene::SceneManager &scene_manager, std::shared_ptr<game::data::SessionData> session_data)
         : Scene("GameScene", context, scene_manager), session_data_(std::move(session_data))
     {
@@ -61,6 +68,10 @@ namespace game::scene
             spdlog::error("Failed to initialize level");
             context.getInputManager().setShouldExit(true);
         }
+
+        player1_ = findGameObjectByName("player");
+        player2_ = findGameObjectByName("player2");
+
         if (!initPlayer())
         {
             spdlog::error("Failed to initialize player");
@@ -76,6 +87,8 @@ namespace game::scene
         auto &audio_player = context.getAudioPlayer();
 
         audio_player.playMusic("assets/audio/hurry_up_and_run.ogg", -1, 1000);
+
+        setCommandMap(*player_->getComponent<game::component::PlayerComponent>());
 
         Scene::initialize();
         spdlog::info("GameScene initialized successfully");
@@ -122,7 +135,6 @@ namespace game::scene
 
     bool GameScene::initPlayer()
     {
-
         player_ = findGameObjectByName("player");
         if (!player_)
         {
@@ -144,6 +156,9 @@ namespace game::scene
                 return false;
             }
         }
+        auto &camera = context.getCamera();
+        auto player_transform = player_->getComponent<engine::component::TransformComponent>();
+        camera.setFollowTarget(player_transform);
         return true;
     }
 
@@ -260,12 +275,63 @@ namespace game::scene
             context.getGameState().setCurrentState(engine::core::State::PAUSED);
             spdlog::info("GameScene: pause action detected, pushing MenuScene");
         }
+        // 判断左右移动操作
+        if (context.getInputManager().isActionDown("move_left"))
+        {
+            if (auto command = command_map_.find("move_left"); command != command_map_.end())
+            {
+                command->second->execute();
+            }
+        }
+        else if (context.getInputManager().isActionDown("move_right"))
+        {
+            if (auto command = command_map_.find("move_right"); command != command_map_.end())
+            {
+                command->second->execute();
+            }
+        }
+        // 判断跳跃或上下移动操作（可以和左右操作同时进行）
+        if (context.getInputManager().isActionPressed("jump"))
+        {
+            if (auto command = command_map_.find("jump"); command != command_map_.end())
+            {
+                command->second->execute();
+            }
+        }
+        else if (context.getInputManager().isActionDown("move_up"))
+        {
+            if (auto command = command_map_.find("move_up"); command != command_map_.end())
+            {
+                command->second->execute();
+            }
+        }
+        else if (context.getInputManager().isActionDown("move_down"))
+        {
+            if (auto command = command_map_.find("move_down"); command != command_map_.end())
+            {
+                command->second->execute();
+            }
+        }
+
+        if (context.getInputManager().isActionPressed("attack"))
+        {
+            switchPlayer();
+        }
     }
 
     void GameScene::close()
     {
         Scene::close();
         spdlog::info("Closing GameScene");
+    }
+
+    void GameScene::setCommandMap(game::component::PlayerComponent &player_component)
+    {
+        command_map_["jump"] = std::make_unique<game::component::command::JumpCommand>(player_component);
+        command_map_["move_left"] = std::make_unique<game::component::command::LeftCommand>(player_component);
+        command_map_["move_right"] = std::make_unique<game::component::command::RightCommand>(player_component);
+        command_map_["move_up"] = std::make_unique<game::component::command::UpCommand>(player_component);
+        command_map_["move_down"] = std::make_unique<game::component::command::DownCommand>(player_component);
     }
 
     void GameScene::handleObjectCollisions()
@@ -555,4 +621,22 @@ namespace game::scene
         score_label_->setText("Score: " + std::to_string(session_data_->getCurrentPlayerScore()));
     }
 #pragma endregion UI
+
+    void GameScene::switchPlayer()
+    {
+        if (!player1_ || !player2_)
+            return;
+        if (player1_ == player_) // 切换到player2
+        {
+            player_ = player2_;
+        }
+        else
+        {
+            player_ = player1_;
+        }
+        setCommandMap(*player_->getComponent<game::component::PlayerComponent>());
+        auto &camera = context.getCamera();
+        auto player_transform = player_->getComponent<engine::component::TransformComponent>();
+        camera.setFollowTarget(player_transform);
+    }
 }

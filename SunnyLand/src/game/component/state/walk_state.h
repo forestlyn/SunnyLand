@@ -7,6 +7,9 @@ namespace game::component::state
     {
         friend class game::component::PlayerComponent;
 
+    private:
+        bool is_moving = false;
+
     public:
         WalkState(game::component::PlayerComponent *player) : PlayerState(player) {}
         ~WalkState() override = default;
@@ -15,10 +18,13 @@ namespace game::component::state
         WalkState(WalkState &&) = delete;
         WalkState &operator=(WalkState &&) = delete;
 
+        std::unique_ptr<PlayerState> MoveLeft() override;
+        std::unique_ptr<PlayerState> MoveRight() override;
+        std::unique_ptr<PlayerState> Jump() override;
+
     private:
         void enter() override;
         void exit() override;
         std::unique_ptr<PlayerState> update(float delta_time, engine::core::Context &context) override;
-        std::unique_ptr<PlayerState> handleInput(engine::core::Context &context) override;
     };
 } // namespace game::component::state

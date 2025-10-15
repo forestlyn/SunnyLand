@@ -11,7 +11,7 @@ void setupInitialScene(engine::scene::SceneManager &scene_manager)
 
 int main(int, char **)
 {
-    spdlog::set_level(spdlog::level::err);
+    spdlog::set_level(spdlog::level::warn);
     engine::core::GameApp app;
     app.setSceneFunc(setupInitialScene);
     app.run();

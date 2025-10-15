@@ -27,10 +27,15 @@ namespace game::component::state
         PlayerState(PlayerState &&) = delete;
         PlayerState &operator=(PlayerState &&) = delete;
 
+        virtual std::unique_ptr<PlayerState> ClimbUp() { return nullptr; }
+        virtual std::unique_ptr<PlayerState> ClimbDown() { return nullptr; }
+        virtual std::unique_ptr<PlayerState> MoveLeft() { return nullptr; }
+        virtual std::unique_ptr<PlayerState> MoveRight() { return nullptr; }
+        virtual std::unique_ptr<PlayerState> Jump() { return nullptr; }
+
     protected:
         virtual void enter() = 0;
         virtual void exit() = 0;
-        virtual std::unique_ptr<PlayerState> handleInput(engine::core::Context &context) = 0;
         virtual std::unique_ptr<PlayerState> update(float deltaTime, engine::core::Context &context) = 0;
     };
 }

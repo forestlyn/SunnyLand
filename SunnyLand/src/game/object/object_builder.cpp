@@ -36,19 +36,12 @@ namespace game::object
 
     void ObjectBuilderSL::buildPlayer()
     {
-        if (name_ == "player")
+        if (object_->getTag() == "player")
         {
             auto player_component = object_->addComponent<game::component::PlayerComponent>();
             if (!player_component)
             {
                 spdlog::error("Failed to add PlayerComponent to player object");
-            }
-            auto transform = object_->getComponent<engine::component::TransformComponent>();
-            if (transform)
-                context_.getCamera().setFollowTarget(transform);
-            else
-            {
-                spdlog::error("Player object does not have a TransformComponent");
             }
         }
     }

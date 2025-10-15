@@ -54,9 +54,4 @@ namespace game::component::state
         return nullptr;
     }
 
-    std::unique_ptr<PlayerState> HurtState::handleInput(engine::core::Context &)
-    {
-        // 眩晕状态下不处理任何输入
-        return nullptr;
-    }
 } // namespace game::component::state

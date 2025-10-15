@@ -5,10 +5,16 @@
 #include <string>
 #include <string_view>
 #include <glm/vec2.hpp>
+#include <unordered_map>
 namespace engine::scene
 {
     class SceneManager;
     class Scene;
+}
+
+namespace game::component::command
+{
+    class Command;
 }
 
 namespace engine::object
@@ -26,18 +32,30 @@ namespace engine::ui
     class UILabel;
 }
 
+namespace game::component
+{
+    class PlayerComponent;
+}
+
 namespace game::scene
 {
     class GameScene final : public engine::scene::Scene
     {
         engine::object::GameObject *player_;
+
+        engine::object::GameObject *player1_ = nullptr;
+        engine::object::GameObject *player2_ = nullptr;
+
         std::shared_ptr<game::data::SessionData> session_data_;
 
         engine::ui::UIPanel *health_panel_ = nullptr;
         engine::ui::UILabel *score_label_ = nullptr;
 
+        std::unordered_map<std::string, std::unique_ptr<game::component::command::Command>> command_map_;
+
     public:
         GameScene(engine::core::Context &context, engine::scene::SceneManager &scene_manager, std::shared_ptr<game::data::SessionData> session_data = nullptr);
+        ~GameScene() override;
         void initialize() override;
         void update(float deltaTime) override;
         void render() override;
@@ -49,6 +67,8 @@ namespace game::scene
         [[nodiscard]] bool initPlayer();
         [[nodiscard]] bool initEnemyAndItem();
         [[nodiscard]] bool initUI();
+
+        void setCommandMap(game::component::PlayerComponent &player_component);
 
         void handleObjectCollisions();
         void handleTileTriggerEvents();
@@ -72,5 +92,7 @@ namespace game::scene
         void initPlayerUI();
         void updateHealthUI();
         void updateScoreUI();
+
+        void switchPlayer();
     };
 }

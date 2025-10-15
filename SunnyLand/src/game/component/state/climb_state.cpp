@@ -32,57 +32,42 @@ namespace game::component::state
         }
     }
 
-    std::unique_ptr<PlayerState> ClimbState::handleInput(engine::core::Context &context)
+    std::unique_ptr<PlayerState> ClimbState::ClimbUp()
     {
-        // 处理爬梯子逻辑
-        auto &input = context.getInputManager();
-        auto *animation = player_component_->getAnimation();
-
-        ClimbDirection climb_direction = ClimbDirection::NONE;
-        if (input.isActionDown("move_up"))
-        {
-            climb_direction = ClimbDirection::CLIMBUP;
-        }
-        else if (input.isActionDown("move_down"))
-        {
-            climb_direction = ClimbDirection::CLIMBDOWN;
-        }
-
-        MoveDirection move_direction = MoveDirection::NONE;
-        if (input.isActionDown("move_left"))
-        {
-            move_direction = MoveDirection::MoveLEFT;
-        }
-        else if (input.isActionDown("move_right"))
-        {
-            move_direction = MoveDirection::MoveRIGHT;
-        }
-        else
-        {
-            move_direction = MoveDirection::NONE;
-            player_component_->idle();
-        }
-        player_component_->move(move_direction);
-        player_component_->climb(climb_direction);
-
-        if (move_direction == MoveDirection::NONE && climb_direction == ClimbDirection::NONE)
-        {
-            // 停止爬梯子动画
-            animation->stopAnimation();
-        }
-        else
-        {
-            animation->resumeAnimation();
-        }
-        if (input.isActionPressed("jump"))
-        {
-            return std::make_unique<JumpState>(player_component_);
-        }
-        return nullptr;
+        is_moving_ = true;
+        player_component_->getPhysics()->velocity_.y = -player_component_->getClimbSpeed();
+        return nullptr; // 继续保持在爬梯子状态
     }
+    std::unique_ptr<PlayerState> ClimbState::ClimbDown()
+    {
+        is_moving_ = true;
+        player_component_->getPhysics()->velocity_.y = player_component_->getClimbSpeed();
+        return nullptr; // 继续保持在爬梯子状态
+    }
+
+    std::unique_ptr<PlayerState> ClimbState::MoveLeft()
+    {
+        is_moving_ = true;
+        player_component_->getPhysics()->velocity_.x = -player_component_->getClimbSpeed();
+        return nullptr; // 继续保持在爬梯子状态
+    }
+
+    std::unique_ptr<PlayerState> ClimbState::MoveRight()
+    {
+        is_moving_ = true;
+        player_component_->getPhysics()->velocity_.x = player_component_->getClimbSpeed();
+        return nullptr; // 继续保持在爬梯子状态
+    }
+
+    std::unique_ptr<PlayerState> ClimbState::Jump()
+    {
+        return std::make_unique<JumpState>(player_component_);
+    }
+
     std::unique_ptr<PlayerState> ClimbState::update(float, engine::core::Context &)
     {
         auto physics = player_component_->getPhysics();
+        auto animation = player_component_->getAnimation();
         if (physics->isColliderBelow())
         {
             return std::make_unique<IdleState>(player_component_);
@@ -91,6 +76,17 @@ namespace game::component::state
         {
             return std::make_unique<FallState>(player_component_);
         }
+        if (is_moving_)
+        {
+            animation->resumeAnimation();
+        }
+        else
+        {
+            animation->stopAnimation();
+        }
+
+        is_moving_ = false;
+        physics->velocity_ = glm::vec2(0.0f);
         return nullptr;
     }
 }

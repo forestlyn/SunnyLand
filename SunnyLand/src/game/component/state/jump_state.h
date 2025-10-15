@@ -14,10 +14,14 @@ namespace game::component::state
         JumpState(JumpState &&) = delete;
         JumpState &operator=(JumpState &&) = delete;
 
+        std::unique_ptr<PlayerState> MoveLeft() override;
+        std::unique_ptr<PlayerState> MoveRight() override;
+        std::unique_ptr<PlayerState> ClimbUp() override;
+        std::unique_ptr<PlayerState> ClimbDown() override;
+
     private:
         void enter() override;
         void exit() override;
         std::unique_ptr<PlayerState> update(float delta_time, engine::core::Context &context) override;
-        std::unique_ptr<PlayerState> handleInput(engine::core::Context &context) override;
     };
 } // namespace game::component::state

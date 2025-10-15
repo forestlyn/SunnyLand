@@ -89,6 +89,8 @@ namespace game::component
         void setJumpVel(float force) { jump_vel_ = force; }
         float getStunnedDuration() const { return stunned_duration_; }
         void setStunnedDuration(float duration) { stunned_duration_ = duration; }
+        float getClimbSpeed() const { return climb_speed_; }
+        void setClimbSpeed(float speed) { climb_speed_ = speed; }
 
         void setState(std::unique_ptr<state::PlayerState> new_state);
 
@@ -102,18 +104,19 @@ namespace game::component
         engine::component::HealthComponent *getHealth() const { return health_; }
         engine::component::AudioComponent *getAudio() const { return audio_; }
 
-        void idle();
+        // --- 状态操作相关
+        void climbUp();
+        void climbDown();
+        void moveLeft();
+        void moveRight();
         void jump();
-        void move(MoveDirection direction);
-        void climb(ClimbDirection direction);
-        void clampVelocity();
+
         void playAnimation(std::string_view anim_name);
         void takeDamage(int amount);
         void heal(int amount);
 
     private:
         void init() override;
-        void handleInput(engine::core::Context &context) override;
         void update(float deltaTime, engine::core::Context &context) override;
     };
 }

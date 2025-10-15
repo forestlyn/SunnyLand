@@ -92,6 +92,11 @@ add_executable(${TARGET}
                 src/game/component/state/climb_state.cpp
                 src/game/data/session_data.cpp
                 src/game/object/object_builder.cpp
+                src/game/component/command/left_command.cpp
+                src/game/component/command/right_command.cpp
+                src/game/component/command/up_command.cpp
+                src/game/component/command/down_command.cpp
+                src/game/component/command/jump_command.cpp
                 )
 
 # 链接库
