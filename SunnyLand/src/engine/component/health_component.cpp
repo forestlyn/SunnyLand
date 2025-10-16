@@ -35,6 +35,7 @@ namespace engine::component
         {
             current_health_ = max_health_;
         }
+        notifyObservers(HealthChangeEventArgs(current_health_));
         spdlog::trace("Healed {} health. Current health: {}/{}", amount, current_health_, max_health_);
     }
 
@@ -61,7 +62,7 @@ namespace engine::component
         {
             setInvincible(invincibility_duration_);
         }
-
+        notifyObservers(HealthChangeEventArgs(current_health_));
         spdlog::info("游戏对象 '{}' 受到了 {} 点伤害，当前生命值：{}/{}", m_gameObject ? m_gameObject->getName() : "Unknown", amount, current_health_, max_health_);
         return true;
     }
@@ -74,7 +75,9 @@ namespace engine::component
             return;
         }
         max_health_ = max_health;
+        notifyObservers(MaxHealthChangeEventArgs(max_health_));
         current_health_ = std::min(current_health_, max_health_);
+        notifyObservers(HealthChangeEventArgs(current_health_));
     }
 
     void HealthComponent::setCurrentHealth(int current_health)
@@ -85,6 +88,7 @@ namespace engine::component
             return;
         }
         current_health_ = std::min(current_health, max_health_);
+        notifyObservers(HealthChangeEventArgs(current_health_));
     }
 
     void HealthComponent::setInvincible(float invincibility_duration)

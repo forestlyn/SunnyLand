@@ -1,6 +1,8 @@
 #pragma once
 #include "component.h"
 #include <glm/vec2.hpp>
+#include "../interface/subject.h"
+#include "../interface/event_args.h"
 namespace engine::core
 {
     class Context;
@@ -9,9 +11,28 @@ namespace engine
 {
     class GameObject;
 }
+
 namespace engine::component
 {
-    class HealthComponent : public Component
+    class HealthChangeEventArgs : public engine::interface::EventArgs
+    {
+    public:
+        int current_health;
+        HealthChangeEventArgs(int new_h) : current_health(new_h)
+        {
+        }
+    };
+
+    class MaxHealthChangeEventArgs : public engine::interface::EventArgs
+    {
+    public:
+        int max_health;
+        MaxHealthChangeEventArgs(int new_h) : max_health(new_h)
+        {
+        }
+    };
+
+    class HealthComponent : public Component, public engine::interface::Subject
     {
         friend class engine::object::GameObject;
 

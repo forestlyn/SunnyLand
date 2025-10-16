@@ -25,20 +25,6 @@ namespace game::component::state
 
 namespace game::component
 {
-    enum class MoveDirection
-    {
-        NONE = 0,
-        MoveLEFT = -1,
-        MoveRIGHT = 1
-    };
-
-    enum class ClimbDirection
-    {
-        NONE = 0,
-        CLIMBUP = -1,
-        CLIMBDOWN = 1
-    };
-
     class PlayerComponent final : public engine::component::Component
     {
         friend class engine::object::GameObject;

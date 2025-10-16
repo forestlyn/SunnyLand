@@ -26,6 +26,8 @@
 #include "../../engine/ui/ui_label.h"
 #include "../../engine/ui/ui_button.h"
 #include "../../engine/utils/math.h"
+#include "../../engine/interface/event_args.h"
+#include "../../engine/component/health_component.h"
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL_rect.h>
 #include "../component/player_component.h"
@@ -68,9 +70,6 @@ namespace game::scene
             spdlog::error("Failed to initialize level");
             context.getInputManager().setShouldExit(true);
         }
-
-        player1_ = findGameObjectByName("player");
-        player2_ = findGameObjectByName("player2");
 
         if (!initPlayer())
         {
@@ -312,11 +311,6 @@ namespace game::scene
                 command->second->execute();
             }
         }
-
-        if (context.getInputManager().isActionPressed("attack"))
-        {
-            switchPlayer();
-        }
     }
 
     void GameScene::close()
@@ -423,7 +417,6 @@ namespace game::scene
     void GameScene::addPlayerScore(int score)
     {
         session_data_->addScore(score);
-        updateScoreUI();
     }
 
     void GameScene::handlePlayerDamage(int damage)
@@ -432,12 +425,10 @@ namespace game::scene
         if (player_comp)
         {
             player_comp->takeDamage(damage);
-            session_data_->setCurrentPlayerHealth(player_comp->getHealth()->getCurrentHealth());
             if (player_comp->isDead())
             {
                 // TODO: 玩家死亡处理
             }
-            updateHealthUI();
         }
     }
     void GameScene::healPlayer(int heal_amount)
@@ -446,8 +437,6 @@ namespace game::scene
         if (player_comp)
         {
             player_comp->heal(heal_amount);
-            session_data_->setCurrentPlayerHealth(player_comp->getHealth()->getCurrentHealth());
-            updateHealthUI();
         }
     }
 
@@ -571,29 +560,52 @@ namespace game::scene
         auto new_scene = std::make_unique<GameScene>(context, scene_manager, std::move(session_data_));
         scene_manager.requestReplaceScene(std::move(new_scene));
     }
+
+    void GameScene::onNotify(const engine::interface::EventArgs &event_args)
+    {
+        if (const auto *health_event = dynamic_cast<const engine::component::HealthChangeEventArgs *>(&event_args))
+        {
+            updateHealthUI();
+        }
+        else if (const auto *max_health_event = dynamic_cast<const engine::component::MaxHealthChangeEventArgs *>(&event_args))
+        {
+            initPlayerUI();
+        }
+        else if (const auto *score_event = dynamic_cast<const game::data::ScoreChangeEventArgs *>(&event_args))
+        {
+            updateScoreUI();
+        }
+    }
+
 #pragma region UI
     void GameScene::initPlayerUI()
     {
         if (!ui_manager)
             return;
         auto health_panel = std::make_unique<engine::ui::UIPanel>(glm::vec2(10, 10));
-        for (int i = 0; i < session_data_->getMaxPlayerHealth(); ++i)
+        auto health_comp = player_->getComponent<engine::component::HealthComponent>();
+        for (int i = 0; i < health_comp->getMaxHealth(); ++i)
         {
             auto heart_image = std::make_unique<engine::ui::UIImage>("assets/textures/UI/Heart-bg.png", glm::vec2(i * 34.0f, 0), glm::vec2(32, 32));
             health_panel->addChild(std::move(heart_image));
         }
-        for (int i = 0; i < session_data_->getMaxPlayerHealth(); ++i)
+        for (int i = 0; i < health_comp->getMaxHealth(); ++i)
         {
             auto heart_image = std::make_unique<engine::ui::UIImage>("assets/textures/UI/Heart.png", glm::vec2(i * 34.0f, 0), glm::vec2(32, 32));
             health_panel->addChild(std::move(heart_image));
         }
         health_panel_ = health_panel.get();
         ui_manager->addUIElement(std::move(health_panel));
-        updateHealthUI();
+
+        health_comp->addObserver(this);
 
         auto score_label = std::make_unique<engine::ui::UILabel>(context.getTextRenderer(), "Score: 0", "assets/fonts/VonwaonBitmap-16px.ttf", 24, engine::utils::FColor{1.0f, 1.0f, 0.0f, 1.0f}, glm::vec2(10, 50));
         score_label_ = score_label.get();
         ui_manager->addUIElement(std::move(score_label));
+
+        session_data_->addObserver(this);
+
+        updateHealthUI();
         updateScoreUI();
     }
     void GameScene::updateHealthUI()
@@ -603,8 +615,9 @@ namespace game::scene
         auto *health_panel = ui_manager->getUIRoot()->getChildren().front().get();
         if (!health_panel)
             return;
-        int current_health = session_data_->getCurrentPlayerHealth();
-        int max_health = session_data_->getMaxPlayerHealth();
+        auto health_comp = player_->getComponent<engine::component::HealthComponent>();
+        int current_health = health_comp->getCurrentHealth();
+        int max_health = health_comp->getMaxHealth();
         for (int i = max_health; i < max_health * 2; ++i)
         {
             auto *heart_image = health_panel->getChildren()[i].get();
@@ -622,21 +635,4 @@ namespace game::scene
     }
 #pragma endregion UI
 
-    void GameScene::switchPlayer()
-    {
-        if (!player1_ || !player2_)
-            return;
-        if (player1_ == player_) // 切换到player2
-        {
-            player_ = player2_;
-        }
-        else
-        {
-            player_ = player1_;
-        }
-        setCommandMap(*player_->getComponent<game::component::PlayerComponent>());
-        auto &camera = context.getCamera();
-        auto player_transform = player_->getComponent<engine::component::TransformComponent>();
-        camera.setFollowTarget(player_transform);
-    }
 }

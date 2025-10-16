@@ -50,6 +50,8 @@ add_executable(${TARGET}
                 src/engine/physics/collision.cpp
                 src/engine/object/game_object.cpp
                 src/engine/object/object_builder.cpp
+                src/engine/interface/observer.cpp
+                src/engine/interface/subject.cpp
                 src/engine/audio/audio_player.cpp
                 src/engine/component/parallax_component.cpp
                 src/engine/component/sprite_component.cpp

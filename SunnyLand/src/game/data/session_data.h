@@ -1,9 +1,20 @@
 #pragma once
 #include <string>
 #include <string_view>
+#include "../../engine/interface/subject.h"
+#include "../../engine/interface/observer.h"
+#include "../../engine/interface/event_args.h"
 namespace game::data
 {
-    class SessionData
+    class ScoreChangeEventArgs : public engine::interface::EventArgs
+    {
+    public:
+        int current_score;
+        ScoreChangeEventArgs(int new_s) : current_score(new_s)
+        {
+        }
+    };
+    class SessionData : public engine::interface::Subject, public engine::interface::Observer
     {
     private:
         int max_player_health = 3;
@@ -43,6 +54,8 @@ namespace game::data
         void setLevelHealth(int health) { level_health = health; }
         void setLevelScore(int score) { level_score = score; }
         void setIsWin(bool win) { is_win_ = win; }
+
+        void onNotify(const engine::interface::EventArgs &event_args) override;
 
         void addScore(int score);
 

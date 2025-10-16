@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "../../engine/scene/scene.h"
+#include "../../engine/interface/observer.h"
 #include <memory>
 #include <string>
 #include <string_view>
@@ -37,14 +38,16 @@ namespace game::component
     class PlayerComponent;
 }
 
+namespace engine::interface
+{
+    class EventArgs;
+}
+
 namespace game::scene
 {
-    class GameScene final : public engine::scene::Scene
+    class GameScene final : public engine::scene::Scene, public engine::interface::Observer
     {
         engine::object::GameObject *player_;
-
-        engine::object::GameObject *player1_ = nullptr;
-        engine::object::GameObject *player2_ = nullptr;
 
         std::shared_ptr<game::data::SessionData> session_data_;
 
@@ -93,6 +96,6 @@ namespace game::scene
         void updateHealthUI();
         void updateScoreUI();
 
-        void switchPlayer();
+        void onNotify(const engine::interface::EventArgs &event_args) override;
     };
 }
