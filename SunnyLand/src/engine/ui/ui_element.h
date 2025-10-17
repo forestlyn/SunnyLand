@@ -39,7 +39,7 @@ namespace engine::ui
         glm::vec2 getPosition() const { return position_; }
 
         void setSize(glm::vec2 size) { size_ = std::move(size); }
-        glm::vec2 getSize() const { return size_; }
+        virtual const glm::vec2 &getSize() { return size_; }
 
         void setVisible(bool visible) { visible_ = visible; }
         bool isVisible() const { return visible_; }

@@ -21,6 +21,8 @@ namespace engine::ui
         int font_size_ = 16;
         engine::utils::FColor text_color_ = {1.0f, 1.0f, 1.0f, 1.0f}; // 默认白色
 
+        bool is_dirty_ = true; // 标记文本是否需要重新渲染
+
     public:
         UILabel(engine::render::TextRenderer &text_renderer,
                 std::string_view text,
@@ -49,7 +51,6 @@ namespace engine::ui
         void setTextColor(engine::utils::FColor color);
         engine::utils::FColor getTextColor() const { return text_color_; }
 
-    private:
-        void updateSize();
+        const glm::vec2 &getSize() override;
     };
 } // namespace engine::ui
